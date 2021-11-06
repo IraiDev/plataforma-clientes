@@ -14,8 +14,7 @@ function NavBar({ onMultiLine, isMultiLine }) {
   const [modalTicket, setModalTicket] = useState(false)
   const [modalFilter, setModalFilter] = useState(false)
 
-  const onSubmit = (e) => {
-    e.preventDefault()
+  const onClose = () => {
     setModalTicket(false)
   }
 
@@ -61,47 +60,54 @@ function NavBar({ onMultiLine, isMultiLine }) {
 
       {/* Modal nuevo ticket */}
 
-      <Modal showModal={modalTicket} isBlur={false} onClose={() => setModalTicket(false)}>
+      <Modal showModal={modalTicket} isBlur={false} onClose={() => setModalTicket(false)}
+        className="max-w-4xl p-8">
         <h1 className="text-xl font-semibold capitalize inline">nuevo Ticket</h1>
         <p className="inline ml-2">a nombre de usuario</p>
-        <form
-          onSubmit={onSubmit}
-          className="mt-5 grid gap-8 mb-2">
+        <div className="mt-5 grid gap-8 mb-2">
           <Select placeholder="Seleccione proyecto" />
           <Input field="Titulo" />
-          <TextArea field="descripcion" type="submit" />
           <Input field="Correo" />
           <Input field="telefono" />
-          <div className="text-sm bg-gray-100 rounded-lg p-2 w-full lg:w-1/2">
-            <p className="capitalize">archivo seleccionado (max 5MB):</p>
-            <p className="font-semibold">no hay archivo seleccionado</p>
+          <TextArea field="descripcion" type="submit" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+            <div className="text-sm bg-gray-100 rounded-lg p-2 w-full max-h-40 overflow-y-auto">
+              <p className="capitalize">archivo seleccionado (max 5MB):</p>
+              <p className="font-semibold">no hay archivo seleccionado</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <label
+                className="capitalize cursor-pointer text-center bg-blue-500 hover:bg-blue-400 text-white transition duration-500 rounded-full py-2 px-4 font-semibold shadow-md"
+                htmlFor="inputFile">
+                <input className="hidden" type="file" id="inputFile" />
+                Subir archivo
+              </label>
+              <Button
+                className="bg-green-500 hover:bg-green-400 text-white rounded-full"
+                shadow
+                name="crear ticket" />
+              <span className="hidden md:block text-transparent">fake boton</span>
+              <Button
+                className="border border-red-500 hover:bg-red-400 text-red-400 hover:text-white rounded-full"
+                shadow
+                name="cancelar"
+                onClick={onClose} />
+            </div>
           </div>
-          <div className="flex justify-between items-center">
-            <label
-              className="capitalize cursor-pointer bg-blue-500 hover:bg-blue-400 text-white transition duration-500 rounded-full py-1.5 px-4 font-semibold shadow-lg"
-              htmlFor="inputFile">
-              <input className="hidden" type="file" id="inputFile" />
-              Subir archivo
-            </label>
-            <Button
-              className="bg-green-500 hover:bg-green-400 text-white rounded-full"
-              shadow
-              name="crear ticket" />
-          </div>
-        </form>
+        </div>
       </Modal>
 
       {/* modal filtros */}
 
       <Modal showModal={modalFilter} isBlur={false} onClose={() => setModalFilter(false)}
-        className="max-w-7xl">
+        className="max-w-7xl p-8">
         <h1 className="text-xl font-semibold capitalize inline">seleccion de filtros</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
           <Container className="w-full">
             <ul className="h-full overflow-y-auto">
               {
                 arrayTest.map((item) => (
-                  <li>
+                  <li key={item}>
                     <input
                       key={item}
                       id={item}
@@ -117,7 +123,7 @@ function NavBar({ onMultiLine, isMultiLine }) {
             <ul className="h-full overflow-y-auto">
               {
                 arrayTest.map((item) => (
-                  <li>
+                  <li key={item}>
                     <input
                       key={item}
                       id={item}
@@ -133,7 +139,7 @@ function NavBar({ onMultiLine, isMultiLine }) {
             <ul className="h-full overflow-y-auto">
               {
                 arrayTest.map((item) => (
-                  <li>
+                  <li key={item}>
                     <input
                       key={item}
                       id={item}
@@ -145,6 +151,14 @@ function NavBar({ onMultiLine, isMultiLine }) {
               }
             </ul>
           </Container>
+        </div>
+        <div className="flex justify-center gap-4 mt-10">
+          <Button
+            className="border border-red-400 hover:bg-red-400 text-red-400 hover:text-white rounded-full w-full md:w-2/5 lg:w-1/5"
+            name="cancelar" />
+          <Button
+            className="bg-green-500 hover:bg-green-400 text-white rounded-full w-full md:w-2/5 lg:w-1/5"
+            name="aplicar" />
         </div>
       </Modal>
     </>

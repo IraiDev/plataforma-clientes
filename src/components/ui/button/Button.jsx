@@ -30,7 +30,7 @@ function Button({
       >
         <button
           onClick={onClick}
-          className={`focus:outline-none transition duration-500 h-8 w-8 ${className} ${shadow && 'shadow-xl'}`}>
+          className={`focus:outline-none transition duration-500 h-8 w-8 ${className} ${shadow && 'shadow-md'}`}>
           <i className={icon}></i>
         </button>
       </Tippy>
@@ -48,7 +48,7 @@ function Button({
       >
         <button
           onClick={onClick}
-          className={`focus:outline-none transition duration-500 capitalize py-1.5 px-4 font-semibold ${className} ${shadow && 'shadow-xl'} ${block && 'block w-full'}`}
+          className={`focus:outline-none transition duration-500 capitalize py-2 px-4 font-semibold ${className} ${shadow && 'shadow-md'} ${block && 'block w-full'}`}
         >
           {iconFirst ?
             <>
@@ -77,7 +77,7 @@ function Button({
     >
       <button
         onClick={onClick}
-        className={`focus:outline-none transition duration-500 capitalize py-1.5 px-4 font-semibold ${className} ${shadow && 'shadow-xl'}  ${block && 'block w-full'}`}>
+        className={`focus:outline-none transition duration-500 capitalize py-2 px-4 font-semibold ${className} ${shadow && 'shadow-md'}  ${block && 'block w-full'}`}>
         {name}
       </button>
     </Tippy>

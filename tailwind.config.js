@@ -9,6 +9,7 @@ module.exports = {
       '1/2': '50%',
       '3/4': '75%',
       'table': '1536px',
+      'table-md': '900px',
       'full': '100%',
     }
   },

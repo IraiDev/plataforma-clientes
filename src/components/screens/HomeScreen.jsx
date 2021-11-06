@@ -18,6 +18,17 @@ const columnTickets = [
   { id: uuidv4(), title: 'prioridad', subTitle: 'cliente' },
 ]
 
+const columnRows = [
+  { id: uuidv4(), title: 'Numero', subTitle: null },
+  { id: uuidv4(), title: 'fecha', subTitle: null },
+  { id: uuidv4(), title: 'empresa', subTitle: 'proyecto' },
+  { id: uuidv4(), title: 'solicita', subTitle: null },
+  { id: uuidv4(), title: 'titulo', subTitle: null },
+  { id: uuidv4(), title: 'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Magnam amet facere exercitationem autem. Rerum aliquam officia eaque provident sequi quibusdam deserunt iusto, eum nisi iure dolorem recusandae nobis exercitationem facilis.', subTitle: null },
+  { id: uuidv4(), title: 'estado', subTitle: null },
+  { id: uuidv4(), title: 'prioridad', subTitle: 'cliente' },
+]
+
 function HomeScreen() {
 
   const [multiLine, setMultiline] = useState(true)
@@ -32,7 +43,7 @@ function HomeScreen() {
               columnTickets.map((item, index) => (
                 <Column
                   key={item.id}
-                  className={`text-white text-center w-full
+                  className={`text-white text-center w-full font-semibold
                   ${item.subTitle === null ? 'p-5' : 'p-2'}
                   ${index % 2 === 0 ? 'bg-gray-600' : 'bg-gray-700'}
                   ${index === 0 ? 'rounded-l-lg' : index + 1 === columnTickets.length ? 'rounded-r-lg' : ''}
@@ -46,7 +57,23 @@ function HomeScreen() {
           </THead>
           {
             arrayTest.map(item => (
-              <TBody key={item} numero={item} isMultiLine={multiLine} />
+              <TBody key={item}>
+                {
+                  columnRows.map((item, index) => (
+                    <Column
+                      key={item.id}
+                      className={`
+                      ${item.subTitle === null ? 'p-5' : 'p-2'}
+                      ${index === 0 ? 'rounded-l-lg' : index + 1 === columnTickets.length ? 'rounded-r-lg' : ''}
+                      ${index === 5 ? 'col-span-4 text-justify' : index === 4 ? 'col-span-2 text-left' : 'col-span-1 text-center'}
+                      `}
+                      value={item.title}
+                      secValue={item.subTitle !== null ? item.subTitle : ''}
+                      isSecValue={item.subTitle !== null}
+                      isMultiLine={multiLine} />
+                  ))
+                }
+              </TBody>
             ))
           }
         </Table>
