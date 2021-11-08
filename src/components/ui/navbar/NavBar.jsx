@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import Button from '../button/Button'
 import Modal from '../modal/Modal'
 import TextContent from '../textContent/TextContent'
@@ -6,26 +6,39 @@ import Select from 'react-select'
 import Input from '../input/Input'
 import TextArea from '../input/TextArea'
 import Container from '../container/Container'
+import { Ticket } from '../../../context/Ticket'
+import { useForm } from '../../../hooks/useForm'
 
 let arrayTest = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
 
 function NavBar({ onMultiLine, isMultiLine }) {
 
+  const { logout, user } = useContext(Ticket)
   const [modalTicket, setModalTicket] = useState(false)
   const [modalFilter, setModalFilter] = useState(false)
+  const [{ title, desc }, onChangeValues, reset] = useForm({ title: '', desc: '' })
+  const [values, setValues] = useState({ email: '', phone: '' })
+  const { email, phone } = values
 
   const onClose = () => {
     setModalTicket(false)
   }
+
+  useEffect(() => {
+    setValues({
+      email: user.name,
+
+    })
+  }, [title])
 
   return (
     <>
       <nav className="sticky top-0 h-20 bg-white shadow-lg flex justify-between items-center pl-3 pr-5 lg:px-14">
         <Button className="hover:bg-gray-200 rounded-lg inline lg:hidden"
           type="icon" />
-        <h5 className="capitalize font-semibold inline lg:hidden">Nombre usuario</h5>
+        <h5 className="capitalize font-semibold inline lg:hidden">{user.fullName}</h5>
         <div className="hidden lg:flex items-center gap-3">
-          <h5 className="capitalize font-semibold">Nombre usuario</h5>
+          <h5 className="capitalize font-semibold">{user.fullName}</h5>
           <Button
             className="border border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 rounded-full"
             type="iconText"
@@ -54,7 +67,8 @@ function NavBar({ onMultiLine, isMultiLine }) {
           </div>
           <Button className="text-red-400 hover:text-red-600 hover:bg-red-100 rounded-lg"
             type="icon"
-            icon="fas fa-sign-out-alt" />
+            icon="fas fa-sign-out-alt"
+            onClick={logout} />
         </div>
       </nav>
 
@@ -63,13 +77,27 @@ function NavBar({ onMultiLine, isMultiLine }) {
       <Modal showModal={modalTicket} isBlur={false} onClose={() => setModalTicket(false)}
         className="max-w-4xl p-8">
         <h1 className="text-xl font-semibold capitalize inline">nuevo Ticket</h1>
-        <p className="inline ml-2">a nombre de usuario</p>
+        <p className="inline ml-2">a nombre de {user.name}</p>
         <div className="mt-5 grid gap-8 mb-2">
-          <Select placeholder="Seleccione proyecto" />
-          <Input field="Titulo" />
-          <Input field="Correo" />
-          <Input field="telefono" />
-          <TextArea field="descripcion" type="submit" />
+          <Select className="z-50" placeholder="Seleccione proyecto" />
+          <Input field="Titulo" name="title" value={title} onChange={onChangeValues} />
+          <Input
+            field="Correo"
+            name="email"
+            value={email}
+            onChange={(e) => setValues({
+              ...values,
+              email: e.target.value
+            })} />
+          <Input
+            field="telefono"
+            name="phone"
+            value={phone}
+            onChange={(e) => setValues({
+              ...values,
+              phone: e.target.value
+            })} />
+          <TextArea field="descripcion" name="desc" value={desc} onChange={onChangeValues} />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
             <div className="text-sm bg-gray-100 rounded-lg p-2 w-full max-h-40 overflow-y-auto">
               <p className="capitalize">archivo seleccionado (max 5MB):</p>

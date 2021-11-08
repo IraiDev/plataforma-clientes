@@ -77,7 +77,7 @@ function Button({
     >
       <button
         onClick={onClick}
-        className={`focus:outline-none transition duration-500 capitalize py-2 px-4 font-semibold ${className} ${shadow && 'shadow-md'}  ${block && 'block w-full'}`}>
+        className={`focus:outline-none transition duration-500 capitalize py-2 px-6 font-semibold ${className} ${shadow && 'shadow-md'}  ${block && 'block w-full'}`}>
         {name}
       </button>
     </Tippy>
