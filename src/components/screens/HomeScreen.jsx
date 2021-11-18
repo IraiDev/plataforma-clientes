@@ -1,10 +1,11 @@
-import React, { useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import NavBar from '../ui/navbar/NavBar'
 import Column from '../ui/table/Column'
 import Table from '../ui/table/Table'
 import TBody from '../ui/table/TBody'
 import THead from '../ui/table/THead'
 import { v4 as uuidv4 } from 'uuid'
+import { Ticket } from '../../context/Ticket'
 
 let arrayTest = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
 const columnTickets = [
@@ -31,7 +32,28 @@ const columnRows = [
 
 function HomeScreen() {
 
+  const { user, getTicketList } = useContext(Ticket)
   const [multiLine, setMultiline] = useState(true)
+  const [ticketList, setTicketList] = useState([])
+
+  const getList = async () => {
+    const filters = {
+      rut_usuario: user.rut,
+      // proyectos: [120],
+      // emisores: ['19.050.844-7'],
+      // estados: [0, 1, 2, 3]
+      proyectos: [],
+      emisores: [],
+      estados: []
+    }
+    const list = await getTicketList(filters)
+    setTicketList(list)
+    console.log('lista de tickets: ', list);
+  }
+
+  useEffect(() => {
+    getList()
+  }, [])
 
   return (
     <div className="bg-gray-100 h-screen w-full">
@@ -56,7 +78,7 @@ function HomeScreen() {
             }
           </THead>
           {
-            arrayTest.map(item => (
+            ticketList.map(item => (
               <TBody key={item}>
                 {
                   columnRows.map((item, index) => (

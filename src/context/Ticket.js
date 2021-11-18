@@ -18,20 +18,26 @@ function TicketProvider({ children }) {
 
     const resp = await fetchUnToken('auth-ticket/login', data, 'POST')
     const body = await resp.json()
+    const { ok, resUser, token, tipo } = body
 
-    if (body.ok) {
-      localStorage.setItem('ticketToken', body.token)
+    if (ok) {
+      const r = await fetchToken(`ticket/get-info-user?rut_usuario=${resUser.rut_user}`)
+      const b = await r.json()
+      localStorage.setItem('ticketToken', token)
       const data = {
-        ok: body.ok,
-        rut: body.resUser.rut_user,
-        name: body.resUser.nom_user,
-        fullName: body.resUser.nombre
+        ok,
+        rut: resUser.rut_user,
+        name: resUser.nom_user,
+        fullName: resUser.nombre,
+        email: resUser.correo,
+        phone: b.usuario.phone
       }
+
       setUser(data)
       return true
     }
     else {
-      if (body.tipo === 1) {
+      if (tipo === 1) {
         setUser({
           content: msg,
           title: 'atencion',
@@ -39,17 +45,17 @@ function TicketProvider({ children }) {
         })
         return false
       }
-      if (body.tipo === 2) {
+      if (tipo === 2) {
         setUser({
-          content: body.msg,
+          content: msg,
           title: 'atencion',
           icon: 'warning'
         })
         return false
       }
-      if (body.tipo === 3) {
+      if (tipo === 3) {
         setUser({
-          content: body.msg,
+          content: msg,
           title: 'PIN recuperado',
           icon: 'info'
         })
@@ -61,14 +67,19 @@ function TicketProvider({ children }) {
   const validateSession = async () => {
     const resp = await fetchToken('auth-ticket/renew-ticket')
     const body = await resp.json()
+    const { ok, resUser, token } = body
 
-    if (body.ok) {
-      localStorage.setItem('ticketToken', body.token)
+    if (ok) {
+      const r = await fetchToken(`ticket/get-info-user?rut_usuario=${resUser.rut_user}`)
+      const b = await r.json()
+      localStorage.setItem('ticketToken', token)
       const data = {
-        ok: body.ok,
-        rut: body.resUser.rut_user,
-        name: body.resUser.nom_user,
-        fullName: body.resUser.nombre
+        ok,
+        rut: resUser.rut_user,
+        name: resUser.nom_user,
+        fullName: resUser.nombre,
+        email: resUser.correo,
+        phone: b.usuario.phone
       }
       setUser(data)
       return true
@@ -81,13 +92,55 @@ function TicketProvider({ children }) {
   const logout = () => {
     localStorage.removeItem('ticketToken')
     window.location.reload()
+    window.console.clear()
+  }
+
+  const getProjects = async () => {
+    const resp = await fetchToken(`ticket/get-filters-ticket?rut_usuario=${user.rut}`)
+    const body = await resp.json()
+    const { ok, msg } = body
+    if (ok) {
+      return msg.arrayEmpresas
+    }
+    console.log('fallo la peticion (getPorject)', body)
+  }
+
+  const getUsers = async (data) => {
+    const resp = await fetchToken('ticket/get-user-empresa', data, 'POST')
+    const body = await resp.json()
+    const { ok, msg } = body
+    if (ok) {
+      return msg
+    }
+    console.log('fallo la peticion (getusers)', body)
+  }
+
+  const getStates = async (data) => {
+    const resp = await fetchToken('ticket/get-user-estado', data, 'POST')
+    const body = await resp.json()
+    const { ok, msg } = body
+    if (ok) return msg
+    console.log('fallo la peticion (getStates)', body)
+  }
+
+  const getTicketList = async (filters) => {
+    const resp = await fetchToken('ticket/get-tickets', filters, 'POST')
+    const body = await resp.json()
+    const { ok, resp: response } = body
+
+    if (ok) return response
+    console.log('fallo la peticion (getTicketList): ', body)
   }
 
   const value = {
     login,
     validateSession,
     logout,
-    user
+    getProjects,
+    getUsers,
+    getStates,
+    getTicketList,
+    user,
   }
 
   return (

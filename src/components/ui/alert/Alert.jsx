@@ -14,6 +14,7 @@ const Alert = ({
   showCancelButton = true,
   showConfirmButton = true,
   showButton = true,
+  showIcon = true,
   html = false,
   title = 'titulo',
   icon = 'info',
@@ -52,8 +53,8 @@ const Alert = ({
           className="fixed top-0 bottom-0 left-0 right-0 z-auto bg-black bg-opacity-25" />
         <div className={`relative bg-white rounded-md shadow-xl h-auto w-96 p-5 text-center grid gap-8 animate__animated animate__bounce animate__faster`}>
           <div>
-            <h1 className="inline mr-2 text-2xl capitalize font-semibold">{title}</h1>
-            <i className={`fas ${iconShow} fa-2x`}></i>
+            <h1 className={`inline mr-2 text-2xl font-semibold ${showIcon && 'capitalize'}`}>{title}</h1>
+            {showIcon && <i className={`fas ${iconShow} fa-2x`}></i>}
           </div>
           {html ? { children }
             : <p className="text-gray-600">{content}</p>

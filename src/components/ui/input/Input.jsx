@@ -1,17 +1,16 @@
 import React from 'react'
-const styleDefault = 'text-sm text-gray-800 border-gray-300 focus:border-blue-500'
 
-function Input({ type = 'text', id, name, value, onChange, placeholder = 'Escriba aqui', className = styleDefault, field = 'campo' }) {
+function Input({ type = 'text', id, name, value, onChange, placeholder = 'Escriba aqui', field = 'campo' }) {
   return (
-    <div className="relative">
-      <label className="absolute z-20 -top-3 left-6 bg-white px-4 capitalize text-xs">{field}</label>
+    <div>
+      <p className="px-4 py-1 capitalize text-xs">{field}</p>
       <input
         id={id}
         name={name}
         value={value}
         onChange={onChange}
         type={type}
-        className={`border px-4 py-2 rounded-full placeholder-gray-400 w-full transition duration-500 focus:outline-none focus:shadow-lg ${className}`}
+        className="px-4 py-2 rounded-md w-full bg-gray-100 focus:bg-white transition duration-500 focus:ring-2 focus:shadow-lg"
         placeholder={placeholder}
         onKeyPress={(event) => {
           if (type !== 'number') return

@@ -22,13 +22,15 @@ function App() {
   }
 
   useEffect(() => {
-    const reNew = async () => {
-      setLoading(true)
-      const reNewState = await validateSession()
-      setIsLogin(reNewState)
-      setLoading(false)
+    if (localStorage.getItem('ticketToken') !== null) {
+      const reNew = async () => {
+        setLoading(true)
+        const reNewState = await validateSession()
+        setIsLogin(reNewState)
+        setLoading(false)
+      }
+      reNew()
     }
-    reNew()
   }, [])
 
   return (
