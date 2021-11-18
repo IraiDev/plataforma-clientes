@@ -31,9 +31,15 @@ function NavBar({ onMultiLine, isMultiLine }) {
   const [option, setOption] = useState(null)
   const [file, setFile] = useState(null)
   const [resetFile, setResetFile] = useState(randomString)
+
+  // checkboxes
   const [projects, setProjects] = useState([])
   const [users, setUsers] = useState([])
   const [states, setStates] = useState([])
+  const [projectsAll, setProjectsAll] = useState(false)
+  const [usersAll, setUsersAll] = useState(false)
+  const [statesAll, setStatesAll] = useState(false)
+  // checkboxes
 
   // object destructuring
   const { email, phone } = values
@@ -58,8 +64,6 @@ function NavBar({ onMultiLine, isMultiLine }) {
       label: st.est,
       select: false
     })))
-
-    console.log(us, st);
   }
 
   const onChangeFile = (e) => {
@@ -101,6 +105,12 @@ function NavBar({ onMultiLine, isMultiLine }) {
     }
     console.log(values, option, title, desc);
     onClose()
+  }
+
+  const handleFilter = () => {
+    const pr = projects.filter(item => item.select === true)
+
+    console.log(pr);
   }
 
   useEffect(() => {
@@ -234,14 +244,43 @@ function NavBar({ onMultiLine, isMultiLine }) {
         <div className="text-sm grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
           <Container className="w-full" tag="Seleccione Proyectos">
             <ul className="h-full overflow-y-auto">
+              <li>
+                <input
+                  className="mr-2 cursor-pointer"
+                  type="checkbox"
+                  checked={projectsAll}
+                  onChange={
+                    (e) => {
+                      const check = e.target.checked
+                      setProjectsAll(check)
+                      setProjects(projects.map(el => {
+                        el.select = check
+                        return el
+                      }))
+                    }
+                  } />
+                Todos
+              </li>
               {
                 projects.map((item) => (
                   <li key={item.value}>
                     <input
                       key={item.value}
                       id={item.value}
-                      className="mr-2"
-                      type="checkbox" />
+                      className="mr-2 cursor-pointer"
+                      type="checkbox"
+                      checked={item.select}
+                      onChange={(e) => {
+                        const check = e.target.checked
+                        setProjects(projects.map(el => {
+                          if (item.value === el.value) {
+                            el.select = check
+                          }
+                          setProjectsAll(projects.every(el => el.select === true))
+                          return el
+                        }))
+                      }}
+                    />
                     {item.label}
                   </li>
                 ))
@@ -250,14 +289,43 @@ function NavBar({ onMultiLine, isMultiLine }) {
           </Container>
           <Container className="w-full" tag="Seleccione Emisores">
             <ul className="h-full overflow-y-auto">
+              <li>
+                <input
+                  className="mr-2 cursor-pointer"
+                  type="checkbox"
+                  checked={usersAll}
+                  onChange={
+                    (e) => {
+                      const check = e.target.checked
+                      setUsersAll(check)
+                      setUsers(users.map(el => {
+                        el.select = check
+                        return el
+                      }))
+                    }
+                  } />
+                Todos
+              </li>
               {
                 users.map((item) => (
                   <li key={item.value}>
                     <input
                       key={item.value}
                       id={item.value}
-                      className="mr-2"
-                      type="checkbox" />
+                      className="mr-2 cursor-pointer"
+                      type="checkbox"
+                      checked={item.select}
+                      onChange={(e) => {
+                        const check = e.target.checked
+                        setUsers(users.map(el => {
+                          if (item.value === el.value) {
+                            el.select = check
+                          }
+                          setUsersAll(users.every(el => el.select === true))
+                          return el
+                        }))
+                      }}
+                    />
                     {item.label}
                   </li>
                 ))
@@ -266,14 +334,43 @@ function NavBar({ onMultiLine, isMultiLine }) {
           </Container>
           <Container className="w-full" tag="Seleccione Estados">
             <ul className="h-full overflow-y-auto">
+              <li>
+                <input
+                  className="mr-2 cursor-pointer"
+                  type="checkbox"
+                  checked={statesAll}
+                  onChange={
+                    (e) => {
+                      const check = e.target.checked
+                      setStatesAll(check)
+                      setStates(states.map(el => {
+                        el.select = check
+                        return el
+                      }))
+                    }
+                  } />
+                Todos
+              </li>
               {
                 states.map((item) => (
                   <li key={item.value}>
                     <input
                       key={item.value}
                       id={item.value}
-                      className="mr-2"
-                      type="checkbox" />
+                      className="mr-2 cursor-pointer"
+                      type="checkbox"
+                      checked={item.select}
+                      onChange={(e) => {
+                        const check = e.target.checked
+                        setStates(states.map(el => {
+                          if (item.value === el.value) {
+                            el.select = check
+                          }
+                          setStatesAll(states.every(el => el.select === true))
+                          return el
+                        }))
+                      }}
+                    />
                     {item.label}
                   </li>
                 ))
@@ -287,7 +384,8 @@ function NavBar({ onMultiLine, isMultiLine }) {
             name="cancelar" />
           <Button
             className="bg-green-500 hover:bg-green-400 text-white rounded-full w-full md:w-2/5 lg:w-1/5"
-            name="aplicar" />
+            name="aplicar"
+            onClick={handleFilter} />
         </div>
       </Modal>
 
