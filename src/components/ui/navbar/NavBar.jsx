@@ -21,7 +21,7 @@ const arr = [
 function NavBar({ onMultiLine, isMultiLine }) {
 
   let randomString = Math.random().toString(36)
-  const { getProjects, getUsers, getStates, logout, user } = useContext(Ticket)
+  const { getTicketList, getProjects, getUsers, getStates, logout, user } = useContext(Ticket)
   const [{ title, desc }, onChangeValues, reset] = useForm({ title: '', desc: '' })
   const [values, setValues] = useState({ email: '', phone: '' })
   const [modalTicket, setModalTicket] = useState(false)
@@ -66,6 +66,12 @@ function NavBar({ onMultiLine, isMultiLine }) {
     })))
   }
 
+  const getIds = (array) => {
+    let temp = array.filter(item => item.select === true)
+    temp = temp.map(item => item.value)
+    return temp
+  }
+
   const onChangeFile = (e) => {
     if (e.target.files[0].size < 5242881) {
       setFile(e.target.files[0])
@@ -108,9 +114,12 @@ function NavBar({ onMultiLine, isMultiLine }) {
   }
 
   const handleFilter = () => {
-    const pr = projects.filter(item => item.select === true)
+    const proyectos = getIds(projects)
+    const emisores = getIds(users)
+    const estados = getIds(states)
 
-    console.log(pr);
+    getTicketList({ rut_usuario: user.rut, proyectos, emisores, estados })
+    setModalFilter(false)
   }
 
   useEffect(() => {

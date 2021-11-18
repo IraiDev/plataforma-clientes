@@ -6,8 +6,8 @@ import TBody from '../ui/table/TBody'
 import THead from '../ui/table/THead'
 import { v4 as uuidv4 } from 'uuid'
 import { Ticket } from '../../context/Ticket'
+import moment from 'moment'
 
-let arrayTest = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
 const columnTickets = [
   { id: uuidv4(), title: 'Numero', subTitle: null },
   { id: uuidv4(), title: 'fecha', subTitle: null },
@@ -19,40 +19,12 @@ const columnTickets = [
   { id: uuidv4(), title: 'prioridad', subTitle: 'cliente' },
 ]
 
-const columnRows = [
-  { id: uuidv4(), title: 'Numero', subTitle: null },
-  { id: uuidv4(), title: 'fecha', subTitle: null },
-  { id: uuidv4(), title: 'empresa', subTitle: 'proyecto' },
-  { id: uuidv4(), title: 'solicita', subTitle: null },
-  { id: uuidv4(), title: 'titulo', subTitle: null },
-  { id: uuidv4(), title: 'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Magnam amet facere exercitationem autem. Rerum aliquam officia eaque provident sequi quibusdam deserunt iusto, eum nisi iure dolorem recusandae nobis exercitationem facilis.', subTitle: null },
-  { id: uuidv4(), title: 'estado', subTitle: null },
-  { id: uuidv4(), title: 'prioridad', subTitle: 'cliente' },
-]
-
 function HomeScreen() {
 
-  const { user, getTicketList } = useContext(Ticket)
+  const { ticketList } = useContext(Ticket)
   const [multiLine, setMultiline] = useState(true)
-  const [ticketList, setTicketList] = useState([])
-
-  const getList = async () => {
-    const filters = {
-      rut_usuario: user.rut,
-      // proyectos: [120],
-      // emisores: ['19.050.844-7'],
-      // estados: [0, 1, 2, 3]
-      proyectos: [],
-      emisores: [],
-      estados: []
-    }
-    const list = await getTicketList(filters)
-    setTicketList(list)
-    console.log('lista de tickets: ', list);
-  }
 
   useEffect(() => {
-    getList()
   }, [])
 
   return (
@@ -71,30 +43,30 @@ function HomeScreen() {
                   ${index === 0 ? 'rounded-l-lg' : index + 1 === columnTickets.length ? 'rounded-r-lg' : ''}
                   ${item.title === 'descripcion' ? 'col-span-4' : item.title === 'titulo' ? 'col-span-2' : 'col-span-1'}
                   `}
-                  value={item.title}
-                  secValue={item.subTitle !== null ? item.subTitle : ''}
-                  isSecValue={item.subTitle !== null} />
+                  value={item.subTitle !== null ? item.subTitle : ''}
+                  isValue={item.subTitle !== null} >
+                  {item.title}
+                </Column>
               ))
             }
           </THead>
           {
             ticketList.map(item => (
-              <TBody key={item}>
-                {
-                  columnRows.map((item, index) => (
-                    <Column
-                      key={item.id}
-                      className={`
-                      ${item.subTitle === null ? 'p-5' : 'p-2'}
-                      ${index === 0 ? 'rounded-l-lg' : index + 1 === columnTickets.length ? 'rounded-r-lg' : ''}
-                      ${index === 5 ? 'col-span-4 text-justify' : index === 4 ? 'col-span-2 text-left' : 'col-span-1 text-center'}
-                      `}
-                      value={item.title}
-                      secValue={item.subTitle !== null ? item.subTitle : ''}
-                      isSecValue={item.subTitle !== null}
-                      isMultiLine={multiLine} />
-                  ))
-                }
+              <TBody key={item.id_ticket}>
+                <Column>{item.id_ticket}</Column>
+                <Column className="col-span-1 px-4 py-1.5 text-center bg-gray-100">
+                  {moment(item.fecha_hora_tx).format('DD-MM-yyyy')}
+                  <p className="text-xs text-gray-400">({moment(item.fecha_hora_tx).format('HH:MM')})</p>
+                </Column>
+                <Column className="col-span-1 px-4 py-1.5 text-center">
+                  {item.empresa}
+                  <p className="text-xs text-gray-400">({item.proyecto})</p>
+                </Column>
+                <Column className="col-span-1 bg-gray-100 p-4 text-center">{item.user_ticket}</Column>
+                <Column isMultiLine={multiLine} className="col-span-2 capitalize font-semibold">{item.titulo_ticket}</Column>
+                <Column isMultiLine={multiLine} className="col-span-4 capitalize bg-gray-100">{item.desc_requerimiento}</Column>
+                <Column>{item.desc_estado}</Column>
+                <Column className="col-span-1 bg-gray-100  text-center p-4 rounded-r-md">{item.prio_cl}</Column>
               </TBody>
             ))
           }

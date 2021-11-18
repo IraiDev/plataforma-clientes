@@ -8,6 +8,7 @@ const msg = '-- “Estimado Usuario este pin no es reconocido por el sistema, de
 function TicketProvider({ children }) {
 
   const [user, setUser] = useState({ ok: false })
+  const [ticketList, setTicketList] = useState([])
 
   const login = async (data) => {
 
@@ -126,10 +127,12 @@ function TicketProvider({ children }) {
   const getTicketList = async (filters) => {
     const resp = await fetchToken('ticket/get-tickets', filters, 'POST')
     const body = await resp.json()
-    const { ok, resp: response } = body
+    const { ok, resp: res } = body
 
-    if (ok) return response
-    console.log('fallo la peticion (getTicketList): ', body)
+    console.log('ticketList: ', res)
+
+    if (ok) setTicketList(res)
+    else { console.log('fallo la peticion (getTicketList): ', body) }
   }
 
   const value = {
@@ -141,6 +144,7 @@ function TicketProvider({ children }) {
     getStates,
     getTicketList,
     user,
+    ticketList
   }
 
   return (

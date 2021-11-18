@@ -18,11 +18,11 @@ const columnEvents = [
 
 const columnRows = [
   { id: 1111, date: '22-12-2021', id_act: 20211, user_e: 'IGNACIO', user_r: 'IGNACIO', desc: 'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Magnam amet facere exercitationem autem. Rerum aliquam officia eaque provident sequi quibusdam deserunt iusto, eum nisi iure dolorem recusandae nobis exercitationem facilis.' },
-  { id: 2222, date: '22-12-2021', id_act: 20211, user_e: 'IGNACIO', user_r: 'IGNACIO', desc: 'Lorem ipsum dolor sit, amet consectetur adipisicing eum nisi iure dolorem recusandae nobis exercitationem facilis.' },
-  { id: 3333, date: '22-12-2021', id_act: 20211, user_e: 'IGNACIO', user_r: 'IGNACIO', desc: 'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Magnam amet facere exercitationem autem. Rerum aliquam officia eaque provident sequi quibusdam deserunt iusto, eum nisi iure dolorem recusandae nobis exercitationem facilis.' },
-  { id: 1111, date: '22-12-2021', id_act: 20211, user_e: 'IGNACIO', user_r: 'IGNACIO', desc: 'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Magnam amet facere exercitationem autem. Rerum aliquam officia eaque provident sequi quibusdam deserunt iusto, eum nisi iure dolorem recusandae nobis exercitationem facilis.' },
-  { id: 2222, date: '22-12-2021', id_act: 20211, user_e: 'IGNACIO', user_r: 'IGNACIO', desc: 'Lorem ipsum dolor sit, amet consectetur adipisicing eum nisi iure dolorem recusandae nobis exercitationem facilis.' },
-  { id: 3333, date: '22-12-2021', id_act: 20211, user_e: 'IGNACIO', user_r: 'IGNACIO', desc: 'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Magnam amet facere exercitationem autem. Rerum aliquam officia eaque provident sequi quibusdam deserunt iusto, eum nisi iure dolorem recusandae nobis exercitationem facilis.' },
+  { id: 2222, date: '22-12-2021', id_act: 20212, user_e: 'IGNACIO', user_r: 'IGNACIO', desc: 'Lorem ipsum dolor sit, amet consectetur adipisicing eum nisi iure dolorem recusandae nobis exercitationem facilis.' },
+  { id: 3333, date: '22-12-2021', id_act: 20213, user_e: 'IGNACIO', user_r: 'IGNACIO', desc: 'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Magnam amet facere exercitationem autem. Rerum aliquam officia eaque provident sequi quibusdam deserunt iusto, eum nisi iure dolorem recusandae nobis exercitationem facilis.' },
+  { id: 4444, date: '22-12-2021', id_act: 20214, user_e: 'IGNACIO', user_r: 'IGNACIO', desc: 'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Magnam amet facere exercitationem autem. Rerum aliquam officia eaque provident sequi quibusdam deserunt iusto, eum nisi iure dolorem recusandae nobis exercitationem facilis.' },
+  { id: 5555, date: '22-12-2021', id_act: 20215, user_e: 'IGNACIO', user_r: 'IGNACIO', desc: 'Lorem ipsum dolor sit, amet consectetur adipisicing eum nisi iure dolorem recusandae nobis exercitationem facilis.' },
+  { id: 6666, date: '22-12-2021', id_act: 20217, user_e: 'IGNACIO', user_r: 'IGNACIO', desc: 'Lorem ipsum dolor sit, amet consectetur adipisicing elit. Magnam amet facere exercitationem autem. Rerum aliquam officia eaque provident sequi quibusdam deserunt iusto, eum nisi iure dolorem recusandae nobis exercitationem facilis.' },
 ]
 
 function Form({ onClick }) {
@@ -62,7 +62,7 @@ function Form({ onClick }) {
                 {
                   Object.values(item).map((item, index) => (
                     <Column
-                      key={item.id}
+                      key={item.id_act}
                       className={`bg-white text-center p-4 text-xs text-gray-600
                         ${index === 5 ? 'col-span-7 text-justify' : 'col-span-1 text-center'}
                         ${index === 0 ? 'rounded-l-md font-semibold' : index === 5 && 'rounded-r-md'}
