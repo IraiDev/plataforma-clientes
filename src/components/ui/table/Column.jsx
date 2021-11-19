@@ -8,7 +8,7 @@ function Column({
   value
 }) {
   return (
-    <div className={`p-4 ${className} ${isMultiLine && 'truncate'}`}>
+    <div className={`${className} ${isMultiLine && 'truncate'}`}>
       {children}
       {isValue && <p className="text-xs">({value})</p>}
     </div>

@@ -10,6 +10,7 @@ const Alert = ({
   children,
   show,
   onAction,
+  onCancel,
   isBlur = false,
   showCancelButton = true,
   showConfirmButton = true,
@@ -56,7 +57,8 @@ const Alert = ({
             <h1 className={`inline mr-2 text-2xl font-semibold ${showIcon && 'capitalize'}`}>{title}</h1>
             {showIcon && <i className={`fas ${iconShow} fa-2x`}></i>}
           </div>
-          {html ? { children }
+          {html ?
+            children
             : <p className="text-gray-600">{content}</p>
           }
           {showButton &&
@@ -72,7 +74,7 @@ const Alert = ({
                   name="cancelar"
                   className="bg-red-400 hover:bg-red-500 text-white rounded-full"
                   shadow
-                  onClick={onAction} />}
+                  onClick={onCancel} />}
             </div>
           }
         </div>

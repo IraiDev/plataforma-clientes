@@ -1,18 +1,21 @@
-import React from 'react'
+import React, { useState } from 'react'
 
-const UiContext = React.createContext()
+export const Ui = React.createContext()
 
-function Ui({ children }) {
+function UiProvider({ children }) {
+
+  const [loading, toggleLoading] = useState(false)
 
   const value = {
-
+    toggleLoading,
+    loading
   }
 
   return (
-    <UiContext.Provider value={value}>
+    <Ui.Provider value={value}>
       {children}
-    </UiContext.Provider>
+    </Ui.Provider>
   )
 }
 
-export default Ui
+export default UiProvider

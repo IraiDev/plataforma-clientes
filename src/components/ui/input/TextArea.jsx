@@ -6,7 +6,7 @@ function TextArea({
   onChange,
   placeholder = 'Escriba aqui',
   field = 'campo',
-  rows = 10,
+  rows = 7,
   countChart = 0,
   chartLimit = 500
 }) {

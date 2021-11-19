@@ -10,19 +10,14 @@ import { Ticket } from '../../../context/Ticket'
 import { useForm } from '../../../hooks/useForm'
 import LiNotes from '../List/LiNotes'
 import Alert from '../alert/Alert'
+import { Ui } from '../../../context/Ui'
 
-const arr = [
-  { id: 'li1', preg: '¿Cuales son las restricción de correo de visitas?', resp: 'Repuesta correo visitas' },
-  { id: 'li2', preg: '¿Cuales son las restricción de correo de anexo fecha?', resp: 'Repuesta correo anexos' },
-  { id: 'li3', preg: '¿Por que en informe general anexo de CANOLA no tiene informacion NDVI?', resp: 'Repuesta informe general' },
-  { id: 'li4', preg: '¿Por que no puedo consultar indicador NDVI en informe general?', resp: 'Repuesta indicadores NDVI' },
-]
 
 function NavBar({ onMultiLine, isMultiLine }) {
 
   let randomString = Math.random().toString(36)
-  const { getTicketList, getProjects, getUsers, getStates, logout, user } = useContext(Ticket)
-  const [{ title, desc }, onChangeValues, reset] = useForm({ title: '', desc: '' })
+  const { getQuestion, getTicketList, getProjects, getUsers, getStates, logout, user } = useContext(Ticket)
+  const { toggleLoading } = useContext(Ui)
   const [values, setValues] = useState({ email: '', phone: '' })
   const [modalTicket, setModalTicket] = useState(false)
   const [modalFilter, setModalFilter] = useState(false)
@@ -30,6 +25,7 @@ function NavBar({ onMultiLine, isMultiLine }) {
   const [{ iconAlert, titleAlert, contentAlert }, setAlertContent] = useState({ iconAlert: '', titleAlert: '', contentAlert: '' })
   const [option, setOption] = useState(null)
   const [file, setFile] = useState(null)
+  const [questions, setQuestions] = useState([])
   const [resetFile, setResetFile] = useState(randomString)
 
   // checkboxes
@@ -39,7 +35,12 @@ function NavBar({ onMultiLine, isMultiLine }) {
   const [projectsAll, setProjectsAll] = useState(false)
   const [usersAll, setUsersAll] = useState(false)
   const [statesAll, setStatesAll] = useState(false)
+  const [oldState, setOldState] = useState({ pr: [], us: [], st: [] })
   // checkboxes
+
+  // ccustom hooks
+  const [{ title, desc }, onChangeValues, reset] = useForm({ title: '', desc: '' })
+  // ccustom hooks
 
   // object destructuring
   const { email, phone } = values
@@ -66,10 +67,11 @@ function NavBar({ onMultiLine, isMultiLine }) {
     })))
   }
 
-  const getIds = (array) => {
-    let temp = array.filter(item => item.select === true)
-    temp = temp.map(item => item.value)
-    return temp
+  const getIds = (arr) => {
+    const complete = arr
+    let id = arr.filter(item => item.select === true)
+    id = id.map(item => item.value)
+    return { complete, id }
   }
 
   const onChangeFile = (e) => {
@@ -114,11 +116,28 @@ function NavBar({ onMultiLine, isMultiLine }) {
   }
 
   const handleFilter = () => {
-    const proyectos = getIds(projects)
-    const emisores = getIds(users)
-    const estados = getIds(states)
+    toggleLoading(true)
+    const pr = getIds(projects)
+    const us = getIds(users)
+    const st = getIds(states)
 
-    getTicketList({ rut_usuario: user.rut, proyectos, emisores, estados })
+    setOldState({
+      pr: pr.complete,
+      us: us.complete,
+      st: st.complete,
+    })
+
+    getTicketList({ rut_usuario: user.rut, proyectos: pr.id, emisores: us.id, estados: st.id })
+    setModalFilter(false)
+  }
+
+  const handleCancel = () => {
+    setProjects(oldState.pr)
+    setUsers(oldState.us)
+    setStates(oldState.st)
+    setProjectsAll(oldState.pr.every(item => item.select === true))
+    setUsersAll(oldState.us.every(item => item.select === true))
+    setStatesAll(oldState.st.every(item => item.select === true))
     setModalFilter(false)
   }
 
@@ -129,6 +148,17 @@ function NavBar({ onMultiLine, isMultiLine }) {
     })
     getFilters()
   }, [])
+
+  useEffect(() => {
+    if (option !== null) {
+      toggleLoading(true)
+      const resp = async () => {
+        const q = await getQuestion(option.value)
+        setQuestions(q)
+      }
+      resp()
+    }
+  }, [option])
 
   return (
     <>
@@ -187,11 +217,11 @@ function NavBar({ onMultiLine, isMultiLine }) {
               setOption(option)
             }} />
 
-          {option !== null &&
+          {option !== null && questions.length > 0 &&
             <ul className="bg-gray-100 rounded-md p-2">
               <p className="text-xs mb-2">Preguntas frecuentes:</p>
               {
-                arr.map(li => (
+                questions.map(li => (
                   <LiNotes key={li.id} id={li.id} resp={li.resp}>{li.preg}</LiNotes>
                 ))
               }
@@ -233,13 +263,13 @@ function NavBar({ onMultiLine, isMultiLine }) {
                 className="bg-green-500 hover:bg-green-400 text-white rounded-full"
                 shadow
                 name="crear ticket"
-                onClick={createTicket} />
+                onClick={() => createTicket()} />
               <span className="hidden md:block text-transparent">fake boton</span>
               <Button
                 className="border border-red-500 hover:bg-red-400 text-red-400 hover:text-white rounded-full"
                 shadow
                 name="cancelar"
-                onClick={onClose} />
+                onClick={() => onClose()} />
             </div>
           </div>
         </div>
@@ -252,7 +282,7 @@ function NavBar({ onMultiLine, isMultiLine }) {
         <h1 className="text-xl font-semibold capitalize inline">seleccion de filtros</h1>
         <div className="text-sm grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
           <Container className="w-full" tag="Seleccione Proyectos">
-            <ul className="h-full overflow-y-auto">
+            <ul className="h-full overflow-y-auto uppercase">
               <li>
                 <input
                   className="mr-2 cursor-pointer"
@@ -285,9 +315,9 @@ function NavBar({ onMultiLine, isMultiLine }) {
                           if (item.value === el.value) {
                             el.select = check
                           }
-                          setProjectsAll(projects.every(el => el.select === true))
                           return el
                         }))
+                        setProjectsAll(projects.every(el => el.select === true))
                       }}
                     />
                     {item.label}
@@ -297,7 +327,7 @@ function NavBar({ onMultiLine, isMultiLine }) {
             </ul>
           </Container>
           <Container className="w-full" tag="Seleccione Emisores">
-            <ul className="h-full overflow-y-auto">
+            <ul className="h-full overflow-y-auto uppercase">
               <li>
                 <input
                   className="mr-2 cursor-pointer"
@@ -330,9 +360,9 @@ function NavBar({ onMultiLine, isMultiLine }) {
                           if (item.value === el.value) {
                             el.select = check
                           }
-                          setUsersAll(users.every(el => el.select === true))
                           return el
                         }))
+                        setUsersAll(users.every(el => el.select === true))
                       }}
                     />
                     {item.label}
@@ -342,7 +372,7 @@ function NavBar({ onMultiLine, isMultiLine }) {
             </ul>
           </Container>
           <Container className="w-full" tag="Seleccione Estados">
-            <ul className="h-full overflow-y-auto">
+            <ul className="h-full overflow-y-auto uppercase">
               <li>
                 <input
                   className="mr-2 cursor-pointer"
@@ -375,9 +405,9 @@ function NavBar({ onMultiLine, isMultiLine }) {
                           if (item.value === el.value) {
                             el.select = check
                           }
-                          setStatesAll(states.every(el => el.select === true))
                           return el
                         }))
+                        setStatesAll(states.every(el => el.select === true))
                       }}
                     />
                     {item.label}
@@ -390,11 +420,12 @@ function NavBar({ onMultiLine, isMultiLine }) {
         <div className="flex justify-center gap-4 mt-10">
           <Button
             className="border border-red-400 hover:bg-red-400 text-red-400 hover:text-white rounded-full w-full md:w-2/5 lg:w-1/5"
-            name="cancelar" />
+            name="cancelar"
+            onClick={() => handleCancel()} />
           <Button
             className="bg-green-500 hover:bg-green-400 text-white rounded-full w-full md:w-2/5 lg:w-1/5"
             name="aplicar"
-            onClick={handleFilter} />
+            onClick={() => handleFilter()} />
         </div>
       </Modal>
 

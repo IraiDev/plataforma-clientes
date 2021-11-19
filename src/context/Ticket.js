@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { fetchToken, fetchUnToken } from '../helpers/fetch'
+import { Ui } from './Ui'
 
 export const Ticket = React.createContext()
 
@@ -7,6 +8,7 @@ const msg = '-- “Estimado Usuario este pin no es reconocido por el sistema, de
 
 function TicketProvider({ children }) {
 
+  const { toggleLoading } = useContext(Ui)
   const [user, setUser] = useState({ ok: false })
   const [ticketList, setTicketList] = useState([])
 
@@ -124,15 +126,41 @@ function TicketProvider({ children }) {
     console.log('fallo la peticion (getStates)', body)
   }
 
+  const getQuestion = async (id) => {
+    const resp = await fetchToken(`ticket/get-preguntas?id_proyecto=${id}`)
+    const body = await resp.json()
+    const { ok, resp: res } = body
+
+    toggleLoading(false)
+
+    if (ok) return res
+    console.log('fallo la peticion (getQuestion): ', body)
+  }
+
   const getTicketList = async (filters) => {
     const resp = await fetchToken('ticket/get-tickets', filters, 'POST')
     const body = await resp.json()
     const { ok, resp: res } = body
 
-    console.log('ticketList: ', res)
+    toggleLoading(false)
+    console.log(body)
 
     if (ok) setTicketList(res)
     else { console.log('fallo la peticion (getTicketList): ', body) }
+  }
+
+
+  const getTicketDetails = async (id) => {
+    const resp = await fetchToken(`ticket?id_ticket=${id}`)
+    const body = await resp.json()
+    const { ok, arrayResp } = body
+
+    toggleLoading(false)
+
+    console.log(body)
+
+    if (ok) return arrayResp[0]
+    console.log('fallo la solicitud (getTicketsDetails)', body)
   }
 
   const value = {
@@ -143,6 +171,8 @@ function TicketProvider({ children }) {
     getUsers,
     getStates,
     getTicketList,
+    getTicketDetails,
+    getQuestion,
     user,
     ticketList
   }

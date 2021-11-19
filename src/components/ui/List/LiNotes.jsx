@@ -16,8 +16,10 @@ function LiNotes(props) {
         showCancelButton={false}
         showIcon={false}
         title={props.children}
-        content={props.resp}
-        onAction={() => setAlert(false)} />
+        html={true}
+        onAction={() => setAlert(false)} >
+        <p className="whitespace-pre-wrap text-left text-gray-500 text-sm">{props.resp}</p>
+      </Alert>
     </>
   )
 }
