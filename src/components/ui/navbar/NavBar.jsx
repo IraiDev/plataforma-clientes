@@ -11,22 +11,23 @@ import { useForm } from '../../../hooks/useForm'
 import LiNotes from '../List/LiNotes'
 import Alert from '../alert/Alert'
 import { Ui } from '../../../context/Ui'
-
+import { checkForms } from '../../../helpers/helpers'
+const notAllow = ['exe', 'js']
 
 function NavBar({ onMultiLine, isMultiLine }) {
 
   let randomString = Math.random().toString(36)
-  const { getQuestion, getTicketList, getProjects, getUsers, getStates, logout, user } = useContext(Ticket)
+  const { createTicket, getQuestion, saveFilters, getTicketList, getProjects, getUsers, getStates, logout, user } = useContext(Ticket)
   const { toggleLoading } = useContext(Ui)
   const [values, setValues] = useState({ email: '', phone: '' })
   const [modalTicket, setModalTicket] = useState(false)
   const [modalFilter, setModalFilter] = useState(false)
   const [alert, setAlert] = useState(false)
-  const [{ iconAlert, titleAlert, contentAlert }, setAlertContent] = useState({ iconAlert: '', titleAlert: '', contentAlert: '' })
+  const [{ iconAlert, titleAlert, contentAlert, isHtml }, setAlertContent] = useState({ iconAlert: '', titleAlert: {}, contentAlert: '', isHtml: false })
   const [option, setOption] = useState(null)
   const [file, setFile] = useState(null)
-  const [questions, setQuestions] = useState([])
   const [resetFile, setResetFile] = useState(randomString)
+  const [questions, setQuestions] = useState([])
 
   // checkboxes
   const [projects, setProjects] = useState([])
@@ -38,9 +39,9 @@ function NavBar({ onMultiLine, isMultiLine }) {
   const [oldState, setOldState] = useState({ pr: [], us: [], st: [] })
   // checkboxes
 
-  // ccustom hooks
+  // custom hooks
   const [{ title, desc }, onChangeValues, reset] = useForm({ title: '', desc: '' })
-  // ccustom hooks
+  // custom hooks
 
   // object destructuring
   const { email, phone } = values
@@ -102,7 +103,51 @@ function NavBar({ onMultiLine, isMultiLine }) {
     })
   }
 
-  const createTicket = () => {
+  const handleCreateTicket = async () => {
+    const vTitle = checkForms(title)
+    const vEmail = checkForms(email)
+    const vPhone = checkForms(phone)
+    const vDesc = checkForms(desc)
+
+    toggleLoading(true)
+
+    if (vTitle.state) {
+      setAlertContent({
+        isHtml: true,
+        iconAlert: 'warning',
+        contentAlert: vTitle,
+        titleAlert: 'Atencion'
+      })
+      return setAlert(true)
+    }
+    if (vEmail.state) {
+      setAlertContent({
+        isHtml: true,
+        iconAlert: 'warning',
+        contentAlert: vEmail,
+        titleAlert: 'Atencion'
+      })
+      return setAlert(true)
+    }
+    if (vPhone.state) {
+      setAlertContent({
+        isHtml: true,
+        iconAlert: 'warning',
+        contentAlert: vPhone,
+        titleAlert: 'Atencion'
+      })
+      return setAlert(true)
+    }
+    if (vDesc.state) {
+      setAlertContent({
+        isHtml: true,
+        iconAlert: 'warning',
+        contentAlert: vDesc,
+        titleAlert: 'Atencion'
+      })
+      return setAlert(true)
+    }
+
     if (title === '' || desc === '' || email === '' || phone === '' || option === null) {
       setAlertContent({
         iconAlert: 'warning',
@@ -111,8 +156,44 @@ function NavBar({ onMultiLine, isMultiLine }) {
       })
       return setAlert(true)
     }
-    console.log(values, option, title, desc);
-    onClose()
+
+    if (file !== null) {
+      const name = file.name.split('.')
+      const ext = name[name.length - 1]
+
+      if (notAllow.includes(ext)) {
+        setAlertContent({
+          isHtml: false,
+          iconAlert: 'error',
+          titleAlert: 'Advertencia',
+          contentAlert: 'No se puede subir archivos con extensiones, .exe, .js, estos seran removidos de la seleccion.'
+        })
+        setFile(null)
+        return setAlert(true)
+      }
+    }
+
+    let formData = new FormData()
+    file !== null && formData.append('archivo', file)
+    formData.append('rut_usuario', user.rut)
+    formData.append('titulo', title)
+    formData.append('correo', email)
+    formData.append('telefono', phone)
+    formData.append('mensaje', desc)
+    formData.append('proyecto', option.value)
+
+    const resp = await createTicket(formData)
+
+    if (resp) return onClose()
+
+    setAlertContent({
+      html: false,
+      iconAlert: 'warning',
+      titleAlert: 'Atencion',
+      contentAlert: 'Error al crear ticket, vuelva a intentarlo.'
+    })
+
+    setAlert(true)
   }
 
   const handleFilter = () => {
@@ -127,7 +208,12 @@ function NavBar({ onMultiLine, isMultiLine }) {
       st: st.complete,
     })
 
-    getTicketList({ rut_usuario: user.rut, proyectos: pr.id, emisores: us.id, estados: st.id })
+    const data = {
+      rut_usuario: user.rut, proyectos: pr.id, emisores: us.id, estados: st.id
+    }
+
+    saveFilters(data)
+    getTicketList(data)
     setModalFilter(false)
   }
 
@@ -263,7 +349,7 @@ function NavBar({ onMultiLine, isMultiLine }) {
                 className="bg-green-500 hover:bg-green-400 text-white rounded-full"
                 shadow
                 name="crear ticket"
-                onClick={() => createTicket()} />
+                onClick={() => handleCreateTicket()} />
               <span className="hidden md:block text-transparent">fake boton</span>
               <Button
                 className="border border-red-500 hover:bg-red-400 text-red-400 hover:text-white rounded-full"
@@ -430,12 +516,25 @@ function NavBar({ onMultiLine, isMultiLine }) {
       </Modal>
 
       <Alert
+        html={isHtml}
         show={alert}
         showCancelButton={false}
         icon={iconAlert}
         title={titleAlert}
-        content={contentAlert}
-        onAction={() => setAlert(false)} />
+        content={!isHtml && contentAlert}
+        onAction={() => setAlert(false)}>
+        {isHtml &&
+          <p className="text-gray-700">
+            Caracter <b className="font-semibold text-black text-xl">{contentAlert.char} No Permitido</b>,
+            por favor revise el texto ingresado.
+            <br />
+            <br />
+            <b className="font-semibold capitalize">Caracteres no permitidos:</b>
+            <br />
+            {contentAlert.list}
+          </p>
+        }
+      </Alert>
     </>
   )
 }

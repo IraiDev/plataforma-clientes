@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react'
-import { fetchToken, fetchUnToken } from '../helpers/fetch'
+import { fetchToken, fetchTokenFile, fetchUnToken } from '../helpers/fetch'
 import { Ui } from './Ui'
 
 export const Ticket = React.createContext()
@@ -11,6 +11,7 @@ function TicketProvider({ children }) {
   const { toggleLoading } = useContext(Ui)
   const [user, setUser] = useState({ ok: false })
   const [ticketList, setTicketList] = useState([])
+  const [filters, setFilters] = useState({})
 
   const login = async (data) => {
 
@@ -137,8 +138,11 @@ function TicketProvider({ children }) {
     console.log('fallo la peticion (getQuestion): ', body)
   }
 
-  const getTicketList = async (filters) => {
-    const resp = await fetchToken('ticket/get-tickets', filters, 'POST')
+  const getTicketList = async (params = null) => {
+
+    if (params === null) params = filters
+
+    const resp = await fetchToken('ticket/get-tickets', params, 'POST')
     const body = await resp.json()
     const { ok, resp: res } = body
 
@@ -148,7 +152,6 @@ function TicketProvider({ children }) {
     if (ok) setTicketList(res)
     else { console.log('fallo la peticion (getTicketList): ', body) }
   }
-
 
   const getTicketDetails = async (id) => {
     const resp = await fetchToken(`ticket?id_ticket=${id}`)
@@ -163,6 +166,112 @@ function TicketProvider({ children }) {
     console.log('fallo la solicitud (getTicketsDetails)', body)
   }
 
+  const createTicket = async (data) => {
+    const resp = await fetchTokenFile('ticket/insert-ticket', data, 'POST')
+    const body = await resp.json()
+    const { ok } = body
+
+    toggleLoading(false)
+
+    if (ok) {
+      getTicketList()
+      return true
+    }
+    else {
+      console.log('fallo la consulta (createTicket)', body)
+      return false
+    }
+  }
+
+  const updatePriority = async (data) => {
+
+    console.log('prioridad', data)
+    return true
+
+    const resp = await fetchToken('ticket/cambiar-prioridad-cliente', data, 'POST')
+    const body = await resp.json()
+    const { ok } = body
+
+    toggleLoading(false)
+
+    if (ok) return true
+    else {
+      console.log('fallo la consulta (updatePriority)', body)
+      return false
+    }
+  }
+
+  const createEvent = async (data) => {
+
+    console.log('creando evento', data)
+    return true
+
+    const resp = await fetchToken('ticket/insert-evento', data, 'POST')
+    const body = await resp.json()
+    const { ok } = body
+
+    toggleLoading(false)
+
+    if (ok) return true
+    console.log('fallo la consulta (createTicket)', body)
+  }
+
+  // docs CRUD
+  const toggleDoc = async (data) => {
+    const resp = await fetchToken('ticket/check-document', data, 'PUT')
+    const body = await resp.json()
+    const { ok } = body
+
+    toggleLoading(false)
+
+    if (ok) return true
+    else {
+      console.log('fallo la consulta (toggleDocs)', body)
+      return false
+    }
+  }
+
+  const deleteDoc = async (data) => {
+    const resp = await fetchToken('ticket/delete-document', data, 'DELETE')
+    const body = await resp.json()
+    const { ok } = body
+
+    toggleLoading(false)
+
+    if (ok) return true
+    else {
+      console.log('fallo la consulta (deleteDoc)', body)
+      return false
+    }
+  }
+
+  const addDoc = async (data) => {
+
+    console.log('add doc: ', data)
+    return true
+
+    const resp = await fetchTokenFile('ticket/add-document', data, 'POST')
+    const body = await resp.json()
+
+    toggleLoading(false)
+
+    const { ok } = body
+    if (ok) return true
+    else {
+      console.log('fallo la consulta (addDoc)', body)
+      return false
+    }
+  }
+
+  const saveFilters = ({ rut_usuario = user.rut, emisores = [], proyectos = [], estados = [] }) => {
+    setFilters({
+      rut_usuario,
+      emisores,
+      proyectos,
+      estados
+    })
+  }
+
   const value = {
     login,
     validateSession,
@@ -173,6 +282,13 @@ function TicketProvider({ children }) {
     getTicketList,
     getTicketDetails,
     getQuestion,
+    toggleDoc,
+    deleteDoc,
+    addDoc,
+    updatePriority,
+    createTicket,
+    saveFilters,
+    createEvent,
     user,
     ticketList
   }
