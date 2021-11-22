@@ -9,13 +9,15 @@ function Input({
   placeholder = 'Escriba aqui',
   field,
   width = 'w-full',
-  disabled = false }) {
+  disabled = false,
+  tooltip }) {
   return (
     <div>
       <p className="px-4 py-1 capitalize text-xs">{field}</p>
       <input
         id={id}
         name={name}
+        title={tooltip}
         value={value}
         onChange={onChange}
         disabled={disabled}

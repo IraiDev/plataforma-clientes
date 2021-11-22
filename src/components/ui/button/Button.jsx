@@ -1,5 +1,4 @@
 import React from 'react'
-import Tippy from '@tippyjs/react'
 
 function Button({
   name = 'boton',
@@ -9,10 +8,9 @@ function Button({
   shadow = false,
   onClick,
   type,
-  tippyText = '',
   disabled = false,
   iconFirst = false,
-  placement = 'bottom',
+  tooltip
 }) {
 
   if (disabled) {
@@ -21,66 +19,45 @@ function Button({
 
   if (type === 'icon') {
     return (
-      <Tippy
-        disabled={tippyText === ''}
-        offset={[0, 10]}
-        delay={[700, 0]}
-        placement={placement}
-        content={<span>{tippyText}</span>}
-      >
-        <button
-          onClick={onClick}
-          className={`focus:outline-none transition duration-500 h-8 w-8 ${className} ${shadow && 'shadow-md'}`}>
-          <i className={icon}></i>
-        </button>
-      </Tippy>
+      <button
+        title={tooltip}
+        onClick={onClick}
+        className={`focus:outline-none transition duration-500 h-8 w-8 ${className} ${shadow && 'shadow-md'}`}>
+        <i className={icon}></i>
+      </button>
     )
   }
 
   if (type === 'iconText') {
     return (
-      <Tippy
-        disabled={tippyText === ''}
-        offset={[0, 10]}
-        delay={[700, 0]}
-        placement={placement}
-        content={<span>{tippyText}</span>}
+      <button
+        title={tooltip}
+        onClick={onClick}
+        className={`focus:outline-none transition duration-500 capitalize py-2 px-4 font-semibold ${className} ${shadow && 'shadow-md'} ${block && 'block w-full'}`}
       >
-        <button
-          onClick={onClick}
-          className={`focus:outline-none transition duration-500 capitalize py-2 px-4 font-semibold ${className} ${shadow && 'shadow-md'} ${block && 'block w-full'}`}
-        >
-          {iconFirst ?
-            <>
-              <i className={`${icon} mr-2`}></i>
-              {name}
-            </>
-            :
-            <>
-              {name}
-              <i className={`${icon} ml-2`}></i>
-            </>
-          }
+        {iconFirst ?
+          <>
+            <i className={`${icon} mr-2`}></i>
+            {name}
+          </>
+          :
+          <>
+            {name}
+            <i className={`${icon} ml-2`}></i>
+          </>
+        }
 
-        </button>
-      </Tippy>
+      </button>
     )
   }
 
   return (
-    <Tippy
-      disabled={tippyText === ''}
-      offset={[0, 10]}
-      delay={[700, 0]}
-      placement={placement}
-      content={<span>{tippyText}</span>}
-    >
-      <button
-        onClick={onClick}
-        className={`focus:outline-none transition duration-500 capitalize py-2 px-6 font-semibold ${className} ${shadow && 'shadow-md'}  ${block && 'block w-full'}`}>
-        {name}
-      </button>
-    </Tippy>
+    <button
+      title={tooltip}
+      onClick={onClick}
+      className={`focus:outline-none transition duration-500 capitalize py-2 px-6 font-semibold ${className} ${shadow && 'shadow-md'}  ${block && 'block w-full'}`}>
+      {name}
+    </button>
 
   )
 }

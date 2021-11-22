@@ -41,7 +41,7 @@ function HomeScreen() {
                 columnTickets.map((item, index) => (
                   <Column
                     key={item.id}
-                    className={`text-white text-center w-full text-base font-semibold
+                    className={`text-white text-center w-full text-base font-semibold capitalize
                   ${item.subTitle === null ? 'p-5' : 'p-2'}
                   ${index % 2 === 0 ? 'bg-gray-600' : 'bg-gray-700'}
                   ${index === 0 ? 'rounded-l-lg' : index + 1 === columnTickets.length ? 'rounded-r-lg' : ''}
@@ -57,7 +57,7 @@ function HomeScreen() {
             {
               ticketList.map(item => (
                 <TBody className="uppercase" key={item.id_ticket} id={item.id_ticket}>
-                  <Column>{item.id_ticket}</Column>
+                  <Column className="p-4 text-center">{item.id_ticket}</Column>
                   <Column className="col-span-1 px-4 py-1.5 text-center bg-gray-100">
                     {moment(item.fecha_hora_tx).format('DD-MM-yyyy')}
                     <p className="text-xs text-gray-400">({moment(item.fecha_hora_tx).format('HH:MM')})</p>

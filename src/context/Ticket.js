@@ -185,9 +185,6 @@ function TicketProvider({ children }) {
 
   const updatePriority = async (data) => {
 
-    console.log('prioridad', data)
-    return true
-
     const resp = await fetchToken('ticket/cambiar-prioridad-cliente', data, 'POST')
     const body = await resp.json()
     const { ok } = body
@@ -203,9 +200,6 @@ function TicketProvider({ children }) {
 
   const createEvent = async (data) => {
 
-    console.log('creando evento', data)
-    return true
-
     const resp = await fetchToken('ticket/insert-evento', data, 'POST')
     const body = await resp.json()
     const { ok } = body
@@ -213,7 +207,10 @@ function TicketProvider({ children }) {
     toggleLoading(false)
 
     if (ok) return true
-    console.log('fallo la consulta (createTicket)', body)
+    else {
+      console.log('fallo la consulta (createTicket)', body)
+      return false
+    }
   }
 
   // docs CRUD
@@ -247,15 +244,12 @@ function TicketProvider({ children }) {
 
   const addDoc = async (data) => {
 
-    console.log('add doc: ', data)
-    return true
-
     const resp = await fetchTokenFile('ticket/add-document', data, 'POST')
     const body = await resp.json()
+    const { ok } = body
 
     toggleLoading(false)
 
-    const { ok } = body
     if (ok) return true
     else {
       console.log('fallo la consulta (addDoc)', body)

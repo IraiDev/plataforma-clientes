@@ -255,6 +255,7 @@ function NavBar({ onMultiLine, isMultiLine }) {
         <div className="hidden lg:flex items-center gap-3">
           <h5 className="capitalize font-semibold">{user.fullName}</h5>
           <Button
+            tooltip="mostrar todo el contenido de descripcion de ticket"
             className="border border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 rounded-full"
             type="iconText"
             icon={isMultiLine ? 'fas fa-angle-double-down' : 'fas fa-angle-double-up'}
@@ -280,7 +281,9 @@ function NavBar({ onMultiLine, isMultiLine }) {
             <TextContent className="text-xs" tag="emisores" value="???" />
             <TextContent className="text-xs" tag="estados" value="???" />
           </div>
-          <Button className="text-red-400 hover:text-red-600 hover:bg-red-100 rounded-lg"
+          <Button
+            tooltip="Cerrar sesion"
+            className="text-red-400 hover:text-red-600 hover:bg-red-100 rounded-lg"
             type="icon"
             icon="fas fa-sign-out-alt"
             onClick={logout} />

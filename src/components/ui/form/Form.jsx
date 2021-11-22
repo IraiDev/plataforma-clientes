@@ -13,6 +13,7 @@ import { useForm } from '../../../hooks/useForm'
 import { checkForms } from '../../../helpers/helpers'
 import Alert from '../alert/Alert'
 import { Ticket } from '../../../context/Ticket'
+import { Ui } from '../../../context/Ui'
 const notAllow = ['exe', 'js']
 
 const columnEvents = [
@@ -35,13 +36,15 @@ function Form({ onClick, data, from = 'EX' }) {
   } = data
 
   const { createEvent, addDoc, updatePriority, user } = useContext(Ticket)
-  const [{ desc, priority }, onChangeValues, reset] = useForm({ desc: '', priority: prioridad_cliente })
+  const { toggleLoading } = useContext(Ui)
+  const [{ desc, priority }, onChangeValues] = useForm({ desc: '', priority: prioridad_cliente })
   const [{ isHtml, icon, title, content }, setAlertContent] = useState({})
   const [alert, setAlert] = useState(false)
   const [file, setFile] = useState(null)
   const [resetFile, setResetFile] = useState(randomString)
   const [event, setEvent] = useState([])
   const [idEvent, setIdEvent] = useState([])
+  const [receiverName, setReceiverName] = useState(null)
 
   const onChangeFile = (e) => {
     if (e.target.files[0].size < 5242881) {
@@ -61,10 +64,13 @@ function Form({ onClick, data, from = 'EX' }) {
   }
 
   const handleNewEvent = async (state) => {
-
     let formData = new FormData()
     file !== null && formData.append('archivo', file)
     formData.append('publicOrPrivate', origin ? 'PR' : 'PU')
+    id_actividad !== '' && formData.append("id_actividad", id_actividad)
+    id_actividad === '' && formData.append("id_ticket", ticket)
+
+    toggleLoading(true)
 
     const dataPriority = {
       id_ticket: ticket,
@@ -77,14 +83,8 @@ function Form({ onClick, data, from = 'EX' }) {
         const ext = name[name.length - 1]
 
         if (notAllow.includes(ext)) {
-          setAlertContent({
-            isHtml: false,
-            icon: 'error',
-            title: 'Advertencia',
-            content: 'No se puede subir archivos con extensiones, .exe, .js, estos seran removidos de la seleccion.'
-          })
           setFile(null)
-          setAlert(true)
+          toggleLoading(false)
           return false
         }
         return true
@@ -92,7 +92,7 @@ function Form({ onClick, data, from = 'EX' }) {
       return false
     }
 
-    const vFile = fileValidation()
+    const vFile = await fileValidation()
     const vDesc = checkForms(desc)
 
     if (vDesc.state) {
@@ -109,11 +109,22 @@ function Form({ onClick, data, from = 'EX' }) {
       if (vFile) {
         addDoc(formData)
         Number(priority) !== prioridad_cliente && updatePriority(dataPriority)
-        return
+        return onClick()
+      }
+      if (!vFile && file !== null) {
+        setAlertContent({
+          isHtml: false,
+          icon: 'error',
+          title: 'Advertencia',
+          content: 'No se puede subir archivos con extensiones, .exe, .js, estos seran removidos de la seleccion.'
+        })
+        return setAlert(true)
       }
       if (Number(priority) !== prioridad_cliente) {
-        return updatePriority(dataPriority)
+        updatePriority(dataPriority)
+        return onClick()
       }
+      toggleLoading(false)
       setAlertContent({
         isHtml: false,
         icon: 'warning',
@@ -123,9 +134,6 @@ function Form({ onClick, data, from = 'EX' }) {
       return setAlert(true)
     }
 
-    const filter = event.filter(item => item.id === idEvent[0])
-    console.log(filter);
-
     const data = {
       id_actividad,
       id_ticket: ticket,
@@ -133,7 +141,7 @@ function Form({ onClick, data, from = 'EX' }) {
       mensajes_contesta: idEvent,
       emisor: user.rut,
       desc_emisor: user.rut,
-      receptor: filter[0].rec,
+      receptor: receiverName,
       publico_privado: from === 'EX' ? 'PU' : 'PR',
       est_evento: state,
       id_proyecto: id_proyecto,
@@ -141,6 +149,28 @@ function Form({ onClick, data, from = 'EX' }) {
     }
 
     const resp = await createEvent(data)
+
+    if (resp) {
+      if (vFile) {
+        addDoc(formData)
+        Number(priority) !== prioridad_cliente && updatePriority(dataPriority)
+        return onClick()
+      }
+      Number(priority) !== prioridad_cliente && updatePriority(dataPriority)
+      return onClick()
+    }
+    setAlertContent({
+      isHtml: false,
+      icon: 'error',
+      title: 'Error',
+      content: 'Error al guardar el evento guardar el evento.'
+    })
+    setAlert(true)
+    onClick()
+  }
+
+  const handleDelete = () => {
+    onClick()
   }
 
   useEffect(() => {
@@ -152,7 +182,13 @@ function Form({ onClick, data, from = 'EX' }) {
   }, [])
 
   useEffect(() => {
-    console.log(event);
+    if (idEvent.length > 0) {
+      const filter = event.filter(item => item.id === idEvent[0])
+      setReceiverName(filter[0].rec)
+    }
+    else {
+      setReceiverName(null)
+    }
   }, [event])
 
   return (
@@ -168,17 +204,18 @@ function Form({ onClick, data, from = 'EX' }) {
           <h1 className="inline ml-2">{desc_empresa}, {desc_usuario}</h1>
         </div>
         <div className="border-b border-t border-gray-300 py-5 my-5">
-          <h5 className="capitalize text-lg font-semibolds mb-2">mensaje ticket</h5>
+          <h5 className="capitalize text-xl font-semibold mb-2">mensaje ticket</h5>
           <p className="font-light">{desc_detalle}</p>
         </div>
         <div className="h-96 mb-10">
           <div className="mb-5 flex justify-between items-center">
-            <h5 className="text-xl">Historial</h5>
+            <h5 className="text-xl font-semibold">Historial</h5>
             <div className="flex items-center gap-2">
-              <h5 className="capitalize">Prioridad cliente</h5>
+              <h5 className="capitalize mt-1 text-sm font-semibold">Prioridad cliente</h5>
               <Input
-                disabled={from !== 'EX'}
+                disabled={from !== 'EX' || id_actividad === ''}
                 type="number"
+                tooltip={id_actividad === '' && 'No puedes modificar este campo si este ticket no tiene asignada una actividad'}
                 width="w-20"
                 placeholder=""
                 name="priority"
@@ -210,7 +247,7 @@ function Form({ onClick, data, from = 'EX' }) {
                   <Column className="p-1.5">
                     {item.est_evento}
                     <input
-                      disabled={item.origen === 'IN'}
+                      disabled={item.origen === from}
                       className={`ml-2 ${item.est_evento !== 'P' && 'hidden'}`}
                       type="checkbox"
                       onChange={(e) => {
@@ -240,6 +277,11 @@ function Form({ onClick, data, from = 'EX' }) {
             }
           </Table>
         </div>
+        {receiverName !== null &&
+          <h5 className="mb-5 text-xl font-semibold">
+            Para: <p className="text-gray-700 font-normal inline">{receiverName}</p>
+          </h5>
+        }
         <TextArea
           field="Descripcion evento"
           name="desc"
@@ -260,7 +302,9 @@ function Form({ onClick, data, from = 'EX' }) {
                     origin={doc.publico_privado}
                     type={doc.tipo}
                     route={doc.ruta_docum}
-                    idActivity={doc.id_det}>
+                    idActivity={doc.id_det}
+                    ticket={ticket}
+                    onClick={handleDelete}>
                     {doc.nom_docum}
                   </LiDocs>
                 ))
@@ -269,11 +313,13 @@ function Form({ onClick, data, from = 'EX' }) {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Button
+              tooltip="Puedes guardar el archivo seleccionado presionando este boton"
               className="bg-yellow-500 hover:bg-yellow-400 text-white rounded-full w-full"
               shadow
               name="guardar pendiente"
               onClick={() => handleNewEvent('P')} />
             <Button
+              tooltip="Puedes guardar el archivo seleccionado presionando este boton"
               className="bg-green-500 hover:bg-green-400 text-white rounded-full w-full"
               shadow
               name="guardar OK"

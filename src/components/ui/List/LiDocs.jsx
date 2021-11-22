@@ -1,4 +1,6 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
+import { Ticket } from '../../../context/Ticket'
+import { Ui } from '../../../context/Ui'
 import Alert from '../alert/Alert'
 import Button from '../button/Button'
 
@@ -6,12 +8,33 @@ const urlRA = 'http://www.zcloud.cl/registro_avance/'
 const urlTicket = 'http://www.zcloud.cl/'
 
 function LiDocs(props) {
-  const { children, type, route, idActivity, origin, id } = props
+  const { children, type, route, idActivity, origin, id, onClick } = props
+  const { deleteDoc } = useContext(Ticket)
+  const { toggleLoading } = useContext(Ui)
   const [check, setCheck] = useState(false)
   const [alert, setAlert] = useState(false)
+  const [alertState, setAlertState] = useState(false)
 
   const handleDelete = () => {
+    setAlertState(false)
     setAlert(true)
+  }
+
+  const onAction = async () => {
+    if (!alertState) {
+      toggleLoading(true)
+      setAlert(false)
+      const data = { id_docum: id, tipo: type }
+      const resp = await deleteDoc(data)
+      if (resp) onClick()
+      else {
+        setAlert(true)
+        setAlertState(true)
+      }
+    }
+    else {
+      setAlert(false)
+    }
   }
 
   return (
@@ -39,11 +62,22 @@ function LiDocs(props) {
       </li>
       <Alert
         show={alert}
-        icon="warning"
-        title="Atencion"
+        icon={alertState ? 'error' : 'warning'}
+        title={alertState ? 'Error' : 'Atencion'}
         html={true}
+        onAction={onAction}
+        showCancelButton={!alertState}
         onCancel={() => setAlert(false)}>
-        <p className="text-gray-600">Se eliminara el siguiente archivo: <p className="font-semibold text-black">{children}</p></p>
+        {alertState ?
+          'Error al eliminar el archivo, vuelva a intentarlo, si el error persiste comuniquese con un administrador.'
+          :
+          <p className="text-gray-600">
+            Se eliminara el siguiente archivo:
+            <br />
+            <b className="font-semibold text-black">{children}</b>
+            <br />
+            Esta accion cerrara el formulario.
+          </p>}
       </Alert>
     </>
   )
