@@ -256,6 +256,18 @@ function TicketProvider({ children }) {
       return false
     }
   }
+  // docs CRUD
+
+  const getUserPin = async (rut) => {
+    const resp = await fetchUnToken(`/auth-ticket/get-pass?rut_user=${rut}`)
+    const body = await resp.json()
+    const { ok, resUser } = body
+
+    if (ok) return resUser.pin
+    else {
+      console.log('fallo la consulta (getPin)', body)
+    }
+  }
 
   const saveFilters = ({ rut_usuario = user.rut, emisores = [], proyectos = [], estados = [] }) => {
     setFilters({
@@ -276,6 +288,7 @@ function TicketProvider({ children }) {
     getTicketList,
     getTicketDetails,
     getQuestion,
+    getUserPin,
     toggleDoc,
     deleteDoc,
     addDoc,

@@ -1,4 +1,4 @@
-export const clearParams = (url, param) => {
+export const findParam = (url, param) => {
   let p1 = url.indexOf(param)
   let p2 = url.indexOf("&", p1)
   if (p1 > -1 && p2 > -1) {

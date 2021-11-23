@@ -5,7 +5,6 @@ import Alert from './components/ui/alert/Alert'
 import Loading from './components/ui/loading/Loading'
 import { Ticket } from './context/Ticket'
 
-
 function App() {
   const { login, validateSession, user } = useContext(Ticket)
   const [isLogin, setIsLogin] = useState(false)
@@ -22,6 +21,9 @@ function App() {
   }
 
   useEffect(() => {
+    // const url = window.location.search.substring(1)
+    // const from = findParam(url, '=')
+    // if (from.param === 'SIS') return
     if (localStorage.getItem('ticketToken') !== null) {
       const reNew = async () => {
         setLoading(true)
