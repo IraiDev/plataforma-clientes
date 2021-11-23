@@ -1,9 +1,14 @@
 import React from 'react'
+import Form from '../ui/form/Form'
 
-function DetailsView() {
+function DetailsView({ data = {} }) {
   return (
-    <div>
-
+    <div className="container mx-auto">
+      <div className="bg-white rounded-lg shadow-lg p-5 md:p-10 my-10 overflow-y-auto">
+        {Object.keys(data).length > 0 &&
+          <Form from='IN' data={data} onClick={() => { }} />
+        }
+      </div>
     </div>
   )
 }

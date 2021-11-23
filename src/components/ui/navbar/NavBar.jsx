@@ -248,7 +248,7 @@ function NavBar({ onMultiLine, isMultiLine }) {
 
   return (
     <>
-      <nav className="sticky top-0 h-20 bg-white shadow-lg flex justify-between items-center pl-3 pr-5 lg:px-14">
+      <nav className="sticky top-0 h-20 z-40 bg-white shadow-lg flex justify-between items-center pl-3 pr-5 lg:px-14">
         <Button className="hover:bg-gray-200 rounded-lg inline lg:hidden"
           type="icon" />
         <h5 className="capitalize font-semibold inline lg:hidden">{user.fullName}</h5>

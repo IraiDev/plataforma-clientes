@@ -10,7 +10,8 @@ function Input({
   field,
   width = 'w-full',
   disabled = false,
-  tooltip }) {
+  tooltip,
+  isNumber = false }) {
   return (
     <div>
       <p className="px-4 py-1 capitalize text-xs">{field}</p>
@@ -21,11 +22,11 @@ function Input({
         value={value}
         onChange={onChange}
         disabled={disabled}
-        type="text"
+        type={type}
         className={`px-4 py-2 rounded-md bg-gray-100 focus:bg-white transition duration-500 focus:ring-2 focus:shadow-lg ${width}`}
         placeholder={placeholder}
         onKeyPress={(event) => {
-          if (type !== 'number') return
+          if (!isNumber) return
           if (!/[0-9]/.test(event.key)) {
             event.preventDefault();
           }

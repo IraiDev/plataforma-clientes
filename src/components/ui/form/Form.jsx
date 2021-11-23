@@ -214,8 +214,8 @@ function Form({ onClick, data, from = 'EX' }) {
               <h5 className="capitalize mt-1 text-sm font-semibold">Prioridad cliente</h5>
               <Input
                 disabled={from !== 'EX' || id_actividad === ''}
-                type="number"
-                tooltip={id_actividad === '' && 'No puedes modificar este campo si este ticket no tiene asignada una actividad'}
+                isNumber
+                tooltip={id_actividad === '' ? 'No puedes modificar este campo si este ticket no tiene asignada una actividad' : ''}
                 width="w-20"
                 placeholder=""
                 name="priority"
@@ -299,7 +299,8 @@ function Form({ onClick, data, from = 'EX' }) {
                   <LiDocs
                     key={doc.id_docum}
                     id={doc.id_docum}
-                    origin={doc.publico_privado}
+                    from={from}
+                    isPublic={doc.publico_privado}
                     type={doc.tipo}
                     route={doc.ruta_docum}
                     idActivity={doc.id_det}
