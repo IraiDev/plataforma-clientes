@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react'
+import { showAlert } from '../helpers/alerts'
 import { fetchToken, fetchTokenFile, fetchUnToken } from '../helpers/fetch'
 import { Ui } from './Ui'
 
@@ -16,13 +17,16 @@ function TicketProvider({ children }) {
   const login = async (data) => {
 
     if (data.pin === '') {
-      setUser({ title: 'PIN vacio', content: 'Debe llenar el campo', icon: 'info' })
+      showAlert({ title: 'PIN vacio', icon: 'info', html: 'Debes llenar el campo' })
+      toggleLoading(false)
       return
     }
 
     const resp = await fetchUnToken('auth-ticket/login', data, 'POST')
     const body = await resp.json()
     const { ok, resUser, token, tipo } = body
+
+    toggleLoading(false)
 
     if (ok) {
       const r = await fetchToken(`ticket/get-info-user?rut_usuario=${resUser.rut_user}`)
@@ -34,7 +38,8 @@ function TicketProvider({ children }) {
         name: resUser.nom_user,
         fullName: resUser.nombre,
         email: resUser.correo,
-        phone: b.usuario.phone
+        phone: b.usuario.phone,
+        pin: b.usuario.pin
       }
 
       setUser(data)
@@ -42,27 +47,15 @@ function TicketProvider({ children }) {
     }
     else {
       if (tipo === 1) {
-        setUser({
-          content: msg,
-          title: 'atencion',
-          icon: 'info'
-        })
+        showAlert({ title: 'Atencion', icon: 'info', html: msg })
         return false
       }
       if (tipo === 2) {
-        setUser({
-          content: msg,
-          title: 'atencion',
-          icon: 'warning'
-        })
+        showAlert({ title: 'Atencion 2', icon: 'info', html: msg })
         return false
       }
       if (tipo === 3) {
-        setUser({
-          content: msg,
-          title: 'PIN recuperado',
-          icon: 'info'
-        })
+        showAlert({ title: 'PIN recuperado', icon: 'info', html: msg })
         return false
       }
     }
@@ -73,6 +66,8 @@ function TicketProvider({ children }) {
     const body = await resp.json()
     const { ok, resUser, token } = body
 
+    toggleLoading(false)
+
     if (ok) {
       const r = await fetchToken(`ticket/get-info-user?rut_usuario=${resUser.rut_user}`)
       const b = await r.json()
@@ -83,7 +78,8 @@ function TicketProvider({ children }) {
         name: resUser.nom_user,
         fullName: resUser.nombre,
         email: resUser.correo,
-        phone: b.usuario.phone
+        phone: b.usuario.phone,
+        pin: b.usuario.pin
       }
       setUser(data)
       return true
@@ -215,6 +211,7 @@ function TicketProvider({ children }) {
 
   // docs CRUD
   const toggleDoc = async (data) => {
+    console.log('data: ', data)
     const resp = await fetchToken('ticket/check-document', data, 'PUT')
     const body = await resp.json()
     const { ok } = body
@@ -258,14 +255,31 @@ function TicketProvider({ children }) {
   }
   // docs CRUD
 
-  const getUserPin = async (rut) => {
-    const resp = await fetchUnToken(`/auth-ticket/get-pass?rut_user=${rut}`)
+  const getUserPin = async (rut, state = false) => {
+    const resp = await fetchUnToken(`/auth-ticket/get-pass?rut_user=${rut}&olvido=${state}`)
     const body = await resp.json()
     const { ok, resUser } = body
 
-    if (ok) return resUser.pin
+    toggleLoading(false)
+
+    if (ok) return { ok, response: resUser }
     else {
       console.log('fallo la consulta (getPin)', body)
+      return { ok }
+    }
+  }
+
+  const updateUser = async (data) => {
+    const resp = await fetchUnToken('auth-ticket/change-data-user', data, 'POST')
+    const body = await resp.json()
+    const { ok, msg } = body
+
+    toggleLoading(false)
+
+    if (ok) return { ok, msg }
+    else {
+      console.log('fallo la consulta (updateUser)', body)
+      return { ok }
     }
   }
 
@@ -292,6 +306,7 @@ function TicketProvider({ children }) {
     toggleDoc,
     deleteDoc,
     addDoc,
+    updateUser,
     updatePriority,
     createTicket,
     saveFilters,

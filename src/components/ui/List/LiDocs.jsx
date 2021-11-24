@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react'
 import { Ticket } from '../../../context/Ticket'
 import { Ui } from '../../../context/Ui'
+import { showAlert } from '../../../helpers/alerts'
 import Alert from '../alert/Alert'
 import Button from '../button/Button'
 
@@ -37,14 +38,10 @@ function LiDocs(props) {
       const resp = await deleteDoc(data)
       if (resp) onClick()
       else {
-        setAlert(true)
-        setAlertContent({
-          ok: true,
+        showAlert({
           icon: 'error',
           title: 'Error',
-          content: 'Error al eliminar el archivo, vuelva a intentarlo, si el error persiste comuniquese con un administrador.',
-          cancelButton: false,
-          action: true
+          content: 'Error al eliminar el archivo, vuelva a intentarlo.',
         })
       }
     }
@@ -55,26 +52,36 @@ function LiDocs(props) {
 
   const onChangeFile = (e) => {
     const target = e.target.checked
-    setCheck(target)
-    setAlert(true)
-    setAlertContent({
-      ok: false,
-      icon: 'info',
-      title: 'Actualizacion',
-      cancelButton: true,
-      action: false,
-      content: `${<p className="text-gray-600">
-        Se eliminara el siguiente archivo:
-        <br />
-        <b className="font-semibold text-black">{children}</b>
-        <br />
-        Esta accion cerrara el formulario.
-      </p>}`
-    })
-  }
 
-  const onUpdate = async () => {
-    const resp = await toggleDoc({ id_docum: id, accion: check ? 'PU' : 'PR' })
+    const action = async () => {
+      const resp = await toggleDoc({ id_docum: id, accion: target ? 'PU' : 'PR' })
+      if (!resp) {
+        console.log('ok false');
+        showAlert({
+          title: 'Error',
+          icon: 'error',
+          html: 'Hubo un error al cambiar el estado del archivo, vuelva a intentarlo'
+        })
+        setCheck(isPublic === 'PU')
+      }
+      else setCheck(target)
+      console.log('ok true');
+    }
+
+    showAlert({
+      icon: 'info',
+      title: 'Atencion',
+      showCancelButton: true,
+      cancelButtonText: 'No, cancelar',
+      confirmButtonText: 'Si, Cambiar',
+      action,
+      html: `Se cambiara el estado del archivo  
+      <p class="inline font-semibold">"${children}"</p> de
+      <p class="inline font-semibold">${isPublic === 'PU' ? 'Publico' : 'Privado'}</p> a 
+      <p class="inline font-semibold">${isPublic !== 'PU' ? 'Publico' : 'Privado'}</p>
+      <p>¿Esta seguro de realizar esta accion?</p>
+      `
+    })
   }
 
   return (
@@ -100,26 +107,6 @@ function LiDocs(props) {
           icon="fas fa-trash-alt"
           onClick={handleDelete} />
       </li>
-      <Alert
-        show={alert}
-        icon={icon}
-        title={title}
-        html={true}
-        onAction={action ? onDelete : onUpdate}
-        showCancelButton={cancelButton}
-        onCancel={() => setAlert(false)}>
-        {content !== 'P' ?
-          content
-          :
-          <p className="text-gray-600">
-            Se eliminara el siguiente archivo:
-            <br />
-            <b className="font-semibold text-black">{children}</b>
-            <br />
-            Esta accion cerrara el formulario.
-          </p>
-        }
-      </Alert>
     </>
   )
 }

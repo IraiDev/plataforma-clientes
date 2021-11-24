@@ -9,27 +9,27 @@ import Container from '../container/Container'
 import { Ticket } from '../../../context/Ticket'
 import { useForm } from '../../../hooks/useForm'
 import LiNotes from '../List/LiNotes'
-import Alert from '../alert/Alert'
 import { Ui } from '../../../context/Ui'
 import { checkForms } from '../../../helpers/helpers'
+import { showAlert } from '../../../helpers/alerts'
 const notAllow = ['exe', 'js']
 
 function NavBar({ onMultiLine, isMultiLine }) {
 
   let randomString = Math.random().toString(36)
-  const { createTicket, getQuestion, saveFilters, getTicketList, getProjects, getUsers, getStates, logout, user } = useContext(Ticket)
+  const { updateUser, createTicket, getQuestion, saveFilters, getTicketList, getProjects, getUsers, getStates, logout, user } = useContext(Ticket)
   const { toggleLoading } = useContext(Ui)
   const [values, setValues] = useState({ email: '', phone: '' })
   const [modalTicket, setModalTicket] = useState(false)
   const [modalFilter, setModalFilter] = useState(false)
-  const [alert, setAlert] = useState(false)
-  const [{ iconAlert, titleAlert, contentAlert, isHtml }, setAlertContent] = useState({ iconAlert: '', titleAlert: {}, contentAlert: '', isHtml: false })
+  const [modalUser, setModalUser] = useState(false)
   const [option, setOption] = useState(null)
   const [file, setFile] = useState(null)
   const [resetFile, setResetFile] = useState(randomString)
   const [questions, setQuestions] = useState([])
 
   // checkboxes
+  const [check, setCheck] = useState(false)
   const [projects, setProjects] = useState([])
   const [users, setUsers] = useState([])
   const [states, setStates] = useState([])
@@ -40,11 +40,11 @@ function NavBar({ onMultiLine, isMultiLine }) {
   // checkboxes
 
   // custom hooks
-  const [{ title, desc }, onChangeValues, reset] = useForm({ title: '', desc: '' })
+  const [{ title, desc, newPin, repeatPin }, onChangeValues, reset] = useForm({ title: '', desc: '', newPin: '', repeatPin: '' })
   // custom hooks
 
   // object destructuring
-  const { email, phone } = values
+  const { email, phone, pin } = values
 
   const getFilters = async () => {
     const data = { rut_usuario: user.rut, proyectos: [] }
@@ -82,16 +82,16 @@ function NavBar({ onMultiLine, isMultiLine }) {
     else {
       setFile(null)
       setResetFile(randomString)
-      setAlertContent({
-        iconAlert: 'warning',
-        titleAlert: 'Atencion',
-        contentAlert: 'Archivo excede el peso permitido por el sistema, peso maximo 5MB'
+      showAlert({
+        title: 'Atencion',
+        icon: 'warn',
+        html: 'Archivo excede el peso permitido por el sistema, peso maximo 5MB',
       })
-      return setAlert(true)
+      return
     }
   }
 
-  const onClose = () => {
+  const onCloseTicket = () => {
     setModalTicket(false)
     setOption(null)
     setFile(null)
@@ -99,62 +99,44 @@ function NavBar({ onMultiLine, isMultiLine }) {
     reset()
     setValues({
       email: user.email,
-      phone: user.phone
+      phone: user.phone,
+      pin: user.pin
     })
   }
 
   const handleCreateTicket = async () => {
-    const vTitle = checkForms(title)
-    const vEmail = checkForms(email)
-    const vPhone = checkForms(phone)
-    const vDesc = checkForms(desc)
+    const { state: ts, char: tc, list: tl } = checkForms(title)
+    const { state: cs, char: cc, list: cl } = checkForms(email)
+    const { state: ps, char: pc, list: pl } = checkForms(phone)
+    const { state: ds, char: dc, list: dl } = checkForms(desc)
 
-    toggleLoading(true)
-
-    if (vTitle.state) {
-      setAlertContent({
-        isHtml: true,
-        iconAlert: 'warning',
-        contentAlert: vTitle,
-        titleAlert: 'Atencion'
-      })
-      return setAlert(true)
-    }
-    if (vEmail.state) {
-      setAlertContent({
-        isHtml: true,
-        iconAlert: 'warning',
-        contentAlert: vEmail,
-        titleAlert: 'Atencion'
-      })
-      return setAlert(true)
-    }
-    if (vPhone.state) {
-      setAlertContent({
-        isHtml: true,
-        iconAlert: 'warning',
-        contentAlert: vPhone,
-        titleAlert: 'Atencion'
-      })
-      return setAlert(true)
-    }
-    if (vDesc.state) {
-      setAlertContent({
-        isHtml: true,
-        iconAlert: 'warning',
-        contentAlert: vDesc,
-        titleAlert: 'Atencion'
-      })
-      return setAlert(true)
+    const AlertContent = (char, field, list) => {
+      return `
+      <p>Caracter <b class="text-2xl">${char}</b> no permitido, campo <b class="capitalize"/>${field}</b>.</p>
+      <p class="mt-2">Caracteres no permitidos por el sistema: </p>
+      <b>${list}</b>
+      `
     }
 
+    if (ts) {
+      showAlert({ title: 'Atencion', icon: 'warn', html: AlertContent(tc, 'titulo', tl) })
+      return
+    }
+    if (cs) {
+      showAlert({ title: 'Atencion', icon: 'warn', html: AlertContent(cc, 'correo', cl) })
+      return
+    }
+    if (ps) {
+      showAlert({ title: 'Atencion', icon: 'warn', html: AlertContent(pc, 'telefono', pl) })
+      return
+    }
+    if (ds) {
+      showAlert({ title: 'Atencion', icon: 'warn', html: AlertContent(dc, 'descripcion', dl) })
+      return
+    }
     if (title === '' || desc === '' || email === '' || phone === '' || option === null) {
-      setAlertContent({
-        iconAlert: 'warning',
-        titleAlert: 'Atencion',
-        contentAlert: 'Debes seleccionar proyecto y llenar todos los campos'
-      })
-      return setAlert(true)
+      showAlert({ title: 'Atencion', icon: 'warn', html: 'Debes seleccionar proyecto y llenar todos los campos' })
+      return
     }
 
     if (file !== null) {
@@ -162,16 +144,17 @@ function NavBar({ onMultiLine, isMultiLine }) {
       const ext = name[name.length - 1]
 
       if (notAllow.includes(ext)) {
-        setAlertContent({
-          isHtml: false,
-          iconAlert: 'error',
-          titleAlert: 'Advertencia',
-          contentAlert: 'No se puede subir archivos con extensiones, .exe, .js, estos seran removidos de la seleccion.'
+        showAlert({
+          title: 'Advertencia',
+          icon: 'error',
+          html: 'No se puede subir archivos con extensiones, .exe, .js, estos seran removidos de la seleccion.'
         })
         setFile(null)
-        return setAlert(true)
+        return
       }
     }
+
+    toggleLoading(true)
 
     let formData = new FormData()
     file !== null && formData.append('archivo', file)
@@ -184,16 +167,9 @@ function NavBar({ onMultiLine, isMultiLine }) {
 
     const resp = await createTicket(formData)
 
-    if (resp) return onClose()
+    if (resp) return onCloseTicket()
 
-    setAlertContent({
-      html: false,
-      iconAlert: 'warning',
-      titleAlert: 'Atencion',
-      contentAlert: 'Error al crear ticket, vuelva a intentarlo.'
-    })
-
-    setAlert(true)
+    showAlert({ title: 'Atencion', icon: 'error', html: 'Error al crear ticket, vuelva a intentarlo.' })
   }
 
   const handleFilter = () => {
@@ -227,10 +203,63 @@ function NavBar({ onMultiLine, isMultiLine }) {
     setModalFilter(false)
   }
 
+  const handleUpdateUser = async () => {
+    if (pin === '' || pin !== pin) {
+      showAlert('Atencion', 'Su pin actual no coincide con el ingresado o el campo esta vacio, por favor  verifiquelo y vuelva a intentarlo', 'Aceptar')
+      return
+    }
+    if (newPin.length !== 8) {
+      showAlert('Atencion', 'El pin debe tener 8 caracteres, solo numeros y letras', 'Aceptar')
+      return
+    }
+    if (newPin !== repeatPin) {
+      showAlert('Atencion', 'El pin nuevo no coincide con su reingreso, verifiquelo y vuelva a intentarlo', 'Aceptar')
+      return
+    }
+    if (newPin === pin) {
+      showAlert('Atencion', 'El nuevo pin no puede ser igual a su pin actual, por favor modifiquelo y vuelva a intentarlo', 'Aceptar')
+      return
+    }
+
+    const data = {
+      correo: email,
+      telefono: phone,
+      old_pass: user.pin,
+      new_pass: newPin,
+      repeat_pass: repeatPin,
+      rut_user: user.rut
+    }
+
+    toggleLoading(true)
+
+    const { ok, msg } = await updateUser(data)
+
+    if (ok) {
+      showAlert('Atencion', msg, 'Aceptar')
+      setCheck(false)
+      reset()
+      setModalUser(false)
+    }
+    else {
+      showAlert('Atencion', 'Error al actualizar usaurio, por favor verifique los datos y vuelva a intentarlo', 'Aceptar')
+    }
+  }
+
+  const onCloseUser = () => {
+    setModalUser(false)
+    reset()
+    setValues({
+      email: user.email,
+      phone: user.phone,
+      pin: user.pin
+    })
+  }
+
   useEffect(() => {
     setValues({
       email: user.email,
-      phone: user.phone
+      phone: user.phone,
+      pin: user.pin
     })
     getFilters()
   }, [])
@@ -251,9 +280,24 @@ function NavBar({ onMultiLine, isMultiLine }) {
       <nav className="sticky top-0 h-20 z-40 bg-white shadow-lg flex justify-between items-center pl-3 pr-5 lg:px-14">
         <Button className="hover:bg-gray-200 rounded-lg inline lg:hidden"
           type="icon" />
-        <h5 className="capitalize font-semibold inline lg:hidden">{user.fullName}</h5>
+        <Button
+          className="lg:hidden rounded-full hover:bg-gray-100"
+          type="iconText"
+          tooltip="Modificar usuario"
+          icon="fas fa-user-cog"
+          name={user.fullName}
+          onClick={() => setModalUser(true)}
+        />
         <div className="hidden lg:flex items-center gap-3">
-          <h5 className="capitalize font-semibold">{user.fullName}</h5>
+          <Button
+            className="rounded-full hover:bg-gray-100"
+            type="iconText"
+            tooltip="Modificar usuario"
+            icon="fas fa-user-cog"
+            iconFirst
+            name={user.fullName}
+            onClick={() => setModalUser(true)}
+          />
           <Button
             tooltip="mostrar todo el contenido de descripcion de ticket"
             className="border border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 rounded-full"
@@ -290,9 +334,101 @@ function NavBar({ onMultiLine, isMultiLine }) {
         </div>
       </nav>
 
+      {/* Modal update User */}
+
+      <Modal showModal={modalUser} isBlur={false} onClose={onCloseUser}
+        className="max-w-min p-8">
+        <h5 className="text-xl mb-4">Modificar usuario</h5>
+        <div className="w-96 grid gap-5">
+          <Input
+            disabled
+            type="text"
+            color="lightBlue"
+            size="regular"
+            outline={true}
+            placeholder={user.fullName}
+          />
+          <Input
+            disabled
+            type="text"
+            color="lightBlue"
+            size="regular"
+            outline={true}
+            placeholder={user.rut}
+          />
+          <Input
+            name="email"
+            value={email}
+            onChange={(e) => setValues({
+              ...values,
+              email: e.target.value
+            })}
+            placeholder="Correo"
+          />
+          <Input
+            name="phone"
+            value={phone}
+            onChange={(e) => setValues({
+              ...values,
+              phone: e.target.value
+            })}
+            placeholder="Telefono"
+          />
+          <Input
+            name="pin"
+            value={pin}
+            onChange={(e) => setValues({
+              ...values,
+              pin: e.target.value
+            })}
+            type={check ? 'text' : 'password'}
+            placeholder="PIN Actual"
+          />
+          <Input
+            name="newPin"
+            value={newPin}
+            onChange={onChangeValues}
+            type={check ? 'text' : 'password'}
+            placeholder="PIN nuevo"
+          />
+          <Input
+            name="repeatPin"
+            value={repeatPin}
+            onChange={onChangeValues}
+            type={check ? 'text' : 'password'}
+            placeholder="Repita nuevo PIN"
+          />
+          <label htmlFor="motrarPIN123">
+            <input
+              className="mr-2"
+              id="motrarPIN123"
+              type="checkbox"
+              checked={check}
+              onChange={(e) => {
+                setCheck(e.target.checked)
+              }}
+            />
+            Mostrar campos
+          </label>
+        </div>
+        <div className="flex justify-between items-center mt-6">
+          <Button
+            className="rounded-full border border-red-400 hover:bg-red-400 text-red-500 hover:text-white"
+            name="cancelar"
+            shadow
+            onClick={onCloseUser} />
+          <Button
+            className="rounded-full bg-blue-400 hover:bg-blue-500 text-white"
+            name="modificar"
+            shadow
+            onClick={handleUpdateUser}
+          />
+        </div>
+      </Modal>
+
       {/* Modal nuevo ticket */}
 
-      <Modal showModal={modalTicket} isBlur={false} onClose={onClose}
+      <Modal showModal={modalTicket} isBlur={false} onClose={onCloseTicket}
         className="max-w-4xl p-8">
         <h1 className="text-xl font-semibold capitalize inline">nuevo Ticket</h1>
         <p className="inline ml-2">a nombre de {user.name}</p>
@@ -358,7 +494,7 @@ function NavBar({ onMultiLine, isMultiLine }) {
                 className="border border-red-500 hover:bg-red-400 text-red-400 hover:text-white rounded-full"
                 shadow
                 name="cancelar"
-                onClick={() => onClose()} />
+                onClick={() => onCloseTicket()} />
             </div>
           </div>
         </div>
@@ -517,27 +653,6 @@ function NavBar({ onMultiLine, isMultiLine }) {
             onClick={() => handleFilter()} />
         </div>
       </Modal>
-
-      <Alert
-        html={isHtml}
-        show={alert}
-        showCancelButton={false}
-        icon={iconAlert}
-        title={titleAlert}
-        content={!isHtml && contentAlert}
-        onAction={() => setAlert(false)}>
-        {isHtml &&
-          <p className="text-gray-700">
-            Caracter <b className="font-semibold text-black text-xl">{contentAlert.char} No Permitido</b>,
-            por favor revise el texto ingresado.
-            <br />
-            <br />
-            <b className="font-semibold capitalize">Caracteres no permitidos:</b>
-            <br />
-            {contentAlert.list}
-          </p>
-        }
-      </Alert>
     </>
   )
 }
