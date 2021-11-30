@@ -38,11 +38,9 @@ function Form({ onClick, data, from = 'EX' }) {
   const { createEvent, addDoc, updatePriority, user } = useContext(Ticket)
   const { toggleLoading } = useContext(Ui)
   const [{ desc, priority }, onChangeValues] = useForm({ desc: '', priority: prioridad_cliente })
-  const [{ isHtml, icon, title, content }, setAlertContent] = useState({})
-  const [alert, setAlert] = useState(false)
   const [file, setFile] = useState(null)
   const [resetFile, setResetFile] = useState(randomString)
-  const [event, setEvent] = useState([])
+  const [events, setEvents] = useState([])
   const [idEvent, setIdEvent] = useState([])
   const [receiverName, setReceiverName] = useState(null)
 
@@ -53,13 +51,14 @@ function Form({ onClick, data, from = 'EX' }) {
     else {
       setFile(null)
       setResetFile(randomString)
-      setAlertContent({
-        isHtml: false,
-        icon: 'warning',
+      Alert({
+        icon: 'warn',
         title: 'Atencion',
-        content: 'Archivo excede el peso permitido por el sistema, peso maximo 5MB'
+        content: 'Archivo excede el peso permitido por el sistema, peso maximo 5MB',
+        showCancelButton: false,
+        timer: 5000
       })
-      return setAlert(true)
+      return
     }
   }
 
@@ -94,15 +93,21 @@ function Form({ onClick, data, from = 'EX' }) {
 
     const vFile = await fileValidation()
     const vDesc = checkForms(desc)
+    const { state: ok, char, list } = vDesc
 
-    if (vDesc.state) {
-      setAlertContent({
-        isHtml: true,
+    if (ok) {
+      Alert({
         icon: 'error',
-        title: 'Advertencia',
-        content: vDesc
+        title: 'Error',
+        content: `
+        Caracter <b class="text-2xl">${char}</b> no permitido, campo <b class="capitalize"/>Descripcion</b></br>
+        Caracteres no permitidos por el sistema: </br>
+        <b>${list}</b>
+        `,
+        showCancelButton: false,
+        timer: 5000
       })
-      return setAlert(true)
+      return
     }
 
     if (desc === '') {
@@ -112,26 +117,28 @@ function Form({ onClick, data, from = 'EX' }) {
         return onClick()
       }
       if (!vFile && file !== null) {
-        setAlertContent({
-          isHtml: false,
+        Alert({
           icon: 'error',
           title: 'Advertencia',
-          content: 'No se puede subir archivos con extensiones, .exe, .js, estos seran removidos de la seleccion.'
+          content: 'No se puede subir archivos con extensiones, .exe, .js, estos seran removidos de la seleccion',
+          showCancelButton: false,
+          timer: 5000
         })
-        return setAlert(true)
+        return
       }
       if (Number(priority) !== prioridad_cliente) {
         updatePriority(dataPriority)
         return onClick()
       }
       toggleLoading(false)
-      setAlertContent({
-        isHtml: false,
-        icon: 'warning',
+      Alert({
+        icon: 'warn',
         title: 'Atencion',
-        content: 'Debe llegar el campo para guardar el evento.'
+        content: 'Debe llegar el campo para guardar el evento',
+        showCancelButton: false,
+        timer: 5000
       })
-      return setAlert(true)
+      return
     }
 
     const data = {
@@ -159,13 +166,14 @@ function Form({ onClick, data, from = 'EX' }) {
       Number(priority) !== prioridad_cliente && updatePriority(dataPriority)
       return onClick()
     }
-    setAlertContent({
-      isHtml: false,
+    Alert({
       icon: 'error',
       title: 'Error',
-      content: 'Error al guardar el evento guardar el evento.'
+      content: 'Error al guardar el evento guardar el evento.',
+      showCancelButton: false,
+      timer: 5000
     })
-    setAlert(true)
+
     onClick()
   }
 
@@ -174,7 +182,7 @@ function Form({ onClick, data, from = 'EX' }) {
   }
 
   useEffect(() => {
-    setEvent(historial.map(el => ({
+    setEvents(historial.map(el => ({
       select: false,
       id: el.id_evento,
       rec: el.desc_emisor
@@ -183,13 +191,13 @@ function Form({ onClick, data, from = 'EX' }) {
 
   useEffect(() => {
     if (idEvent.length > 0) {
-      const filter = event.filter(item => item.id === idEvent[0])
+      const filter = events.filter(item => item.id === idEvent[0])
       setReceiverName(filter[0].rec)
     }
     else {
       setReceiverName(null)
     }
-  }, [event])
+  }, [events])
 
   return (
     <>
@@ -252,7 +260,7 @@ function Form({ onClick, data, from = 'EX' }) {
                       type="checkbox"
                       onChange={(e) => {
                         const check = e.target.checked
-                        setEvent(event.map(ev => {
+                        setEvents(events.map(ev => {
                           if (ev.id === item.id_evento) {
                             if (check) {
                               setIdEvent([...idEvent, ev.id])
@@ -339,27 +347,6 @@ function Form({ onClick, data, from = 'EX' }) {
           </div>
         </div>
       </div>
-
-      <Alert
-        html={isHtml}
-        show={alert}
-        showCancelButton={false}
-        icon={icon}
-        title={title}
-        content={!isHtml && content}
-        onAction={() => setAlert(false)}>
-        {isHtml &&
-          <p className="text-gray-700">
-            Caracter <b className="font-semibold text-black text-xl">{content.char} No Permitido</b>,
-            por favor revise el texto ingresado.
-            <br />
-            <br />
-            <b className="font-semibold capitalize">Caracteres no permitidos:</b>
-            <br />
-            {content.list}
-          </p>
-        }
-      </Alert>
     </>
   )
 }

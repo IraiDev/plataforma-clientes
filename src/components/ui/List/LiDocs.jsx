@@ -1,52 +1,36 @@
 import React, { useContext, useState } from 'react'
 import { Ticket } from '../../../context/Ticket'
 import { Ui } from '../../../context/Ui'
-import { showAlert } from '../../../helpers/alerts'
-import Alert from '../alert/Alert'
+import { Alert } from '../../../helpers/alerts'
 import Button from '../button/Button'
 
 const urlRA = 'http://www.zcloud.cl/registro_avance/'
 const urlTicket = 'http://www.zcloud.cl/'
-
-const initialState = {
-  ok: false,
-  icon: 'warning',
-  title: 'Atencion',
-  content: 'P',
-  cancelButton: true,
-  action: true
-}
 
 function LiDocs(props) {
   const { children, type, route, idActivity, isPublic, from, id, onClick } = props
   const { deleteDoc, toggleDoc } = useContext(Ticket)
   const { toggleLoading } = useContext(Ui)
   const [check, setCheck] = useState(isPublic === 'PU')
-  const [alert, setAlert] = useState(false)
-  const [{ ok, icon, title, content, cancelButton, action }, setAlertContent] = useState(initialState)
 
   const handleDelete = () => {
-    setAlertContent(initialState)
-    setAlert(true)
   }
 
   const onDelete = async () => {
-    if (!ok) {
+    if (true) {
       toggleLoading(true)
-      setAlert(false)
       const data = { id_docum: 123123123, tipo: type }
       const resp = await deleteDoc(data)
       if (resp) onClick()
       else {
-        showAlert({
+        Alert({
           icon: 'error',
           title: 'Error',
           content: 'Error al eliminar el archivo, vuelva a intentarlo.',
+          showCancelButton: false,
+          timer: 5000
         })
       }
-    }
-    else {
-      setAlert(false)
     }
   }
 
@@ -56,31 +40,30 @@ function LiDocs(props) {
     const action = async () => {
       const resp = await toggleDoc({ id_docum: id, accion: target ? 'PU' : 'PR' })
       if (!resp) {
-        console.log('ok false');
-        showAlert({
+        Alert({
           title: 'Error',
           icon: 'error',
-          html: 'Hubo un error al cambiar el estado del archivo, vuelva a intentarlo'
+          content: 'Hubo un error al cambiar el estado del archivo, vuelva a intentarlo',
+          showCancelButton: false,
+          timer: 5000
         })
         setCheck(isPublic === 'PU')
       }
       else setCheck(target)
-      console.log('ok true');
     }
 
-    showAlert({
+    Alert({
       icon: 'info',
-      title: 'Atencion',
-      showCancelButton: true,
+      title: 'Cambio de privacidad',
       cancelButtonText: 'No, cancelar',
       confirmButtonText: 'Si, Cambiar',
+      content: `Se cambiara el estado del archivo  
+      <b"${children}"</p> de: </br>
+      <b${isPublic === 'PU' ? 'Publico' : 'Privado'}</b> a 
+      <b${isPublic !== 'PU' ? 'Publico' : 'Privado'}</b> </br>
+      <b>¿Esta seguro de realizar esta accion?</b>
+      `,
       action,
-      html: `Se cambiara el estado del archivo  
-      <p class="inline font-semibold">"${children}"</p> de
-      <p class="inline font-semibold">${isPublic === 'PU' ? 'Publico' : 'Privado'}</p> a 
-      <p class="inline font-semibold">${isPublic !== 'PU' ? 'Publico' : 'Privado'}</p>
-      <p>¿Esta seguro de realizar esta accion?</p>
-      `
     })
   }
 

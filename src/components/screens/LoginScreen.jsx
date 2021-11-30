@@ -3,7 +3,7 @@ import loginIMG from '../../assets/img/login.jpg'
 import logo from '../../assets/img/logo25x25.png'
 import { Ticket } from '../../context/Ticket'
 import { Ui } from '../../context/Ui'
-import { showAlert } from '../../helpers/alerts'
+import { Alert } from '../../helpers/alerts'
 import { useForm } from '../../hooks/useForm'
 import Button from '../ui/button/Button'
 import Input from '../ui/input/Input'
@@ -31,10 +31,11 @@ function LoginScreen({ onLogin }) {
   const recoverPin = async () => {
     const r = validateRUT(rut)
     if (rut === '' || !r) {
-      showAlert({
+      Alert({
         title: 'Atencion',
-        icon: 'warn',
-        html: 'Campo vacio o rut invalido, por favor verifiquelo y vuelva a intentarlo.'
+        content: 'El campo esta vacio o el RUT invalido, por favor verifiquelo y vuelva a intentarlo',
+        showCancelButton: false,
+        timer: 7000
       })
       return
     }
@@ -42,21 +43,25 @@ function LoginScreen({ onLogin }) {
     toggleLoading(true)
 
     const { ok, response } = await getUserPin(rut, true)
-    const { nombre, pin } = response
+
     if (ok) {
-      showAlert({
+      const { nombre, pin } = response
+      Alert({
         title: nombre,
         icon: 'info',
-        html: `Su pin es: <p class="font-semibold inline">${pin}</p> <p>Le recomendamos guardarlo.</p>`
+        content: `Su pin es: <b>${pin}</b> </br> Le recomendamos guardarlo`,
+        showCancelButton: false,
       })
       reset()
       setShowModal(false)
     }
     else {
-      showAlert({
-        title: 'Informacion',
-        icon: 'info',
-        html: '<p>El usuario no existe, <b class="font-semibold">recuerde agregar los puntos y guion al digitar su rut</b>, por favor verifique el rut ingresado y vuelva a intentarlo</p>'
+      Alert({
+        title: 'Atencion',
+        icon: 'warn',
+        content: 'El usuario no existe o formato del RUT es incorrecto, <b>recuerde los puntos y el guion</b> </br> ej: 12.345.678-9',
+        showCancelButton: false,
+        timer: 5000
       })
     }
   }

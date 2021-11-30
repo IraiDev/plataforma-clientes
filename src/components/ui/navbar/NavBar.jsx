@@ -11,7 +11,7 @@ import { useForm } from '../../../hooks/useForm'
 import LiNotes from '../List/LiNotes'
 import { Ui } from '../../../context/Ui'
 import { checkForms } from '../../../helpers/helpers'
-import { showAlert } from '../../../helpers/alerts'
+import { Alert } from '../../../helpers/alerts'
 const notAllow = ['exe', 'js']
 
 function NavBar({ onMultiLine, isMultiLine }) {
@@ -76,16 +76,18 @@ function NavBar({ onMultiLine, isMultiLine }) {
   }
 
   const onChangeFile = (e) => {
-    if (e.target.files[0].size < 5242881) {
+    if (e.target.files[0].size < 1) {
       setFile(e.target.files[0])
     }
     else {
       setFile(null)
       setResetFile(randomString)
-      showAlert({
+      Alert({
         title: 'Atencion',
         icon: 'warn',
-        html: 'Archivo excede el peso permitido por el sistema, peso maximo 5MB',
+        content: 'Archivo excede el peso permitido por el sistema, <b>peso maximo 5MB</b>',
+        showCancelButton: false,
+        timer: 7000
       })
       return
     }
@@ -119,23 +121,23 @@ function NavBar({ onMultiLine, isMultiLine }) {
     }
 
     if (ts) {
-      showAlert({ title: 'Atencion', icon: 'warn', html: AlertContent(tc, 'titulo', tl) })
+      Alert({ title: 'Atencion', icon: 'warn', content: AlertContent(tc, 'titulo', tl), showCancelButton: false, timer: 7000 })
       return
     }
     if (cs) {
-      showAlert({ title: 'Atencion', icon: 'warn', html: AlertContent(cc, 'correo', cl) })
+      Alert({ title: 'Atencion', icon: 'warn', content: AlertContent(cc, 'correo', cl), showCancelButton: false, timer: 7000 })
       return
     }
     if (ps) {
-      showAlert({ title: 'Atencion', icon: 'warn', html: AlertContent(pc, 'telefono', pl) })
+      Alert({ title: 'Atencion', icon: 'warn', content: AlertContent(pc, 'telefono', pl), showCancelButton: false, timer: 7000 })
       return
     }
     if (ds) {
-      showAlert({ title: 'Atencion', icon: 'warn', html: AlertContent(dc, 'descripcion', dl) })
+      Alert({ title: 'Atencion', icon: 'warn', content: AlertContent(dc, 'descripcion', dl), showCancelButton: false, timer: 7000 })
       return
     }
     if (title === '' || desc === '' || email === '' || phone === '' || option === null) {
-      showAlert({ title: 'Atencion', icon: 'warn', html: 'Debes seleccionar proyecto y llenar todos los campos' })
+      Alert({ title: 'Atencion', icon: 'warn', content: 'Debes seleccionar proyecto y llenar todos los campos', showCancelButton: false, timer: 5000 })
       return
     }
 
@@ -144,10 +146,12 @@ function NavBar({ onMultiLine, isMultiLine }) {
       const ext = name[name.length - 1]
 
       if (notAllow.includes(ext)) {
-        showAlert({
+        Alert({
           title: 'Advertencia',
           icon: 'error',
-          html: 'No se puede subir archivos con extensiones, .exe, .js, estos seran removidos de la seleccion.'
+          content: 'No se puede subir archivos con extensiones, .exe, .js, estos seran removidos de la seleccion.',
+          showCancelButton: false,
+          timer: 5000
         })
         setFile(null)
         return
@@ -169,7 +173,7 @@ function NavBar({ onMultiLine, isMultiLine }) {
 
     if (resp) return onCloseTicket()
 
-    showAlert({ title: 'Atencion', icon: 'error', html: 'Error al crear ticket, vuelva a intentarlo.' })
+    Alert({ title: 'Atencion', icon: 'error', content: 'Error al crear ticket, vuelva a intentarlo.', showCancelButton: false, timer: 5000 })
   }
 
   const handleFilter = () => {
@@ -205,19 +209,43 @@ function NavBar({ onMultiLine, isMultiLine }) {
 
   const handleUpdateUser = async () => {
     if (pin === '' || pin !== pin) {
-      showAlert('Atencion', 'Su pin actual no coincide con el ingresado o el campo esta vacio, por favor  verifiquelo y vuelva a intentarlo', 'Aceptar')
+      Alert({
+        icon: 'warn',
+        title: 'Atencion',
+        content: 'Su pin actual no coincide con el ingresado o el campo esta vacio, por favor  verifiquelo y vuelva a intentarlo',
+        showCancelButton: false,
+        timer: 5000
+      })
       return
     }
     if (newPin.length !== 8) {
-      showAlert('Atencion', 'El pin debe tener 8 caracteres, solo numeros y letras', 'Aceptar')
+      Alert({
+        icon: 'warn',
+        title: 'Atencion',
+        content: 'El pin debe tener 8 caracteres, solo numeros y letras',
+        showCancelButton: false,
+        timer: 5000
+      })
       return
     }
     if (newPin !== repeatPin) {
-      showAlert('Atencion', 'El pin nuevo no coincide con su reingreso, verifiquelo y vuelva a intentarlo', 'Aceptar')
+      Alert({
+        icon: 'warn',
+        title: 'Atencion',
+        content: 'El pin nuevo no coincide con su reingreso, verifiquelo y vuelva a intentarlo',
+        showCancelButton: false,
+        timer: 5000
+      })
       return
     }
     if (newPin === pin) {
-      showAlert('Atencion', 'El nuevo pin no puede ser igual a su pin actual, por favor modifiquelo y vuelva a intentarlo', 'Aceptar')
+      Alert({
+        icon: 'warn',
+        title: 'Atencion',
+        content: 'El nuevo pin no puede ser igual a su pin actual, por favor modifiquelo y vuelva a intentarlo',
+        showCancelButton: false,
+        timer: 5000
+      })
       return
     }
 
@@ -235,13 +263,25 @@ function NavBar({ onMultiLine, isMultiLine }) {
     const { ok, msg } = await updateUser(data)
 
     if (ok) {
-      showAlert('Atencion', msg, 'Aceptar')
+      Alert({
+        icon: 'warn',
+        title: 'Atencion',
+        content: msg,
+        showCancelButton: false,
+        timer: 5000
+      })
       setCheck(false)
       reset()
       setModalUser(false)
     }
     else {
-      showAlert('Atencion', 'Error al actualizar usaurio, por favor verifique los datos y vuelva a intentarlo', 'Aceptar')
+      Alert({
+        icon: 'warn',
+        title: 'Atencion',
+        content: 'Error al actualizar usuario, por favor verifique los datos y vuelva a intentarlo',
+        showCancelButton: false,
+        timer: 5000
+      })
     }
   }
 

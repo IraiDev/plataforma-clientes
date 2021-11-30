@@ -1,11 +1,11 @@
 import React, { useContext, useState } from 'react'
-import { showAlert } from '../helpers/alerts'
+import { Alert } from '../helpers/alerts'
 import { fetchToken, fetchTokenFile, fetchUnToken } from '../helpers/fetch'
 import { Ui } from './Ui'
 
 export const Ticket = React.createContext()
 
-const msg = '-- “Estimado Usuario este pin no es reconocido por el sistema, deben ser solo letras y números (mínimo 8), intente nuevamente por favor o en su defecto dejar su dirección de correo electrónico en casilla y luego elegir procesar, el sistema le enviará indicaciones, OBS: si la dirección e-mail proporcionada por usted no está en nuestros registros el correo no será enviado”--'
+const msg = '-- “Estimado Usuario este pin no es reconocido por el sistema, deben ser solo letras y números, si lo ha olvidado dirigase a la opcion ¿Olvido su pin? para recuperarlo”--'
 
 function TicketProvider({ children }) {
 
@@ -17,7 +17,13 @@ function TicketProvider({ children }) {
   const login = async (data) => {
 
     if (data.pin === '') {
-      showAlert({ title: 'PIN vacio', icon: 'info', html: 'Debes llenar el campo' })
+      Alert({
+        icon: 'warn',
+        title: 'Atencion',
+        content: 'El campo pin esta vacio, por favor introduce tu pin',
+        showCancelButton: false,
+        timer: 5000
+      })
       toggleLoading(false)
       return
     }
@@ -47,15 +53,33 @@ function TicketProvider({ children }) {
     }
     else {
       if (tipo === 1) {
-        showAlert({ title: 'Atencion', icon: 'info', html: msg })
+        Alert({
+          title: 'Atencion',
+          icon: 'info',
+          content: msg,
+          showCancelButton: false,
+          timer: 7000
+        })
         return false
       }
       if (tipo === 2) {
-        showAlert({ title: 'Atencion 2', icon: 'info', html: msg })
+        Alert({
+          title: 'Atencion',
+          icon: 'info',
+          content: msg,
+          showCancelButton: false,
+          timer: 7000
+        })
         return false
       }
       if (tipo === 3) {
-        showAlert({ title: 'PIN recuperado', icon: 'info', html: msg })
+        Alert({
+          title: 'PIN recuperado',
+          icon: 'info',
+          content: msg,
+          showCancelButton: false,
+          timer: 7000
+        })
         return false
       }
     }
@@ -240,7 +264,6 @@ function TicketProvider({ children }) {
   }
 
   const addDoc = async (data) => {
-
     const resp = await fetchTokenFile('ticket/add-document', data, 'POST')
     const body = await resp.json()
     const { ok } = body
@@ -265,7 +288,7 @@ function TicketProvider({ children }) {
     if (ok) return { ok, response: resUser }
     else {
       console.log('fallo la consulta (getPin)', body)
-      return { ok }
+      return { ok, response: null }
     }
   }
 
