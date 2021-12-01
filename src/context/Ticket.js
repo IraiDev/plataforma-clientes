@@ -12,6 +12,7 @@ function TicketProvider({ children }) {
   const { toggleLoading } = useContext(Ui)
   const [user, setUser] = useState({ ok: false })
   const [ticketList, setTicketList] = useState([])
+  const [ticketDetail, setTicketDetail] = useState({})
   const [filters, setFilters] = useState({})
 
   const login = async (data) => {
@@ -160,6 +161,10 @@ function TicketProvider({ children }) {
 
   const getTicketList = async (params = null) => {
 
+    if (params.emisores.length < 1 || params.estados.length < 1 || params.proyectos.length < 1) setTicketList([])
+    if (params.emisores.length < 1) return
+    if (params.estados.length < 1) return
+    if (params.proyectos.length < 1) return
     if (params === null) params = filters
 
     const resp = await fetchToken('ticket/get-tickets', params, 'POST')
@@ -182,8 +187,11 @@ function TicketProvider({ children }) {
 
     console.log(body)
 
-    if (ok) return arrayResp[0]
-    console.log('fallo la solicitud (getTicketsDetails)', body)
+    if (ok) {
+      setTicketDetail(arrayResp[0])
+      return arrayResp[0]
+    }
+    else { console.log('fallo la peticion (getTicketDetails): ', body) }
   }
 
   const createTicket = async (data) => {
@@ -191,88 +199,96 @@ function TicketProvider({ children }) {
     const body = await resp.json()
     const { ok } = body
 
-    toggleLoading(false)
-
     if (ok) {
       getTicketList()
       return true
     }
     else {
       console.log('fallo la consulta (createTicket)', body)
+      toggleLoading(false)
       return false
     }
   }
 
-  const updatePriority = async (data) => {
+  const updatePriority = async ({ data, id }) => {
 
     const resp = await fetchToken('ticket/cambiar-prioridad-cliente', data, 'POST')
     const body = await resp.json()
     const { ok } = body
 
-    toggleLoading(false)
-
-    if (ok) return true
+    if (ok) {
+      getTicketDetails(id)
+      return true
+    }
     else {
       console.log('fallo la consulta (updatePriority)', body)
+      toggleLoading(false)
       return false
     }
   }
 
-  const createEvent = async (data) => {
+  const createEvent = async ({ data, id }) => {
 
     const resp = await fetchToken('ticket/insert-evento', data, 'POST')
     const body = await resp.json()
     const { ok } = body
 
-    toggleLoading(false)
-
-    if (ok) return true
+    if (ok) {
+      getTicketDetails(id)
+      return true
+    }
     else {
       console.log('fallo la consulta (createTicket)', body)
+      toggleLoading(false)
       return false
     }
   }
 
   // docs CRUD
-  const toggleDoc = async (data) => {
-    console.log('data: ', data)
+  const toggleDoc = async ({ data, id }) => {
     const resp = await fetchToken('ticket/check-document', data, 'PUT')
     const body = await resp.json()
     const { ok } = body
 
-    toggleLoading(false)
-
-    if (ok) return true
+    if (ok) {
+      getTicketDetails(id)
+      return true
+    }
     else {
       console.log('fallo la consulta (toggleDocs)', body)
+      toggleLoading(false)
       return false
     }
   }
 
-  const deleteDoc = async (data) => {
+  const deleteDoc = async ({ data, id }) => {
     const resp = await fetchToken('ticket/delete-document', data, 'DELETE')
     const body = await resp.json()
     const { ok } = body
 
-    toggleLoading(false)
-
-    if (ok) return true
+    if (ok) {
+      getTicketDetails(id)
+      return true
+    }
     else {
       console.log('fallo la consulta (deleteDoc)', body)
+      toggleLoading(false)
       return false
     }
   }
 
-  const addDoc = async (data) => {
+  const addDoc = async ({ data, id }) => {
     const resp = await fetchTokenFile('ticket/add-document', data, 'POST')
     const body = await resp.json()
     const { ok } = body
 
-    toggleLoading(false)
-
-    if (ok) return true
+    if (ok) {
+      getTicketDetails(id)
+      return true
+    }
     else {
       console.log('fallo la consulta (addDoc)', body)
+      toggleLoading(false)
       return false
     }
   }
@@ -299,7 +315,10 @@ function TicketProvider({ children }) {
 
     toggleLoading(false)
 
-    if (ok) return { ok, msg }
+    if (ok) {
+      validateSession()
+      return { ok, msg }
+    }
     else {
       console.log('fallo la consulta (updateUser)', body)
       return { ok }
@@ -335,7 +354,9 @@ function TicketProvider({ children }) {
     saveFilters,
     createEvent,
     user,
-    ticketList
+    ticketList,
+    ticketDetail,
+    filters
   }
 
   return (

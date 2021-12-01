@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import ReactDOM from 'react-dom'
 
 const portal = document.getElementById('modal-root')
@@ -6,10 +6,18 @@ const portal = document.getElementById('modal-root')
 const Modal = ({ children, showModal, onClose, isBlur = true, className = 'md:w-3/5 p-5' }) => {
 
   const onBlur = () => {
-    if (isBlur) {
-      onClose()
-    }
+    if (isBlur) onClose()
   }
+
+  useEffect(() => {
+    if (showModal) {
+      const body = document.querySelector('body')
+      body.classList.add('overflow-hidden')
+    } else {
+      const body = document.querySelector('body')
+      body.classList.remove('overflow-hidden')
+    }
+  }, [showModal])
 
   if (showModal) {
     return ReactDOM.createPortal(

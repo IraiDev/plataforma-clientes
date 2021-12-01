@@ -27,6 +27,7 @@ function NavBar({ onMultiLine, isMultiLine }) {
   const [file, setFile] = useState(null)
   const [resetFile, setResetFile] = useState(randomString)
   const [questions, setQuestions] = useState([])
+  const [filter, setFilter] = useState({ pr: ['???'], us: ['???'], st: ['???'] })
 
   // checkboxes
   const [check, setCheck] = useState(false)
@@ -36,7 +37,7 @@ function NavBar({ onMultiLine, isMultiLine }) {
   const [projectsAll, setProjectsAll] = useState(false)
   const [usersAll, setUsersAll] = useState(false)
   const [statesAll, setStatesAll] = useState(false)
-  const [oldState, setOldState] = useState({ pr: [], us: [], st: [] })
+  const [{ p, u, s }, setOldState] = useState({ p: [], u: [], s: [] })
   // checkboxes
 
   // custom hooks
@@ -51,28 +52,39 @@ function NavBar({ onMultiLine, isMultiLine }) {
     const pr = await getProjects()
     const us = await getUsers(data)
     const st = await getStates(data)
-    setProjects(pr.map(pr => ({
-      value: pr.id_proyecto,
-      label: pr.desc_proyecto,
-      select: false
-    })))
-    setUsers(us.map(us => ({
-      value: us.rut,
-      label: us.nombre,
-      select: false
-    })))
-    setStates(st.map(st => ({
-      value: st.id,
-      label: st.est,
-      select: false
-    })))
+
+    const tempPr = pr.map(item => ({ value: item.id_proyecto, label: item.desc_proyecto, select: false }))
+    const tempUs = us.map(item => ({ value: item.rut, label: item.nombre, select: false }))
+    const tempSt = st.map(item => ({ value: item.id, label: item.est, select: false }))
+
+    setProjects(tempPr)
+    setUsers(tempUs)
+    setStates(tempSt)
+    setOldState({
+      p: tempPr,
+      u: tempUs,
+      s: tempSt,
+    })
   }
 
-  const getIds = (arr) => {
-    const complete = arr
-    let id = arr.filter(item => item.select === true)
-    id = id.map(item => item.value)
-    return { complete, id }
+  const getFilterSelection = (arr) => {
+    let name = []
+    const filter = arr.filter(item => item.select === true)
+
+    if (filter.length !== 0) {
+      if (filter.length === arr.length) name.push('todos')
+      else {
+        name = filter.map((item, index) => {
+          if (index < filter.length - 1) return `${item.label}, `
+          else return item.label
+        })
+      }
+    }
+    else name.push('???')
+
+    const id = filter.map(item => item.value)
+
+    return { filter, id, name }
   }
 
   const onChangeFile = (e) => {
@@ -175,18 +187,41 @@ function NavBar({ onMultiLine, isMultiLine }) {
 
     Alert({ title: 'Atencion', icon: 'error', content: 'Error al crear ticket, vuelva a intentarlo.', showCancelButton: false, timer: 5000 })
   }
-
+  // FIXME: ver el porque no se se guarda el estado antiguo
   const handleFilter = () => {
-    toggleLoading(true)
-    const pr = getIds(projects)
-    const us = getIds(users)
-    const st = getIds(states)
+    const pr = getFilterSelection(projects)
+    const us = getFilterSelection(users)
+    const st = getFilterSelection(states)
 
-    setOldState({
-      pr: pr.complete,
-      us: us.complete,
-      st: st.complete,
+    if (pr.id.length > 0 && us.id.length > 0 && st.id.length > 0) toggleLoading(true)
+
+    setFilter({
+      pr: pr.name,
+      us: us.name,
+      st: st.name,
     })
+
+    // const f = () => {
+    //   const pp = projects.map(item => {
+    //     if (pr.id.includes(item.value)) return { ...item, select: true }
+    //     else return { ...item, select: false }
+    //   })
+
+    //   const uu = users.map(item => {
+    //     if (us.id.includes(item.value)) return { ...item, select: true }
+    //     else return { ...item, select: false }
+    //   })
+
+    //   const ss = states.map(item => {
+    //     if (st.id.includes(item.value)) return { ...item, select: true }
+    //     else return { ...item, select: false }
+    //   })
+
+    //   console.log('se ejecuta la funcionnnnnn');
+
+    //   setOldState({ p: pp, u: uu, s: ss })
+    // }
+    // f()
 
     const data = {
       rut_usuario: user.rut, proyectos: pr.id, emisores: us.id, estados: st.id
@@ -196,23 +231,24 @@ function NavBar({ onMultiLine, isMultiLine }) {
     getTicketList(data)
     setModalFilter(false)
   }
-
+  // FIXME: ver porque no funciona el cancelar para volver al estado antiguo  
   const handleCancel = () => {
-    setProjects(oldState.pr)
-    setUsers(oldState.us)
-    setStates(oldState.st)
-    setProjectsAll(oldState.pr.every(item => item.select === true))
-    setUsersAll(oldState.us.every(item => item.select === true))
-    setStatesAll(oldState.st.every(item => item.select === true))
+    // console.log(prevState.p);
+    // setProjects(prevState.p)
+    // setUsers(prevState.u)
+    // setStates(prevState.s)
+    // setProjectsAll(prevState.p.every(item => item.select === true))
+    // setUsersAll(prevState.u.every(item => item.select === true))
+    // setStatesAll(prevState.s.every(item => item.select === true))
     setModalFilter(false)
   }
 
   const handleUpdateUser = async () => {
-    if (pin === '' || pin !== pin) {
+    if (pin === '' || pin !== user.pin) {
       Alert({
         icon: 'warn',
         title: 'Atencion',
-        content: 'Su pin actual no coincide con el ingresado o el campo esta vacio, por favor  verifiquelo y vuelva a intentarlo',
+        content: 'Su pin actual no coincide con el ingresado o el campo esta vacio, por favor verifiquelo y vuelva a intentarlo',
         showCancelButton: false,
         timer: 5000
       })
@@ -228,6 +264,18 @@ function NavBar({ onMultiLine, isMultiLine }) {
       })
       return
     }
+
+    if (!/^[a-zA-Z0-9]*$/g.test(newPin)) {
+      Alert({
+        icon: 'warn',
+        title: 'Atencion',
+        content: 'El pin debe tener solo letras y numeros',
+        showCancelButton: false,
+        timer: 5000
+      })
+      return
+    }
+
     if (newPin !== repeatPin) {
       Alert({
         icon: 'warn',
@@ -287,6 +335,7 @@ function NavBar({ onMultiLine, isMultiLine }) {
 
   const onCloseUser = () => {
     setModalUser(false)
+    setCheck(false)
     reset()
     setValues({
       email: user.email,
@@ -296,28 +345,60 @@ function NavBar({ onMultiLine, isMultiLine }) {
   }
 
   useEffect(() => {
+    const loadUsersFilter = async () => {
+      let p = projects.filter(item => item.select === true)
+      p = p.map(item => item.value)
+
+      if (p.length > 0) {
+        setStates([])
+        setUsers([])
+        setStatesAll(false)
+        setUsersAll(false)
+        const data = { rut_usuario: user.rut, proyectos: p }
+        const us = await getUsers(data)
+        setUsers(us.map(item => ({
+          value: item.rut,
+          label: item.nombre,
+          select: false
+        })))
+
+        const st = await getStates(data)
+        setStates(st.map(item => ({
+          value: item.id,
+          label: item.est,
+          select: false
+        })))
+      }
+    }
+    loadUsersFilter()
+  }, [projects])
+
+  useEffect(() => {
     setValues({
       email: user.email,
       phone: user.phone,
       pin: user.pin
     })
+  }, [user])
+
+  useEffect(() => {
     getFilters()
   }, [])
 
   useEffect(() => {
     if (option !== null) {
       toggleLoading(true)
-      const resp = async () => {
-        const q = await getQuestion(option.value)
-        setQuestions(q)
+      const get_questions = async () => {
+        const resp = await getQuestion(option.value)
+        setQuestions(resp)
       }
-      resp()
+      get_questions()
     }
   }, [option])
 
   return (
     <>
-      <nav className="sticky top-0 h-20 z-40 bg-white shadow-lg flex justify-between items-center pl-3 pr-5 lg:px-14">
+      <nav className="sticky top-0 h-20 z-40 bg-white shadow-lg flex justify-between items-center pl-3 pr-5 lg:px-5">
         <Button className="hover:bg-gray-200 rounded-lg inline lg:hidden"
           type="icon" />
         <Button
@@ -325,9 +406,14 @@ function NavBar({ onMultiLine, isMultiLine }) {
           type="iconText"
           tooltip="Modificar usuario"
           icon="fas fa-user-cog"
-          name={user.fullName}
+          name={user.name}
           onClick={() => setModalUser(true)}
         />
+        <div className="lg:hidden">
+          <TextContent className="text-xs uppercase" tag="proyectos" value={filter.pr} />
+          <TextContent className="text-xs uppercase" tag="emisores" value={filter.us} />
+          <TextContent className="text-xs uppercase" tag="estados" value={filter.st} />
+        </div>
         <div className="hidden lg:flex items-center gap-3">
           <Button
             className="rounded-full hover:bg-gray-100"
@@ -361,9 +447,9 @@ function NavBar({ onMultiLine, isMultiLine }) {
         </div>
         <div className="hidden lg:flex items-center">
           <div className="mr-2">
-            <TextContent className="text-xs" tag="proyectos" value="???" />
-            <TextContent className="text-xs" tag="emisores" value="???" />
-            <TextContent className="text-xs" tag="estados" value="???" />
+            <TextContent className="text-xs uppercase" tag="proyectos" value={filter.pr} />
+            <TextContent className="text-xs uppercase" tag="emisores" value={filter.us} />
+            <TextContent className="text-xs uppercase" tag="estados" value={filter.st} />
           </div>
           <Button
             tooltip="Cerrar sesion"
@@ -375,7 +461,6 @@ function NavBar({ onMultiLine, isMultiLine }) {
       </nav>
 
       {/* Modal update User */}
-
       <Modal showModal={modalUser} isBlur={false} onClose={onCloseUser}
         className="max-w-min p-8">
         <h5 className="text-xl mb-4">Modificar usuario</h5>
@@ -467,7 +552,6 @@ function NavBar({ onMultiLine, isMultiLine }) {
       </Modal>
 
       {/* Modal nuevo ticket */}
-
       <Modal showModal={modalTicket} isBlur={false} onClose={onCloseTicket}
         className="max-w-4xl p-8">
         <h1 className="text-xl font-semibold capitalize inline">nuevo Ticket</h1>
@@ -541,145 +625,153 @@ function NavBar({ onMultiLine, isMultiLine }) {
       </Modal>
 
       {/* modal filtros */}
-
       <Modal showModal={modalFilter} isBlur={false} onClose={() => setModalFilter(false)}
         className="max-w-7xl p-8">
         <h1 className="text-xl font-semibold capitalize inline">seleccion de filtros</h1>
         <div className="text-sm grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
           <Container className="w-full" tag="Seleccione Proyectos">
-            <ul className="h-full overflow-y-auto uppercase">
-              <li>
-                <input
-                  className="mr-2 cursor-pointer"
-                  type="checkbox"
-                  checked={projectsAll}
-                  onChange={
-                    (e) => {
-                      const check = e.target.checked
-                      setProjectsAll(check)
-                      setProjects(projects.map(el => {
-                        el.select = check
-                        return el
-                      }))
-                    }
-                  } />
-                Todos
-              </li>
-              {
-                projects.map((item) => (
-                  <li key={item.value}>
-                    <input
-                      key={item.value}
-                      id={item.value}
-                      className="mr-2 cursor-pointer"
-                      type="checkbox"
-                      checked={item.select}
-                      onChange={(e) => {
+            {projects.length > 0 ?
+              <ul className="h-full overflow-y-auto uppercase">
+                <li>
+                  <input
+                    className="mr-2 cursor-pointer"
+                    type="checkbox"
+                    checked={projectsAll}
+                    onChange={
+                      (e) => {
                         const check = e.target.checked
+                        setProjectsAll(check)
                         setProjects(projects.map(el => {
-                          if (item.value === el.value) {
-                            el.select = check
-                          }
+                          el.select = check
                           return el
                         }))
-                        setProjectsAll(projects.every(el => el.select === true))
-                      }}
-                    />
-                    {item.label}
-                  </li>
-                ))
-              }
-            </ul>
+                      }
+                    } />
+                  Todos
+                </li>
+                {
+
+                  projects.map((item) => (
+                    <li key={item.value}>
+                      <input
+                        key={item.value}
+                        id={item.value}
+                        className="mr-2 cursor-pointer"
+                        type="checkbox"
+                        checked={item.select}
+                        onChange={(e) => {
+                          const check = e.target.checked
+                          setProjects(projects.map(el => {
+                            if (item.value === el.value) {
+                              el.select = check
+                            }
+                            return el
+                          }))
+                          setProjectsAll(projects.every(el => el.select === true))
+                        }}
+                      />
+                      {item.label}
+                    </li>
+                  ))
+                }
+              </ul> : <p className="animate-pulse">cargando <i className="fas fa-spinner animate-spin"></i></p>
+            }
           </Container>
           <Container className="w-full" tag="Seleccione Emisores">
-            <ul className="h-full overflow-y-auto uppercase">
-              <li>
-                <input
-                  className="mr-2 cursor-pointer"
-                  type="checkbox"
-                  checked={usersAll}
-                  onChange={
-                    (e) => {
-                      const check = e.target.checked
-                      setUsersAll(check)
-                      setUsers(users.map(el => {
-                        el.select = check
-                        return el
-                      }))
-                    }
-                  } />
-                Todos
-              </li>
-              {
-                users.map((item) => (
-                  <li key={item.value}>
-                    <input
-                      key={item.value}
-                      id={item.value}
-                      className="mr-2 cursor-pointer"
-                      type="checkbox"
-                      checked={item.select}
-                      onChange={(e) => {
+            {users.length > 0 ?
+              <ul className="h-full overflow-y-auto uppercase">
+                <li>
+                  <input
+                    className="mr-2 cursor-pointer"
+                    type="checkbox"
+                    checked={usersAll}
+                    onChange={
+                      (e) => {
                         const check = e.target.checked
+                        setUsersAll(check)
                         setUsers(users.map(el => {
-                          if (item.value === el.value) {
-                            el.select = check
-                          }
+                          el.select = check
                           return el
                         }))
-                        setUsersAll(users.every(el => el.select === true))
-                      }}
-                    />
-                    {item.label}
-                  </li>
-                ))
-              }
-            </ul>
+                      }
+                    } />
+                  Todos
+                </li>
+                {
+
+                  users.map((item) => (
+                    <li key={item.value}>
+                      <input
+                        key={item.value}
+                        id={item.value}
+                        className="mr-2 cursor-pointer"
+                        type="checkbox"
+                        checked={item.select}
+                        onChange={(e) => {
+                          const check = e.target.checked
+                          setUsers(users.map(el => {
+                            if (item.value === el.value) {
+                              el.select = check
+                            }
+                            return el
+                          }))
+                          setUsersAll(users.every(el => el.select === true))
+                        }}
+                      />
+                      {item.label}
+                    </li>
+                  ))
+                }
+              </ul> : <p className="animate-pulse">cargando <i className="fas fa-spinner animate-spin"></i></p>
+            }
           </Container>
           <Container className="w-full" tag="Seleccione Estados">
-            <ul className="h-full overflow-y-auto uppercase">
-              <li>
-                <input
-                  className="mr-2 cursor-pointer"
-                  type="checkbox"
-                  checked={statesAll}
-                  onChange={
-                    (e) => {
-                      const check = e.target.checked
-                      setStatesAll(check)
-                      setStates(states.map(el => {
-                        el.select = check
-                        return el
-                      }))
-                    }
-                  } />
-                Todos
-              </li>
-              {
-                states.map((item) => (
-                  <li key={item.value}>
-                    <input
-                      key={item.value}
-                      id={item.value}
-                      className="mr-2 cursor-pointer"
-                      type="checkbox"
-                      checked={item.select}
-                      onChange={(e) => {
+            {states.length > 0 ?
+              <ul className="h-full overflow-y-auto uppercase">
+                <li>
+                  <input
+                    className="mr-2 cursor-pointer"
+                    type="checkbox"
+                    checked={statesAll}
+                    onChange={
+                      (e) => {
                         const check = e.target.checked
+                        setStatesAll(check)
                         setStates(states.map(el => {
-                          if (item.value === el.value) {
-                            el.select = check
-                          }
+                          el.select = check
                           return el
                         }))
-                        setStatesAll(states.every(el => el.select === true))
-                      }}
-                    />
-                    {item.label}
-                  </li>
-                ))
-              }
-            </ul>
+                      }
+                    } />
+                  Todos
+                </li>
+                {
+
+                  states.map((item) => (
+                    <li key={item.value}>
+                      <input
+                        key={item.value}
+                        id={item.value}
+                        className="mr-2 cursor-pointer"
+                        type="checkbox"
+                        checked={item.select}
+                        onChange={(e) => {
+                          const check = e.target.checked
+                          setStates(states.map(el => {
+                            if (item.value === el.value) {
+                              el.select = check
+                            }
+                            return el
+                          }))
+                          setStatesAll(states.every(el => el.select === true))
+                        }}
+                      />
+                      {item.label}
+                    </li>
+                  ))
+                }
+              </ul> : <p className="animate-pulse">cargando <i className="fas fa-spinner animate-spin"></i></p>
+            }
           </Container>
         </div>
         <div className="flex justify-center gap-4 mt-10">

@@ -11,9 +11,10 @@ import LiDocs from '../List/LiDocs'
 import Input from '../input/Input'
 import { useForm } from '../../../hooks/useForm'
 import { checkForms } from '../../../helpers/helpers'
-import Alert from '../alert/Alert'
+
 import { Ticket } from '../../../context/Ticket'
 import { Ui } from '../../../context/Ui'
+import { Alert } from '../../../helpers/alerts'
 const notAllow = ['exe', 'js']
 
 const columnEvents = [
@@ -37,12 +38,12 @@ function Form({ onClick, data, from = 'EX' }) {
 
   const { createEvent, addDoc, updatePriority, user } = useContext(Ticket)
   const { toggleLoading } = useContext(Ui)
-  const [{ desc, priority }, onChangeValues] = useForm({ desc: '', priority: prioridad_cliente })
+  const [{ desc, priority }, onChangeValues, reset] = useForm({ desc: '', priority: prioridad_cliente })
   const [file, setFile] = useState(null)
   const [resetFile, setResetFile] = useState(randomString)
   const [events, setEvents] = useState([])
   const [idEvent, setIdEvent] = useState([])
-  const [receiverName, setReceiverName] = useState(null)
+  const [receiver, setReceiver] = useState(null)
 
   const onChangeFile = (e) => {
     if (e.target.files[0].size < 5242881) {
@@ -96,9 +97,10 @@ function Form({ onClick, data, from = 'EX' }) {
     const { state: ok, char, list } = vDesc
 
     if (ok) {
+      toggleLoading(false)
       Alert({
         icon: 'error',
-        title: 'Error',
+        title: 'Advertencia',
         content: `
         Caracter <b class="text-2xl">${char}</b> no permitido, campo <b class="capitalize"/>Descripcion</b></br>
         Caracteres no permitidos por el sistema: </br>
@@ -112,8 +114,10 @@ function Form({ onClick, data, from = 'EX' }) {
 
     if (desc === '') {
       if (vFile) {
-        addDoc(formData)
-        Number(priority) !== prioridad_cliente && updatePriority(dataPriority)
+        addDoc({ data: formData, id: ticket })
+        setFile(null)
+        setResetFile(randomString)
+        Number(priority) !== prioridad_cliente && updatePriority({ data: dataPriority, id: ticket })
         return onClick()
       }
       if (!vFile && file !== null) {
@@ -127,14 +131,15 @@ function Form({ onClick, data, from = 'EX' }) {
         return
       }
       if (Number(priority) !== prioridad_cliente) {
-        updatePriority(dataPriority)
+        updatePriority({ data: dataPriority, id: ticket })
         return onClick()
       }
       toggleLoading(false)
+      console.log('despues del loading');
       Alert({
         icon: 'warn',
         title: 'Atencion',
-        content: 'Debe llegar el campo para guardar el evento',
+        content: 'No puedes crear un evento sin descripcion',
         showCancelButton: false,
         timer: 5000
       })
@@ -148,55 +153,58 @@ function Form({ onClick, data, from = 'EX' }) {
       mensajes_contesta: idEvent,
       emisor: user.rut,
       desc_emisor: user.rut,
-      receptor: receiverName,
+      receptor: receiver.rut,
       publico_privado: from === 'EX' ? 'PU' : 'PR',
       est_evento: state,
       id_proyecto: id_proyecto,
       origen: from
     }
 
-    const resp = await createEvent(data)
+    const resp = await createEvent({ data, id: ticket })
 
     if (resp) {
       if (vFile) {
-        addDoc(formData)
-        Number(priority) !== prioridad_cliente && updatePriority(dataPriority)
+        addDoc({ data: formData, id: ticket })
+        setFile(null)
+        setResetFile(randomString)
+        Number(priority) !== prioridad_cliente && updatePriority({ data: dataPriority, id: ticket })
         return onClick()
       }
-      Number(priority) !== prioridad_cliente && updatePriority(dataPriority)
-      return onClick()
+      Number(priority) !== prioridad_cliente && updatePriority({ data: dataPriority, id: ticket })
     }
-    Alert({
-      icon: 'error',
-      title: 'Error',
-      content: 'Error al guardar el evento guardar el evento.',
-      showCancelButton: false,
-      timer: 5000
-    })
-
+    else {
+      Alert({
+        icon: 'error',
+        title: 'Error',
+        content: 'Error al guardar el evento guardar el evento.',
+        showCancelButton: false,
+        timer: 5000
+      })
+    }
+    setReceiver(null)
+    setIdEvent([])
     onClick()
+    reset()
   }
 
-  const handleDelete = () => {
-    onClick()
+  const handleDeleteDoc = () => {
+    setFile(null)
+    setResetFile(randomString)
+    from === 'EX' && onClick()
   }
 
   useEffect(() => {
     setEvents(historial.map(el => ({
       select: false,
       id: el.id_evento,
-      rec: el.desc_emisor
+      name: el.desc_emisor,
+      rut: el.emisor
     })))
   }, [])
 
   useEffect(() => {
-    if (idEvent.length > 0) {
-      const filter = events.filter(item => item.id === idEvent[0])
-      setReceiverName(filter[0].rec)
-    }
-    else {
-      setReceiverName(null)
-    }
+    if (idEvent.length > 0) setReceiver(events.find(item => item.id === idEvent[0]))
+    else setReceiver(null)
   }, [events])
 
   return (
@@ -285,9 +293,9 @@ function Form({ onClick, data, from = 'EX' }) {
             }
           </Table>
         </div>
-        {receiverName !== null &&
+        {receiver !== null &&
           <h5 className="mb-5 text-xl font-semibold">
-            Para: <p className="text-gray-700 font-normal inline">{receiverName}</p>
+            Para: <p className="text-gray-700 font-normal inline">{receiver.name}</p>
           </h5>
         }
         <TextArea
@@ -312,8 +320,9 @@ function Form({ onClick, data, from = 'EX' }) {
                     type={doc.tipo}
                     route={doc.ruta_docum}
                     idActivity={doc.id_det}
+                    idTicket={ticket}
                     ticket={ticket}
-                    onClick={handleDelete}>
+                    onClick={handleDeleteDoc}>
                     {doc.nom_docum}
                   </LiDocs>
                 ))

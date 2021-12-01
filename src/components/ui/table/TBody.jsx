@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react'
 import { Ticket } from '../../../context/Ticket'
 import { Ui } from '../../../context/Ui'
+import { Alert } from '../../../helpers/alerts'
 import Form from '../form/Form'
 import Modal from '../modal/Modal'
 
@@ -13,8 +14,20 @@ function TBody({ id, children, width = 'min-w-table', isModal = true, className 
 
   const openModal = async () => {
     await toggleLoading(true)
-    setTicketDetails(await getTicketDetails(id))
-    setModalForm(true)
+    const resp = await getTicketDetails(id)
+    if (Object.keys(resp).length > 0) {
+      setTicketDetails(resp)
+      setModalForm(true)
+    }
+    else {
+      Alert({
+        icon: 'error',
+        title: 'Error',
+        content: 'No se pudo obtener los datos del ticket',
+        showCancelButton: false,
+        timer: 5000
+      })
+    }
   }
 
   return (

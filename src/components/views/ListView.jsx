@@ -20,7 +20,47 @@ const columnTickets = [
 
 function ListView({ multiLine }) {
 
-  const { ticketList } = useContext(Ticket)
+  const { ticketList, filters, user } = useContext(Ticket)
+
+  if (Object.keys(filters).length > 0) {
+    if (filters.emisores.length < 1 || filters.proyectos.length < 1 || filters.estados.length < 1) {
+      return (
+        <div className="max-w-3xl bg-white rounded-md p-8 text-center w-max mx-auto shadow-lg mt-20">
+          <p>
+            Por favor seleccione las tres opciones de filtrado <label className="font-semibold capitalize">(Proyectos, emisores y estados)</label>, de lo contrario no se encontrara coincidencias de busqueda.
+            <br />
+            <label className="font-semibold block mt-3">Falta seleccionar:</label>
+          </p>
+          <ul className="font-semibold text-red-500 uppercase mx-auto w-max text-left">
+            {filters.proyectos.length < 1 && <li className="list-inside list-disc">proyectos</li>}
+            {filters.emisores.length < 1 && <li className="list-inside list-disc">emisores</li>}
+            {filters.estados.length < 1 && <li className="list-inside list-disc">estados</li>}
+          </ul>
+        </div>
+      )
+    }
+  }
+
+  if (ticketList.length === 0 && Object.keys(filters).length < 1) {
+    return (
+      <div className="max-w-3xl bg-white rounded-md p-8 text-center w-max mx-auto shadow-lg mt-20">
+        <p>
+          Estimado(a) <label className="font-semibold uppercase">{user.fullName}</label> dado que acaba de ingresar a la plataforma no hay criterios de seleccion aplicados, por favor dirigase a la seccion de <label className="font-bold text-yellow-500 uppercase">filtros</label> para aplicar criterios de busqueda.
+        </p>
+      </div>
+    )
+  }
+
+  if (ticketList.length === 0 && Object.keys(filters).length > 0) {
+    return (
+      <div className="max-w-3xl bg-white rounded-md p-8 text-center w-max mx-auto shadow-lg mt-20">
+        <p>
+          No se encontraron tickets para los filtros aplicados, por favor modificque su seleccion de <label className="font-bold text-yellow-500 uppercase">filtros</label> para realizar una nueva busqueda.
+        </p>
+      </div>
+    )
+  }
+
   return (
     <div className="relative">
       <Table>
@@ -65,6 +105,7 @@ function ListView({ multiLine }) {
       </Table>
     </div>
   )
+
 }
 
 export default ListView
