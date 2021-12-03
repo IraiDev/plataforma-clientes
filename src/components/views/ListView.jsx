@@ -1,7 +1,7 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import Column from '../ui/table/Column'
 import Table from '../ui/table/Table'
-import TBody from '../ui/table/TBody'
+import Row from '../ui/table/Row'
 import THead from '../ui/table/THead'
 import moment from 'moment'
 import { v4 as uuidv4 } from 'uuid'
@@ -21,11 +21,12 @@ const columnTickets = [
 function ListView({ multiLine }) {
 
   const { ticketList, filters, user } = useContext(Ticket)
+  const [idRow, setIdRow] = useState(null)
 
   if (Object.keys(filters).length > 0) {
     if (filters.emisores.length < 1 || filters.proyectos.length < 1 || filters.estados.length < 1) {
       return (
-        <div className="max-w-3xl bg-white rounded-md p-8 text-center w-max mx-auto shadow-lg mt-20">
+        <div className="max-w-3xl bg-white rounded-md p-8 text-center mx-3 md:mx-auto shadow-lg mt-20">
           <p>
             Por favor seleccione las tres opciones de filtrado <label className="font-semibold capitalize">(Proyectos, emisores y estados)</label>, de lo contrario no se encontrara coincidencias de busqueda.
             <br />
@@ -43,7 +44,7 @@ function ListView({ multiLine }) {
 
   if (ticketList.length === 0 && Object.keys(filters).length < 1) {
     return (
-      <div className="max-w-3xl bg-white rounded-md p-8 text-center w-max mx-auto shadow-lg mt-20">
+      <div className="max-w-3xl bg-white rounded-md p-8 text-center mx-3 md:mx-auto shadow-lg mt-20">
         <p>
           Estimado(a) <label className="font-semibold uppercase">{user.fullName}</label> dado que acaba de ingresar a la plataforma no hay criterios de seleccion aplicados, por favor dirigase a la seccion de <label className="font-bold text-yellow-500 uppercase">filtros</label> para aplicar criterios de busqueda.
         </p>
@@ -53,7 +54,7 @@ function ListView({ multiLine }) {
 
   if (ticketList.length === 0 && Object.keys(filters).length > 0) {
     return (
-      <div className="max-w-3xl bg-white rounded-md p-8 text-center w-max mx-auto shadow-lg mt-20">
+      <div className="max-w-3xl bg-white rounded-md p-8 text-center mx-3 md:mx-auto shadow-lg mt-20">
         <p>
           No se encontraron tickets para los filtros aplicados, por favor modificque su seleccion de <label className="font-bold text-yellow-500 uppercase">filtros</label> para realizar una nueva busqueda.
         </p>
@@ -84,7 +85,13 @@ function ListView({ multiLine }) {
         </THead>
         {
           ticketList.map(item => (
-            <TBody className="uppercase" key={item.id_ticket} id={item.id_ticket}>
+            <Row
+              className="uppercase"
+              key={item.id_ticket}
+              id={item.id_ticket}
+              getId={(id) => setIdRow(id)}
+              active={idRow === item.id_ticket && 'border-blue-500 hover:border-blue-600 hover:text-blue-600'}
+            >
               <Column className="p-4 text-center">{item.id_ticket}</Column>
               <Column className="col-span-1 px-4 py-1.5 text-center bg-gray-100">
                 {moment(item.fecha_hora_tx).format('DD-MM-yyyy')}
@@ -96,10 +103,10 @@ function ListView({ multiLine }) {
               </Column>
               <Column className="col-span-1 bg-gray-100 p-4 text-center">{item.user_ticket}</Column>
               <Column isMultiLine={multiLine} className="col-span-2 p-4 capitalize font-semibold">{item.titulo_ticket}</Column>
-              <Column isMultiLine={multiLine} className="col-span-4 p-4 capitalize bg-gray-100">{item.desc_requerimiento}</Column>
+              <Column isMultiLine={multiLine} className="col-span-4 p-4 lowercase bg-gray-100">{item.desc_requerimiento}</Column>
               <Column className={`p-4 capitalize ${item.tiene_pendientes && 'text-red-600 font-semibold'}`}>{item.desc_estado}</Column>
               <Column className="col-span-1 bg-gray-100  text-center p-4 rounded-r-md">{item.prio_cl}</Column>
-            </TBody>
+            </Row>
           ))
         }
       </Table>

@@ -4,7 +4,7 @@ import Table from '../table/Table'
 import THead from '../table/THead'
 import { v4 as uuidv4 } from 'uuid'
 import Column from '../table/Column'
-import TBody from '../table/TBody'
+import Row from '../table/Row'
 import Button from '../button/Button'
 import moment from 'moment'
 import LiDocs from '../List/LiDocs'
@@ -259,7 +259,7 @@ function Form({ onClick, data, from = 'EX' }) {
             {
               historial.length > 0 &&
               historial.map(item => (
-                <TBody key={item.id_evento} className="text-xs text-center text-gray-600" width="min-w-table-md" isModal={false}>
+                <Row key={item.id_evento} className="text-xs text-center text-gray-600" width="min-w-table-md" isModal={false}>
                   <Column className="p-1.5">
                     {item.est_evento}
                     <input
@@ -288,7 +288,7 @@ function Form({ onClick, data, from = 'EX' }) {
                   <Column className="bg-gray-100 p-1.5">{item.desc_emisor}</Column>
                   <Column className="py-1.5">{item.desc_receptor}</Column>
                   <Column className="col-span-7 bg-gray-100 p-1.5 text-justify rounded-r-md">{item.contenido}</Column>
-                </TBody>
+                </Row>
               ))
             }
           </Table>

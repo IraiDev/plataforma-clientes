@@ -12,13 +12,14 @@ import LiNotes from '../List/LiNotes'
 import { Ui } from '../../../context/Ui'
 import { checkForms } from '../../../helpers/helpers'
 import { Alert } from '../../../helpers/alerts'
+import NavMenu from '../navmenu/NavMenu'
 const notAllow = ['exe', 'js']
 
 function NavBar({ onMultiLine, isMultiLine }) {
 
   let randomString = Math.random().toString(36)
   const { updateUser, createTicket, getQuestion, saveFilters, getTicketList, getProjects, getUsers, getStates, logout, user } = useContext(Ticket)
-  const { toggleLoading } = useContext(Ui)
+  const { toggleLoading, toggleNavMenu } = useContext(Ui)
   const [values, setValues] = useState({ email: '', phone: '' })
   const [modalTicket, setModalTicket] = useState(false)
   const [modalFilter, setModalFilter] = useState(false)
@@ -28,6 +29,7 @@ function NavBar({ onMultiLine, isMultiLine }) {
   const [resetFile, setResetFile] = useState(randomString)
   const [questions, setQuestions] = useState([])
   const [filter, setFilter] = useState({ pr: ['???'], us: ['???'], st: ['???'] })
+  const [tooltip, setTooltip] = useState({ pr: '', us: '', st: '' })
 
   // checkboxes
   const [check, setCheck] = useState(false)
@@ -69,22 +71,36 @@ function NavBar({ onMultiLine, isMultiLine }) {
 
   const getFilterSelection = (arr) => {
     let name = []
+    let tooltip = ''
     const filter = arr.filter(item => item.select === true)
 
     if (filter.length !== 0) {
       if (filter.length === arr.length) name.push('todos')
       else {
-        name = filter.map((item, index) => {
-          if (index < filter.length - 1) return `${item.label}, `
-          else return item.label
-        })
+        if (filter.length > 3) {
+          name = filter.map((item, index) => {
+            if (index < 2) return `${item.label}, `
+            else if (index === 3) return `${item.label}...`
+            else return ''
+          })
+        }
+        else {
+          name = filter.map((item, index) => {
+            if (index < filter.length - 1) return `${item.label}, `
+            else return item.label
+          })
+        }
       }
-    }
-    else name.push('???')
+    } else name.push('???')
+
+    filter.forEach((item, index) => {
+      if (index < filter.length - 1) tooltip = `${tooltip} ${item.label}, `
+      else tooltip = `${tooltip} ${item.label}`
+    })
 
     const id = filter.map(item => item.value)
 
-    return { filter, id, name }
+    return { complete: arr, id, name, tooltip }
   }
 
   const onChangeFile = (e) => {
@@ -201,6 +217,12 @@ function NavBar({ onMultiLine, isMultiLine }) {
       st: st.name,
     })
 
+    setTooltip({
+      pr: pr.tooltip,
+      us: us.tooltip,
+      st: st.tooltip,
+    })
+
     // const f = () => {
     //   const pp = projects.map(item => {
     //     if (pr.id.includes(item.value)) return { ...item, select: true }
@@ -219,9 +241,9 @@ function NavBar({ onMultiLine, isMultiLine }) {
 
     //   console.log('se ejecuta la funcionnnnnn');
 
-    //   setOldState({ p: pp, u: uu, s: ss })
     // }
     // f()
+    // setOldState({ p: pr.complete, u: us.complete, s: st.complete })
 
     const data = {
       rut_usuario: user.rut, proyectos: pr.id, emisores: us.id, estados: st.id
@@ -233,13 +255,13 @@ function NavBar({ onMultiLine, isMultiLine }) {
   }
   // FIXME: ver porque no funciona el cancelar para volver al estado antiguo  
   const handleCancel = () => {
-    // console.log(prevState.p);
-    // setProjects(prevState.p)
-    // setUsers(prevState.u)
-    // setStates(prevState.s)
-    // setProjectsAll(prevState.p.every(item => item.select === true))
-    // setUsersAll(prevState.u.every(item => item.select === true))
-    // setStatesAll(prevState.s.every(item => item.select === true))
+    // console.log(p);
+    // setProjects(p)
+    // setUsers(u)
+    // setStates(s)
+    // setProjectsAll(p.every(item => item.select === true))
+    // setUsersAll(u.every(item => item.select === true))
+    // setStatesAll(s.every(item => item.select === true))
     setModalFilter(false)
   }
 
@@ -398,58 +420,16 @@ function NavBar({ onMultiLine, isMultiLine }) {
 
   return (
     <>
-      <nav className="sticky top-0 h-20 z-40 bg-white shadow-lg flex justify-between items-center pl-3 pr-5 lg:px-5">
-        <Button className="hover:bg-gray-200 rounded-lg inline lg:hidden"
-          type="icon" />
-        <Button
-          className="lg:hidden rounded-full hover:bg-gray-100"
-          type="iconText"
-          tooltip="Modificar usuario"
-          icon="fas fa-user-cog"
-          name={user.name}
-          onClick={() => setModalUser(true)}
-        />
-        <div className="lg:hidden">
-          <TextContent className="text-xs uppercase" tag="proyectos" value={filter.pr} />
-          <TextContent className="text-xs uppercase" tag="emisores" value={filter.us} />
-          <TextContent className="text-xs uppercase" tag="estados" value={filter.st} />
-        </div>
-        <div className="hidden lg:flex items-center gap-3">
+      <nav className="sticky top-0 h-20 z-40 bg-white shadow-lg grid pl-3 pr-5 lg:px-5">
+        <div className="flex items-center justify-between lg:hidden">
           <Button
-            className="rounded-full hover:bg-gray-100"
-            type="iconText"
-            tooltip="Modificar usuario"
-            icon="fas fa-user-cog"
-            iconFirst
-            name={user.fullName}
-            onClick={() => setModalUser(true)}
-          />
-          <Button
-            tooltip="mostrar todo el contenido de descripcion de ticket"
-            className="border border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 rounded-full"
-            type="iconText"
-            icon={isMultiLine ? 'fas fa-angle-double-down' : 'fas fa-angle-double-up'}
-            shadow
-            name="multilinea"
-            onClick={onMultiLine} />
-          <Button
-            className="border border-yellow-500 text-yellow-500 hover:text-white hover:bg-yellow-500 rounded-full"
-            type="iconText"
-            icon="fas fa-filter"
-            shadow
-            name="filtros"
-            onClick={() => setModalFilter(true)} />
-          <Button
-            className="bg-green-500 hover:bg-green-400 text-white rounded-full"
-            shadow
-            name="nuevo ticket"
-            onClick={() => setModalTicket(true)} />
-        </div>
-        <div className="hidden lg:flex items-center">
-          <div className="mr-2">
-            <TextContent className="text-xs uppercase" tag="proyectos" value={filter.pr} />
-            <TextContent className="text-xs uppercase" tag="emisores" value={filter.us} />
-            <TextContent className="text-xs uppercase" tag="estados" value={filter.st} />
+            className="hover:bg-gray-200 rounded-lg"
+            type="icon"
+            onClick={() => toggleNavMenu()} />
+          <div className="max-w-xs">
+            <TextContent className="text-xs uppercase font-light" tag="proyectos" value={filter.pr} toolptipValue={tooltip.pr} />
+            <TextContent className="text-xs uppercase font-light" tag="emisores" value={filter.us} toolptipValue={tooltip.us} />
+            <TextContent className="text-xs uppercase font-light" tag="estados" value={filter.st} toolptipValue={tooltip.st} />
           </div>
           <Button
             tooltip="Cerrar sesion"
@@ -458,7 +438,101 @@ function NavBar({ onMultiLine, isMultiLine }) {
             icon="fas fa-sign-out-alt"
             onClick={logout} />
         </div>
+        <section className="hidden lg:flex lg:justify-between">
+          <div className="flex items-center gap-3">
+            <Button
+              className="rounded-full hover:bg-gray-100"
+              type="iconText"
+              tooltip="Modificar usuario"
+              icon="fas fa-user-cog"
+              iconFirst
+              name={user.fullName}
+              onClick={() => setModalUser(true)}
+            />
+            <Button
+              tooltip="mostrar todo el contenido de descripcion de ticket"
+              className="border border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 rounded-full"
+              type="iconText"
+              icon={isMultiLine ? 'fas fa-angle-double-down' : 'fas fa-angle-double-up'}
+              shadow
+              name="multilinea"
+              onClick={onMultiLine} />
+            <Button
+              className="border border-yellow-500 text-yellow-500 hover:text-white hover:bg-yellow-500 rounded-full"
+              type="iconText"
+              icon="fas fa-filter"
+              shadow
+              name="filtros"
+              onClick={() => setModalFilter(true)} />
+            <Button
+              className="bg-green-500 hover:bg-green-400 text-white rounded-full"
+              shadow
+              name="nuevo ticket"
+              onClick={() => setModalTicket(true)} />
+          </div>
+          <div className="flex items-center">
+            <div className="mr-2 max-w-xs">
+              <TextContent className="text-xs uppercase font-light" tag="proyectos" value={filter.pr} toolptipValue={tooltip.pr} />
+              <TextContent className="text-xs uppercase font-light" tag="emisores" value={filter.us} toolptipValue={tooltip.us} />
+              <TextContent className="text-xs uppercase font-light" tag="estados" value={filter.st} toolptipValue={tooltip.st} />
+            </div>
+            <Button
+              tooltip="Cerrar sesion"
+              className="text-red-400 hover:text-red-600 hover:bg-red-100 rounded-lg"
+              type="icon"
+              icon="fas fa-sign-out-alt"
+              onClick={logout} />
+          </div>
+        </section>
       </nav>
+
+      {/* navMenu */}
+      <NavMenu>
+        <Button
+          className="rounded-full bg-gray-100 hover:bg-gray-200 "
+          type="iconText"
+          tooltip="Modificar usuario"
+          icon="fas fa-user-cog"
+          name={user.name}
+          block
+          onClick={() => {
+            setModalUser(true)
+            toggleNavMenu()
+          }}
+        />
+        <Button
+          tooltip="mostrar todo el contenido de descripcion de ticket"
+          className="border border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 rounded-full"
+          type="iconText"
+          icon={isMultiLine ? 'fas fa-angle-double-down' : 'fas fa-angle-double-up'}
+          shadow
+          block
+          name="multilinea"
+          onClick={() => {
+            onMultiLine()
+            toggleNavMenu()
+          }} />
+        <Button
+          className="border border-yellow-500 text-yellow-500 hover:text-white hover:bg-yellow-500 rounded-full"
+          type="iconText"
+          icon="fas fa-filter"
+          shadow
+          block
+          name="filtros"
+          onClick={() => {
+            setModalFilter(true)
+            toggleNavMenu()
+          }} />
+        <Button
+          className="bg-green-500 hover:bg-green-400 text-white rounded-full"
+          shadow
+          block
+          name="nuevo ticket"
+          onClick={() => {
+            setModalTicket(true)
+            toggleNavMenu()
+          }} />
+      </NavMenu>
 
       {/* Modal update User */}
       <Modal showModal={modalUser} isBlur={false} onClose={onCloseUser}
