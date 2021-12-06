@@ -16,14 +16,14 @@ import { Alert } from '../../../helpers/alerts'
 import NavMenu from '../navmenu/NavMenu'
 const notAllow = ['exe', 'js']
 
-function NavBar({ onMultiLine, isMultiLine, hideOption = false }) {
+function NavBar({ onMultiLine, isMultiLine, hiddenOption = false, showModalTicket = false, showGoTo = false }) {
 
   let randomString = Math.random().toString(36)
   const navigate = useNavigate()
   const { updateUser, createTicket, getQuestion, saveFilters, getTicketList, getProjects, getUsers, getStates, logout, user } = useContext(Ticket)
   const { toggleLoading, toggleNavMenu } = useContext(Ui)
   const [values, setValues] = useState({ email: '', phone: '' })
-  const [modalTicket, setModalTicket] = useState(false)
+  const [modalTicket, setModalTicket] = useState(showModalTicket)
   const [modalFilter, setModalFilter] = useState(false)
   const [modalUser, setModalUser] = useState(false)
   const [option, setOption] = useState(null)
@@ -435,17 +435,20 @@ function NavBar({ onMultiLine, isMultiLine, hideOption = false }) {
             className="hover:bg-gray-200 rounded-lg"
             type="icon"
             onClick={() => toggleNavMenu()} />
-          <div className={`max-w-xs ${hideOption && 'hidden'}`} >
+          <div className={`max-w-xs ${hiddenOption && 'hidden'}`} >
             <TextContent className="text-xs uppercase font-light" tag="proyectos" value={filter.pr} toolptipValue={tooltip.pr} />
             <TextContent className="text-xs uppercase font-light" tag="emisores" value={filter.us} toolptipValue={tooltip.us} />
             <TextContent className="text-xs uppercase font-light" tag="estados" value={filter.st} toolptipValue={tooltip.st} />
           </div>
           <Button
-            tooltip="Cerrar sesion"
-            className="text-red-400 hover:text-red-600 hover:bg-red-100 rounded-lg"
-            type="icon"
-            icon="fas fa-sign-out-alt"
-            onClick={handleLogout} />
+            className={`rounded-full hover:bg-blue-100 text-blue-500 ${!showGoTo && 'hidden'}`}
+            type="iconText"
+            tooltip="Ir al sitio completo"
+            icon="fas fa-arrow-left"
+            iconFirst
+            name="Ir al sitio completo"
+            onClick={() => navigate('/')}
+          />
         </div>
         <section className="hidden lg:flex lg:justify-between">
           <div className="flex items-center gap-3">
@@ -460,31 +463,40 @@ function NavBar({ onMultiLine, isMultiLine, hideOption = false }) {
             />
             <Button
               tooltip="mostrar todo el contenido de descripcion de ticket"
-              className={`border border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 rounded-full ${hideOption && 'hidden'}`}
+              className={`border border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 rounded-full ${hiddenOption && 'hidden'}`}
               type="iconText"
               icon={isMultiLine ? 'fas fa-angle-double-down' : 'fas fa-angle-double-up'}
               shadow
               name="multilinea"
               onClick={onMultiLine} />
             <Button
-              className={`border border-yellow-500 text-yellow-500 hover:text-white hover:bg-yellow-500 rounded-full ${hideOption && 'hidden'}`}
+              className={`border border-yellow-500 text-yellow-500 hover:text-white hover:bg-yellow-500 rounded-full ${hiddenOption && 'hidden'}`}
               type="iconText"
               icon="fas fa-filter"
               shadow
               name="filtros"
               onClick={() => setModalFilter(true)} />
             <Button
-              className={`bg-green-500 hover:bg-green-400 text-white rounded-full ${hideOption && 'hidden'}`}
+              className={`bg-green-500 hover:bg-green-400 text-white rounded-full ${hiddenOption && 'hidden'}`}
               shadow
               name="nuevo ticket"
               onClick={() => setModalTicket(true)} />
           </div>
           <div className="flex items-center">
-            <div className={`mr-2 max-w-xs ${hideOption && 'hidden'}`} >
+            <div className={`mr-2 max-w-xs ${hiddenOption && 'hidden'}`} >
               <TextContent className="text-xs uppercase font-light" tag="proyectos" value={filter.pr} toolptipValue={tooltip.pr} />
               <TextContent className="text-xs uppercase font-light" tag="emisores" value={filter.us} toolptipValue={tooltip.us} />
               <TextContent className="text-xs uppercase font-light" tag="estados" value={filter.st} toolptipValue={tooltip.st} />
             </div>
+            <Button
+              className={`rounded-full hover:bg-blue-100 text-blue-500 ${!showGoTo && 'hidden'}`}
+              type="iconText"
+              tooltip="Ir al sitio completo"
+              icon="fas fa-arrow-left"
+              iconFirst
+              name="Ir al sitio completo"
+              onClick={() => navigate('/')}
+            />
             <Button
               tooltip="Cerrar sesion"
               className="text-red-400 hover:text-red-600 hover:bg-red-100 rounded-lg"
@@ -511,7 +523,7 @@ function NavBar({ onMultiLine, isMultiLine, hideOption = false }) {
         />
         <Button
           tooltip="mostrar todo el contenido de descripcion de ticket"
-          className={`border border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 rounded-full ${hideOption && 'hidden'}`}
+          className={`border border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 rounded-full ${hiddenOption && 'hidden'}`}
           type="iconText"
           icon={isMultiLine ? 'fas fa-angle-double-down' : 'fas fa-angle-double-up'}
           shadow
@@ -522,7 +534,7 @@ function NavBar({ onMultiLine, isMultiLine, hideOption = false }) {
             toggleNavMenu()
           }} />
         <Button
-          className={`border border-yellow-500 text-yellow-500 hover:text-white hover:bg-yellow-500 rounded-full ${hideOption && 'hidden'}`}
+          className={`border border-yellow-500 text-yellow-500 hover:text-white hover:bg-yellow-500 rounded-full ${hiddenOption && 'hidden'}`}
           type="iconText"
           icon="fas fa-filter"
           shadow
@@ -533,7 +545,7 @@ function NavBar({ onMultiLine, isMultiLine, hideOption = false }) {
             toggleNavMenu()
           }} />
         <Button
-          className={`bg-green-500 hover:bg-green-400 text-white rounded-full ${hideOption && 'hidden'}`}
+          className={`bg-green-500 hover:bg-green-400 text-white rounded-full ${hiddenOption && 'hidden'}`}
           shadow
           block
           name="nuevo ticket"
@@ -541,13 +553,20 @@ function NavBar({ onMultiLine, isMultiLine, hideOption = false }) {
             setModalTicket(true)
             toggleNavMenu()
           }} />
+        <Button
+          tooltip="Cerrar sesion"
+          className="text-red-400 hover:text-red-600 bg-red-100  hover:bg-red-300 rounded-full"
+          type="iconText"
+          name="cerrar sesion"
+          icon="fas fa-sign-out-alt"
+          onClick={handleLogout} />
       </NavMenu>
 
       {/* Modal update User */}
       <Modal showModal={modalUser} isBlur={false} onClose={onCloseUser}
-        className="max-w-min p-8">
+        className="max-w-lg p-8">
         <h5 className="text-xl mb-4">Modificar usuario</h5>
-        <div className="w-96 grid gap-5">
+        <div className="grid gap-5">
           <Input
             disabled
             type="text"
@@ -619,9 +638,9 @@ function NavBar({ onMultiLine, isMultiLine, hideOption = false }) {
             Mostrar campos
           </label>
         </div>
-        <div className="flex justify-between items-center mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
           <Button
-            className="rounded-full border border-red-400 hover:bg-red-400 text-red-500 hover:text-white"
+            className="rounded-full border border-red-400 hover:bg-red-400 text-red-500 hover:text-white order-last md:order-first"
             name="cancelar"
             shadow
             onClick={onCloseUser} />

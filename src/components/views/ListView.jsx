@@ -23,12 +23,12 @@ function ListView({ multiLine }) {
   const { ticketList, filters, user } = useContext(Ticket)
   const [idRow, setIdRow] = useState(null)
 
-  if (Object.keys(filters).length > 0) {
+  if (Object.keys(filters).length > 0) { // falta seleccionar algun filtro
     if (filters.emisores.length < 1 || filters.proyectos.length < 1 || filters.estados.length < 1) {
       return (
         <div className="max-w-3xl bg-white rounded-md p-8 text-center mx-3 md:mx-auto shadow-lg mt-20">
           <p>
-            Por favor seleccione las tres opciones de filtrado <label className="font-semibold capitalize">(Proyectos, emisores y estados)</label>, de lo contrario no se encontrara coincidencias de busqueda.
+            Por favor seleccione las tres opciones de filtros <label className="font-semibold capitalize">(Proyectos, emisores y estados)</label>, de lo contrario no se reralizara la busqueda.
             <br />
             <label className="font-semibold block mt-3">Falta seleccionar:</label>
           </p>
@@ -42,21 +42,21 @@ function ListView({ multiLine }) {
     }
   }
 
-  if (ticketList.length === 0 && Object.keys(filters).length < 1) {
+  if (ticketList.length === 0 && Object.keys(filters).length < 1) { // no hay filtros aplicados
     return (
       <div className="max-w-3xl bg-white rounded-md p-8 text-center mx-3 md:mx-auto shadow-lg mt-20">
         <p>
-          Estimado(a) <label className="font-semibold uppercase">{user.fullName}</label> dado que acaba de ingresar a la plataforma no hay criterios de seleccion aplicados, por favor dirigase a la seccion <label className="font-bold text-yellow-500 uppercase">filtros</label> para aplicar criterios de busqueda.
+          Estimado(a) <label className="font-semibold uppercase">{user.fullName}</label> dado que acaba de ingresar a la plataforma no hay criterios de filtros aplicados, por favor dirigase a la seccion <label className="font-bold text-yellow-500 uppercase">filtros</label> para aplicar criterios de busqueda.
         </p>
       </div>
     )
   }
 
-  if (ticketList.length === 0 && Object.keys(filters).length > 0) {
+  if (ticketList.length === 0 && Object.keys(filters).length > 0) { // no se encontraron coincidencias
     return (
       <div className="max-w-3xl bg-white rounded-md p-8 text-center mx-3 md:mx-auto shadow-lg mt-20">
         <p>
-          No se encontraron tickets para los filtros aplicados, por favor modificque su seleccion de <label className="font-bold text-yellow-500 uppercase">filtros</label> para realizar una nueva busqueda.
+          No se encontraron tickets que coincidadn con los filtros aplicados, por favor modificque su seleccion de <label className="font-bold text-yellow-500 uppercase">filtros</label> para realizar una nueva busqueda.
         </p>
       </div>
     )

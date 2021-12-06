@@ -16,7 +16,7 @@ function DetailsView({ from }) {
 
   return (
     <>
-      <NavBar hideOption={true} />
+      <NavBar hiddenOption={true} showGoTo={true} />
       <div className="container mx-auto">
         <div className="bg-white rounded-lg shadow-lg p-5 md:p-10 my-10 overflow-custom">
           {Object.keys(ticketDetail).length > 0 &&

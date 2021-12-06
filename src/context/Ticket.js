@@ -40,7 +40,9 @@ function TicketProvider({ children }) {
     if (ok) {
       const r = await fetchToken(`ticket/get-info-user?rut_usuario=${resUser.rut_user}`)
       const b = await r.json()
+
       localStorage.setItem('ticketToken', token)
+
       const data = {
         ok,
         rut: resUser.rut_user,
@@ -98,8 +100,10 @@ function TicketProvider({ children }) {
     if (ok) {
       const r = await fetchToken(`ticket/get-info-user?rut_usuario=${resUser.rut_user}`)
       const b = await r.json()
-      localStorage.setItem('ticketToken', token)
-      localStorage.setItem('lastPath-ticket', pathname)
+
+      window.localStorage.setItem('ticketToken', token)
+      window.localStorage.setItem('lastPath-ticket', pathname)
+
       const data = {
         ok,
         rut: resUser.rut_user,
