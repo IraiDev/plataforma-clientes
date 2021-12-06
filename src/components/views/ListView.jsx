@@ -46,7 +46,7 @@ function ListView({ multiLine }) {
     return (
       <div className="max-w-3xl bg-white rounded-md p-8 text-center mx-3 md:mx-auto shadow-lg mt-20">
         <p>
-          Estimado(a) <label className="font-semibold uppercase">{user.fullName}</label> dado que acaba de ingresar a la plataforma no hay criterios de seleccion aplicados, por favor dirigase a la seccion de <label className="font-bold text-yellow-500 uppercase">filtros</label> para aplicar criterios de busqueda.
+          Estimado(a) <label className="font-semibold uppercase">{user.fullName}</label> dado que acaba de ingresar a la plataforma no hay criterios de seleccion aplicados, por favor dirigase a la seccion <label className="font-bold text-yellow-500 uppercase">filtros</label> para aplicar criterios de busqueda.
         </p>
       </div>
     )
@@ -90,7 +90,7 @@ function ListView({ multiLine }) {
               key={item.id_ticket}
               id={item.id_ticket}
               getId={(id) => setIdRow(id)}
-              active={idRow === item.id_ticket && 'border-blue-500 hover:border-blue-600 hover:text-blue-600'}
+              active={idRow === item.id_ticket && 'border-purple-700 text-purple-700 hover:text-black'}
             >
               <Column className="p-4 text-center">{item.id_ticket}</Column>
               <Column className="col-span-1 px-4 py-1.5 text-center bg-gray-100">

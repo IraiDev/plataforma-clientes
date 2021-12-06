@@ -1,4 +1,5 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom';
 import TextArea from '../input/TextArea'
 import Table from '../table/Table'
 import THead from '../table/THead'
@@ -36,6 +37,8 @@ function Form({ onClick, data, from = 'EX' }) {
     prioridad_zionit
   } = data
 
+  const navigate = useNavigate()
+  const { pathname } = useLocation()
   const { createEvent, addDoc, updatePriority, user } = useContext(Ticket)
   const { toggleLoading } = useContext(Ui)
   const [{ desc, priority }, onChangeValues, reset] = useForm({ desc: '', priority: prioridad_cliente })
@@ -135,7 +138,6 @@ function Form({ onClick, data, from = 'EX' }) {
         return onClick()
       }
       toggleLoading(false)
-      console.log('despues del loading');
       Alert({
         icon: 'warn',
         title: 'Atencion',
@@ -146,6 +148,8 @@ function Form({ onClick, data, from = 'EX' }) {
       return
     }
 
+    const receptor = receiver !== null ? receiver.rut : ''
+
     const data = {
       id_actividad,
       id_ticket: ticket,
@@ -153,7 +157,7 @@ function Form({ onClick, data, from = 'EX' }) {
       mensajes_contesta: idEvent,
       emisor: user.rut,
       desc_emisor: user.rut,
-      receptor: receiver.rut,
+      receptor,
       publico_privado: from === 'EX' ? 'PU' : 'PR',
       est_evento: state,
       id_proyecto: id_proyecto,
@@ -191,6 +195,13 @@ function Form({ onClick, data, from = 'EX' }) {
     setFile(null)
     setResetFile(randomString)
     from === 'EX' && onClick()
+  }
+
+  const handleCancel = () => {
+    if (pathname.includes('/email/') || pathname.includes('/in/')) {
+      navigate('/')
+    }
+    else onClick()
   }
 
   useEffect(() => {
@@ -308,7 +319,7 @@ function Form({ onClick, data, from = 'EX' }) {
           <div className="text-sm bg-gray-100 rounded-lg p-2 w-full">
             <p className="capitalize">archivo seleccionado (max 5MB):</p>
             <p className="font-semibold mb-2">{file !== null ? file.name : 'no hay archivo seleccionado'}</p>
-            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-28 overflow-y-auto">
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-28 overflow-custom">
               {
                 documentos.length > 0 &&
                 documentos.map(doc => (
@@ -352,7 +363,7 @@ function Form({ onClick, data, from = 'EX' }) {
               className="text-red-500 border border-red-400 hover:bg-red-400 w-full hover:text-white rounded-full"
               shadow
               name="cancelar"
-              onClick={onClick} />
+              onClick={handleCancel} />
           </div>
         </div>
       </div>

@@ -1,14 +1,16 @@
-import React, { useContext, useState } from 'react'
+import { useContext, useState, createContext } from 'react'
+import { useLocation } from 'react-router-dom';
 import { Alert } from '../helpers/alerts'
 import { fetchToken, fetchTokenFile, fetchUnToken } from '../helpers/fetch'
 import { Ui } from './Ui'
 
-export const Ticket = React.createContext()
+export const Ticket = createContext()
 
 const msg = '-- “Estimado Usuario este pin no es reconocido por el sistema, deben ser solo letras y números, si lo ha olvidado dirigase a la opcion ¿Olvido su pin? para recuperarlo”--'
 
 function TicketProvider({ children }) {
 
+  const { pathname } = useLocation()
   const { toggleLoading } = useContext(Ui)
   const [user, setUser] = useState({ ok: false })
   const [ticketList, setTicketList] = useState([])
@@ -97,6 +99,7 @@ function TicketProvider({ children }) {
       const r = await fetchToken(`ticket/get-info-user?rut_usuario=${resUser.rut_user}`)
       const b = await r.json()
       localStorage.setItem('ticketToken', token)
+      localStorage.setItem('lastPath-ticket', pathname)
       const data = {
         ok,
         rut: resUser.rut_user,
@@ -115,8 +118,11 @@ function TicketProvider({ children }) {
   }
 
   const logout = () => {
+    setUser({ ok: false })
+    setTicketList([])
+    setTicketDetail({})
+    setFilters({})
     localStorage.removeItem('ticketToken')
-    window.location.reload()
     window.console.clear()
   }
 
@@ -161,11 +167,11 @@ function TicketProvider({ children }) {
 
   const getTicketList = async (params = null) => {
 
+    if (params === null) params = filters
     if (params.emisores.length < 1 || params.estados.length < 1 || params.proyectos.length < 1) setTicketList([])
     if (params.emisores.length < 1) return
     if (params.estados.length < 1) return
     if (params.proyectos.length < 1) return
-    if (params === null) params = filters
 
     const resp = await fetchToken('ticket/get-tickets', params, 'POST')
     const body = await resp.json()
@@ -189,9 +195,12 @@ function TicketProvider({ children }) {
 
     if (ok) {
       setTicketDetail(arrayResp[0])
-      return arrayResp[0]
+      return true
     }
-    else { console.log('fallo la peticion (getTicketDetails): ', body) }
+    else {
+      console.log('fallo la peticion (getTicketDetails): ', body)
+      return false
+    }
   }
 
   const createTicket = async (data) => {

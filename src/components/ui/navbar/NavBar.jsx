@@ -1,4 +1,5 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Button from '../button/Button'
 import Modal from '../modal/Modal'
 import TextContent from '../textContent/TextContent'
@@ -15,9 +16,10 @@ import { Alert } from '../../../helpers/alerts'
 import NavMenu from '../navmenu/NavMenu'
 const notAllow = ['exe', 'js']
 
-function NavBar({ onMultiLine, isMultiLine }) {
+function NavBar({ onMultiLine, isMultiLine, hideOption = false }) {
 
   let randomString = Math.random().toString(36)
+  const navigate = useNavigate()
   const { updateUser, createTicket, getQuestion, saveFilters, getTicketList, getProjects, getUsers, getStates, logout, user } = useContext(Ticket)
   const { toggleLoading, toggleNavMenu } = useContext(Ui)
   const [values, setValues] = useState({ email: '', phone: '' })
@@ -177,7 +179,7 @@ function NavBar({ onMultiLine, isMultiLine }) {
         Alert({
           title: 'Advertencia',
           icon: 'error',
-          content: 'No se puede subir archivos con extensiones, .exe, .js, estos seran removidos de la seleccion.',
+          content: 'No se puede subir archivos con extensiones: .exe, .js, estos seran removidos de la seleccion.',
           showCancelButton: false,
           timer: 5000
         })
@@ -366,6 +368,13 @@ function NavBar({ onMultiLine, isMultiLine }) {
     })
   }
 
+  const handleLogout = () => {
+    logout()
+    navigate('/login', {
+      replace: true
+    })
+  }
+
   useEffect(() => {
     const loadUsersFilter = async () => {
       let p = projects.filter(item => item.select === true)
@@ -410,11 +419,11 @@ function NavBar({ onMultiLine, isMultiLine }) {
   useEffect(() => {
     if (option !== null) {
       toggleLoading(true)
-      const get_questions = async () => {
+      const loadQuestions = async () => {
         const resp = await getQuestion(option.value)
         setQuestions(resp)
       }
-      get_questions()
+      loadQuestions()
     }
   }, [option])
 
@@ -426,7 +435,7 @@ function NavBar({ onMultiLine, isMultiLine }) {
             className="hover:bg-gray-200 rounded-lg"
             type="icon"
             onClick={() => toggleNavMenu()} />
-          <div className="max-w-xs">
+          <div className={`max-w-xs ${hideOption && 'hidden'}`} >
             <TextContent className="text-xs uppercase font-light" tag="proyectos" value={filter.pr} toolptipValue={tooltip.pr} />
             <TextContent className="text-xs uppercase font-light" tag="emisores" value={filter.us} toolptipValue={tooltip.us} />
             <TextContent className="text-xs uppercase font-light" tag="estados" value={filter.st} toolptipValue={tooltip.st} />
@@ -436,7 +445,7 @@ function NavBar({ onMultiLine, isMultiLine }) {
             className="text-red-400 hover:text-red-600 hover:bg-red-100 rounded-lg"
             type="icon"
             icon="fas fa-sign-out-alt"
-            onClick={logout} />
+            onClick={handleLogout} />
         </div>
         <section className="hidden lg:flex lg:justify-between">
           <div className="flex items-center gap-3">
@@ -451,27 +460,27 @@ function NavBar({ onMultiLine, isMultiLine }) {
             />
             <Button
               tooltip="mostrar todo el contenido de descripcion de ticket"
-              className="border border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 rounded-full"
+              className={`border border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 rounded-full ${hideOption && 'hidden'}`}
               type="iconText"
               icon={isMultiLine ? 'fas fa-angle-double-down' : 'fas fa-angle-double-up'}
               shadow
               name="multilinea"
               onClick={onMultiLine} />
             <Button
-              className="border border-yellow-500 text-yellow-500 hover:text-white hover:bg-yellow-500 rounded-full"
+              className={`border border-yellow-500 text-yellow-500 hover:text-white hover:bg-yellow-500 rounded-full ${hideOption && 'hidden'}`}
               type="iconText"
               icon="fas fa-filter"
               shadow
               name="filtros"
               onClick={() => setModalFilter(true)} />
             <Button
-              className="bg-green-500 hover:bg-green-400 text-white rounded-full"
+              className={`bg-green-500 hover:bg-green-400 text-white rounded-full ${hideOption && 'hidden'}`}
               shadow
               name="nuevo ticket"
               onClick={() => setModalTicket(true)} />
           </div>
           <div className="flex items-center">
-            <div className="mr-2 max-w-xs">
+            <div className={`mr-2 max-w-xs ${hideOption && 'hidden'}`} >
               <TextContent className="text-xs uppercase font-light" tag="proyectos" value={filter.pr} toolptipValue={tooltip.pr} />
               <TextContent className="text-xs uppercase font-light" tag="emisores" value={filter.us} toolptipValue={tooltip.us} />
               <TextContent className="text-xs uppercase font-light" tag="estados" value={filter.st} toolptipValue={tooltip.st} />
@@ -481,7 +490,7 @@ function NavBar({ onMultiLine, isMultiLine }) {
               className="text-red-400 hover:text-red-600 hover:bg-red-100 rounded-lg"
               type="icon"
               icon="fas fa-sign-out-alt"
-              onClick={logout} />
+              onClick={handleLogout} />
           </div>
         </section>
       </nav>
@@ -502,7 +511,7 @@ function NavBar({ onMultiLine, isMultiLine }) {
         />
         <Button
           tooltip="mostrar todo el contenido de descripcion de ticket"
-          className="border border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 rounded-full"
+          className={`border border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 rounded-full ${hideOption && 'hidden'}`}
           type="iconText"
           icon={isMultiLine ? 'fas fa-angle-double-down' : 'fas fa-angle-double-up'}
           shadow
@@ -513,7 +522,7 @@ function NavBar({ onMultiLine, isMultiLine }) {
             toggleNavMenu()
           }} />
         <Button
-          className="border border-yellow-500 text-yellow-500 hover:text-white hover:bg-yellow-500 rounded-full"
+          className={`border border-yellow-500 text-yellow-500 hover:text-white hover:bg-yellow-500 rounded-full ${hideOption && 'hidden'}`}
           type="iconText"
           icon="fas fa-filter"
           shadow
@@ -524,7 +533,7 @@ function NavBar({ onMultiLine, isMultiLine }) {
             toggleNavMenu()
           }} />
         <Button
-          className="bg-green-500 hover:bg-green-400 text-white rounded-full"
+          className={`bg-green-500 hover:bg-green-400 text-white rounded-full ${hideOption && 'hidden'}`}
           shadow
           block
           name="nuevo ticket"
@@ -671,7 +680,7 @@ function NavBar({ onMultiLine, isMultiLine }) {
           <TextArea field="descripcion" name="desc" value={desc} onChange={onChangeValues} />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-            <div className="text-sm bg-gray-100 rounded-lg p-2 w-full max-h-40 overflow-y-auto">
+            <div className="text-sm bg-gray-100 rounded-lg p-2 w-full max-h-40 overflow-custom">
               <p className="capitalize">archivo seleccionado (max 5MB):</p>
               <p className="font-semibold">{file !== null ? file.name : 'No hay archivo seleccionado'}</p>
             </div>
@@ -705,7 +714,7 @@ function NavBar({ onMultiLine, isMultiLine }) {
         <div className="text-sm grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
           <Container className="w-full" tag="Seleccione Proyectos">
             {projects.length > 0 ?
-              <ul className="h-full overflow-y-auto uppercase">
+              <ul className="h-full overflow-custom uppercase">
                 <li>
                   <input
                     className="mr-2 cursor-pointer"
@@ -753,7 +762,7 @@ function NavBar({ onMultiLine, isMultiLine }) {
           </Container>
           <Container className="w-full" tag="Seleccione Emisores">
             {users.length > 0 ?
-              <ul className="h-full overflow-y-auto uppercase">
+              <ul className="h-full overflow-custom uppercase">
                 <li>
                   <input
                     className="mr-2 cursor-pointer"
@@ -801,7 +810,7 @@ function NavBar({ onMultiLine, isMultiLine }) {
           </Container>
           <Container className="w-full" tag="Seleccione Estados">
             {states.length > 0 ?
-              <ul className="h-full overflow-y-auto uppercase">
+              <ul className="h-full overflow-custom uppercase">
                 <li>
                   <input
                     className="mr-2 cursor-pointer"

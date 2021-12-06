@@ -7,20 +7,15 @@ import Modal from '../modal/Modal'
 
 function Row({ id, children, width = 'min-w-table', isModal = true, className, active, getId }) {
 
-  const [modalFrom, setModalForm] = useState(false)
-  const { getTicketDetails } = useContext(Ticket)
+  const { getTicketDetails, ticketDetail } = useContext(Ticket)
   const { toggleLoading } = useContext(Ui)
-  const [ticketDetails, setTicketDetails] = useState({})
+  const [modalFrom, setModalForm] = useState(false)
 
   const openModal = async () => {
-    console.log('id: ', id);
     getId(id)
     await toggleLoading(true)
     const resp = await getTicketDetails(id)
-    if (Object.keys(resp).length > 0) {
-      setTicketDetails(resp)
-      setModalForm(true)
-    }
+    if (resp) setModalForm(true)
     else {
       Alert({
         icon: 'error',
@@ -42,8 +37,8 @@ function Row({ id, children, width = 'min-w-table', isModal = true, className, a
       {
         isModal &&
         <Modal showModal={modalFrom} isBlur={false} onClose={() => setModalForm(false)}
-          className="max-w-5xl p-8">
-          <Form data={ticketDetails} onClick={() => setModalForm(false)} />
+          className="max-w-7xl">
+          <Form data={ticketDetail} onClick={() => setModalForm(false)} />
         </Modal>
       }
     </>

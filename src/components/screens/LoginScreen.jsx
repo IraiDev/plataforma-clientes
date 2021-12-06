@@ -1,4 +1,5 @@
-import React, { useContext, useState } from 'react'
+import { useContext, useState } from 'react'
+import { useNavigate } from 'react-router-dom';
 import loginIMG from '../../assets/img/login.jpg'
 import logo from '../../assets/img/logo25x25.png'
 import { Ticket } from '../../context/Ticket'
@@ -10,17 +11,26 @@ import Input from '../ui/input/Input'
 import Modal from '../ui/modal/Modal'
 import { validateRUT } from 'validar-rut'
 
-function LoginScreen({ onLogin }) {
+const LoginScreen = () => {
 
-  const { getUserPin } = useContext(Ticket)
+  const navigate = useNavigate()
+  const { getUserPin, login } = useContext(Ticket)
   const { toggleLoading } = useContext(Ui)
   const [check, setCheck] = useState(false)
   const [showModal, setShowModal] = useState(false)
-  const [{ input, rut }, onChangeInput, reset] = useForm({ input: '', rut: '' })
+  const [{ pin, rut }, onChangeInput, reset] = useForm({ pin: '', rut: '' })
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault()
-    onLogin(input, reset)
+    toggleLoading(true)
+    await login({ pin })
+
+    const lastPath = localStorage.getItem('lastPath-ticket') || '/'
+    navigate(lastPath, {
+      replace: true,
+    })
+
+    reset()
   }
 
   const onCloseModal = () => {
@@ -81,8 +91,8 @@ function LoginScreen({ onLogin }) {
             field="ingrese su PIN"
             type={check ? 'text' : 'password'}
             className="focus:border-blue-500"
-            name="input"
-            value={input}
+            name="pin"
+            value={pin}
             onChange={onChangeInput} />
           <label className="block mx-auto w-max capitalize text-sm mt-2" htmlFor="checkField">
             <input

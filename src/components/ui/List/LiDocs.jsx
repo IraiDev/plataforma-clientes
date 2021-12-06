@@ -78,8 +78,10 @@ function LiDocs(props) {
     })
   }
 
+  if (isPublic === 'PU' && from === 'EX') return null
+
   return (
-    <li className="p-2 col-span-1 border-2 border-transparent hover:border-blue-400 shadow-md transition duration-300 bg-white rounded-md flex items-center justify-between">
+    <li className="p-2 col-span-1 border-2 border-transparent hover:border-blue-400 shadow-md transition duration-300 bg-white rounded-md flex items-center justify-between" >
       <div className="truncate">
         <input
           disabled={from === 'EX'}
