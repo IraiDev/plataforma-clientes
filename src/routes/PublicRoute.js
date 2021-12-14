@@ -6,7 +6,9 @@ const PublicRoute = ({ children }) => {
 
   const { user } = useContext(Ticket)
 
-  const lastPath = localStorage.getItem('lastPath-ticket') || '/'
+  let lastPath = window.localStorage.getItem('lastPath-ticket') || '/'
+
+  lastPath === '/login' && (lastPath = '/')
 
   return user.ok ? <Navigate to={lastPath} /> : children
 }

@@ -9,7 +9,7 @@ import { useForm } from '../../hooks/useForm'
 import Button from '../ui/button/Button'
 import Input from '../ui/input/Input'
 import Modal from '../ui/modal/Modal'
-import { validateRUT } from 'validar-rut'
+import { checkRut, prettifyRut } from 'react-rut-formatter'
 
 const LoginScreen = () => {
 
@@ -39,7 +39,7 @@ const LoginScreen = () => {
   }
 
   const recoverPin = async () => {
-    const r = validateRUT(rut)
+    const r = checkRut(rut)
     if (rut === '' || !r) {
       Alert({
         title: 'Atencion',
@@ -52,7 +52,7 @@ const LoginScreen = () => {
 
     toggleLoading(true)
 
-    const { ok, response } = await getUserPin(rut, true)
+    const { ok, response } = await getUserPin(prettifyRut(rut), true)
 
     if (ok) {
       const { nombre, pin } = response
@@ -123,7 +123,7 @@ const LoginScreen = () => {
         <p className="text-sm">Ingrese su run con puntos y guion</p>
         <Input
           name="rut"
-          value={rut}
+          value={prettifyRut(rut)}
           onChange={onChangeInput}
         />
         <div className="flex justify-between items-center mt-7">

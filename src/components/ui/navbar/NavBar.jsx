@@ -16,13 +16,20 @@ import { Alert } from '../../../helpers/alerts'
 import NavMenu from '../navmenu/NavMenu'
 const notAllow = ['exe', 'js']
 
-function NavBar({ onMultiLine, isMultiLine, hiddenOption = false, showModalTicket = false, showGoTo = false }) {
+function NavBar({
+  onMultiLine,
+  isMultiLine,
+  hiddenOption = false,
+  showModalTicket = false,
+  showGoTo = false,
+  isMantainerRoute = false,
+}) {
 
   let randomString = Math.random().toString(36)
   const navigate = useNavigate()
   const { updateUser, createTicket, getQuestion, saveFilters, getTicketList, getProjects, getUsers, getStates, logout, user } = useContext(Ticket)
   const { toggleLoading, toggleNavMenu } = useContext(Ui)
-  const [values, setValues] = useState({ email: '', phone: '' })
+  const [values, setValues] = useState({ email: '', phone: '', pin: '' })
   const [modalTicket, setModalTicket] = useState(showModalTicket)
   const [modalFilter, setModalFilter] = useState(false)
   const [modalUser, setModalUser] = useState(false)
@@ -41,7 +48,6 @@ function NavBar({ onMultiLine, isMultiLine, hiddenOption = false, showModalTicke
   const [projectsAll, setProjectsAll] = useState(false)
   const [usersAll, setUsersAll] = useState(false)
   const [statesAll, setStatesAll] = useState(false)
-  const [{ p, u, s }, setOldState] = useState({ p: [], u: [], s: [] })
   // checkboxes
 
   // custom hooks
@@ -64,11 +70,6 @@ function NavBar({ onMultiLine, isMultiLine, hiddenOption = false, showModalTicke
     setProjects(tempPr)
     setUsers(tempUs)
     setStates(tempSt)
-    setOldState({
-      p: tempPr,
-      u: tempUs,
-      s: tempSt,
-    })
   }
 
   const getFilterSelection = (arr) => {
@@ -268,6 +269,7 @@ function NavBar({ onMultiLine, isMultiLine, hiddenOption = false, showModalTicke
   }
 
   const handleUpdateUser = async () => {
+
     if (pin === '' || pin !== user.pin) {
       Alert({
         icon: 'warn',
@@ -332,15 +334,14 @@ function NavBar({ onMultiLine, isMultiLine, hiddenOption = false, showModalTicke
 
     toggleLoading(true)
 
-    const { ok, msg } = await updateUser(data)
+    const { ok } = await updateUser(data)
 
     if (ok) {
       Alert({
-        icon: 'warn',
-        title: 'Atencion',
-        content: msg,
+        title: 'Usuario actualizado',
+        content: 'Usuario actualizado correctamente, se enviara un correo con los datos actualizados',
         showCancelButton: false,
-        timer: 5000
+        timer: 7000
       })
       setCheck(false)
       reset()
@@ -361,11 +362,15 @@ function NavBar({ onMultiLine, isMultiLine, hiddenOption = false, showModalTicke
     setModalUser(false)
     setCheck(false)
     reset()
+  }
+
+  const handleOpenUserModal = () => {
     setValues({
       email: user.email,
       phone: user.phone,
       pin: user.pin
     })
+    setModalUser(true)
   }
 
   const handleLogout = () => {
@@ -405,14 +410,6 @@ function NavBar({ onMultiLine, isMultiLine, hiddenOption = false, showModalTicke
   }, [projects])
 
   useEffect(() => {
-    setValues({
-      email: user.email,
-      phone: user.phone,
-      pin: user.pin
-    })
-  }, [user])
-
-  useEffect(() => {
     getFilters()
   }, [])
 
@@ -430,16 +427,19 @@ function NavBar({ onMultiLine, isMultiLine, hiddenOption = false, showModalTicke
   return (
     <>
       <nav className="sticky top-0 h-20 z-40 bg-white shadow-lg grid pl-3 pr-5 lg:px-5">
-        <div className="flex items-center justify-between lg:hidden">
+        <section className="flex items-center justify-between lg:hidden">
           <Button
             className="hover:bg-gray-200 rounded-lg"
             type="icon"
             onClick={() => toggleNavMenu()} />
-          <div className={`max-w-xs ${hiddenOption && 'hidden'}`} >
-            <TextContent className="text-xs uppercase font-light" tag="proyectos" value={filter.pr} toolptipValue={tooltip.pr} />
-            <TextContent className="text-xs uppercase font-light" tag="emisores" value={filter.us} toolptipValue={tooltip.us} />
-            <TextContent className="text-xs uppercase font-light" tag="estados" value={filter.st} toolptipValue={tooltip.st} />
-          </div>
+          {
+            !isMantainerRoute &&
+            <div className={`max-w-xs ${hiddenOption && 'hidden'}`} >
+              <TextContent className="text-xs uppercase font-light" tag="proyectos" value={filter.pr} toolptipValue={tooltip.pr} />
+              <TextContent className="text-xs uppercase font-light" tag="emisores" value={filter.us} toolptipValue={tooltip.us} />
+              <TextContent className="text-xs uppercase font-light" tag="estados" value={filter.st} toolptipValue={tooltip.st} />
+            </div>
+          }
           <Button
             className={`rounded-full hover:bg-blue-100 text-blue-500 ${!showGoTo && 'hidden'}`}
             type="iconText"
@@ -449,7 +449,19 @@ function NavBar({ onMultiLine, isMultiLine, hiddenOption = false, showModalTicke
             name="Ir al sitio completo"
             onClick={() => navigate('/')}
           />
-        </div>
+          {
+            isMantainerRoute &&
+            <Button
+              className={`rounded-full hover:bg-blue-100 text-blue-500`}
+              type="iconText"
+              tooltip="Ir al sitio completo"
+              icon="fas fa-arrow-left"
+              iconFirst
+              name="Volver"
+              onClick={() => navigate('/')}
+            />
+          }
+        </section>
         <section className="hidden lg:flex lg:justify-between">
           <div className="flex items-center gap-3">
             <Button
@@ -458,36 +470,51 @@ function NavBar({ onMultiLine, isMultiLine, hiddenOption = false, showModalTicke
               tooltip="Modificar usuario"
               icon="fas fa-user-cog"
               iconFirst
-              name={user.fullName}
-              onClick={() => setModalUser(true)}
+              name={user.name}
+              onClick={handleOpenUserModal}
             />
-            <Button
-              tooltip="mostrar todo el contenido de descripcion de ticket"
-              className={`border border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 rounded-full ${hiddenOption && 'hidden'}`}
-              type="iconText"
-              icon={isMultiLine ? 'fas fa-angle-double-down' : 'fas fa-angle-double-up'}
-              shadow
-              name="multilinea"
-              onClick={onMultiLine} />
-            <Button
-              className={`border border-yellow-500 text-yellow-500 hover:text-white hover:bg-yellow-500 rounded-full ${hiddenOption && 'hidden'}`}
-              type="iconText"
-              icon="fas fa-filter"
-              shadow
-              name="filtros"
-              onClick={() => setModalFilter(true)} />
-            <Button
-              className={`bg-green-500 hover:bg-green-400 text-white rounded-full ${hiddenOption && 'hidden'}`}
-              shadow
-              name="nuevo ticket"
-              onClick={() => setModalTicket(true)} />
+            {
+              !isMantainerRoute &&
+              <>
+                {user.isAdmin === 1 &&
+                  <Button
+                    className={`bg-black hover:bg-gray-600 text-white rounded-full ${hiddenOption && 'hidden'}`}
+                    shadow
+                    name="Mantenedor usuarios"
+                    onClick={() => navigate('/mantenedor-usuarios')} />
+                }
+                <Button
+                  tooltip="mostrar todo el contenido de descripcion de ticket"
+                  className={`border border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 rounded-full ${hiddenOption && 'hidden'}`}
+                  type="iconText"
+                  icon={isMultiLine ? 'fas fa-angle-double-down' : 'fas fa-angle-double-up'}
+                  shadow
+                  name="multilinea"
+                  onClick={onMultiLine} />
+                <Button
+                  className={`border border-yellow-500 text-yellow-500 hover:text-white hover:bg-yellow-500 rounded-full ${hiddenOption && 'hidden'}`}
+                  type="iconText"
+                  icon="fas fa-filter"
+                  shadow
+                  name="filtros"
+                  onClick={() => setModalFilter(true)} />
+                <Button
+                  className={`bg-green-500 hover:bg-green-400 text-white rounded-full ${hiddenOption && 'hidden'}`}
+                  shadow
+                  name="nuevo ticket"
+                  onClick={() => setModalTicket(true)} />
+              </>
+            }
           </div>
           <div className="flex items-center">
-            <div className={`mr-2 max-w-xs ${hiddenOption && 'hidden'}`} >
-              <TextContent className="text-xs uppercase font-light" tag="proyectos" value={filter.pr} toolptipValue={tooltip.pr} />
-              <TextContent className="text-xs uppercase font-light" tag="emisores" value={filter.us} toolptipValue={tooltip.us} />
-              <TextContent className="text-xs uppercase font-light" tag="estados" value={filter.st} toolptipValue={tooltip.st} />
-            </div>
+            {
+              !isMantainerRoute &&
+              <div className={`mr-2 max-w-xs ${hiddenOption && 'hidden'}`} >
+                <TextContent className="text-xs uppercase font-light" tag="proyectos" value={filter.pr} toolptipValue={tooltip.pr} />
+                <TextContent className="text-xs uppercase font-light" tag="emisores" value={filter.us} toolptipValue={tooltip.us} />
+                <TextContent className="text-xs uppercase font-light" tag="estados" value={filter.st} toolptipValue={tooltip.st} />
+              </div>
+            }
             <Button
               className={`rounded-full hover:bg-blue-100 text-blue-500 ${!showGoTo && 'hidden'}`}
               type="iconText"
@@ -497,6 +524,18 @@ function NavBar({ onMultiLine, isMultiLine, hiddenOption = false, showModalTicke
               name="Ir al sitio completo"
               onClick={() => navigate('/')}
             />
+            {
+              isMantainerRoute &&
+              <Button
+                className={`rounded-full hover:bg-blue-100 text-blue-500`}
+                type="iconText"
+                tooltip="Ir al sitio completo"
+                icon="fas fa-arrow-left"
+                iconFirst
+                name="Volver"
+                onClick={() => navigate('/')}
+              />
+            }
             <Button
               tooltip="Cerrar sesion"
               className="text-red-400 hover:text-red-600 hover:bg-red-100 rounded-lg"
@@ -517,42 +556,54 @@ function NavBar({ onMultiLine, isMultiLine, hiddenOption = false, showModalTicke
           name={user.name}
           block
           onClick={() => {
-            setModalUser(true)
+            handleOpenUserModal()
             toggleNavMenu()
           }}
         />
-        <Button
-          tooltip="mostrar todo el contenido de descripcion de ticket"
-          className={`border border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 rounded-full ${hiddenOption && 'hidden'}`}
-          type="iconText"
-          icon={isMultiLine ? 'fas fa-angle-double-down' : 'fas fa-angle-double-up'}
-          shadow
-          block
-          name="multilinea"
-          onClick={() => {
-            onMultiLine()
-            toggleNavMenu()
-          }} />
-        <Button
-          className={`border border-yellow-500 text-yellow-500 hover:text-white hover:bg-yellow-500 rounded-full ${hiddenOption && 'hidden'}`}
-          type="iconText"
-          icon="fas fa-filter"
-          shadow
-          block
-          name="filtros"
-          onClick={() => {
-            setModalFilter(true)
-            toggleNavMenu()
-          }} />
-        <Button
-          className={`bg-green-500 hover:bg-green-400 text-white rounded-full ${hiddenOption && 'hidden'}`}
-          shadow
-          block
-          name="nuevo ticket"
-          onClick={() => {
-            setModalTicket(true)
-            toggleNavMenu()
-          }} />
+        {
+          !isMantainerRoute &&
+          <>
+            {user.isAdmin === 1 &&
+              <Button
+                className={`bg-black hover:bg-gray-600 text-white rounded-full ${hiddenOption && 'hidden'}`}
+                shadow
+                name="Mantenedor usuarios"
+                onClick={() => navigate('/mantenedor-usuarios')} />
+            }
+            <Button
+              tooltip="mostrar todo el contenido de descripcion de ticket"
+              className={`border border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 rounded-full ${hiddenOption && 'hidden'}`}
+              type="iconText"
+              icon={isMultiLine ? 'fas fa-angle-double-down' : 'fas fa-angle-double-up'}
+              shadow
+              block
+              name="multilinea"
+              onClick={() => {
+                onMultiLine()
+                toggleNavMenu()
+              }} />
+            <Button
+              className={`border border-yellow-500 text-yellow-500 hover:text-white hover:bg-yellow-500 rounded-full ${hiddenOption && 'hidden'}`}
+              type="iconText"
+              icon="fas fa-filter"
+              shadow
+              block
+              name="filtros"
+              onClick={() => {
+                setModalFilter(true)
+                toggleNavMenu()
+              }} />
+            <Button
+              className={`bg-green-500 hover:bg-green-400 text-white rounded-full ${hiddenOption && 'hidden'}`}
+              shadow
+              block
+              name="nuevo ticket"
+              onClick={() => {
+                setModalTicket(true)
+                toggleNavMenu()
+              }} />
+          </>
+        }
         <Button
           tooltip="Cerrar sesion"
           className="text-red-400 hover:text-red-600 bg-red-100  hover:bg-red-300 rounded-full"
@@ -708,7 +759,7 @@ function NavBar({ onMultiLine, isMultiLine, hiddenOption = false, showModalTicke
                 className="capitalize cursor-pointer text-center bg-blue-500 hover:bg-blue-400 text-white transition duration-500 rounded-full py-2 px-4 font-semibold shadow-md"
                 htmlFor="inputFile">
                 <input key={resetFile || ''} className="hidden" type="file" id="inputFile" onChange={onChangeFile} />
-                Subir archivo
+                Seleccionar archivo
               </label>
               <Button
                 className="bg-green-500 hover:bg-green-400 text-white rounded-full"

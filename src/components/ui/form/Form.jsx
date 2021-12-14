@@ -357,7 +357,7 @@ function Form({ onClick, data, from = 'EX' }) {
               className="capitalize text-center cursor-pointer bg-blue-500 hover:bg-blue-400 text-white transition duration-500 rounded-full py-2 px-4 font-semibold shadow-md w-full"
               htmlFor="inputFile">
               <input key={resetFile || ''} className="hidden" type="file" id="inputFile" onChange={onChangeFile} />
-              Subir archivo
+              Seleccionar archivo
             </label>
             <Button
               className="text-red-500 border border-red-400 hover:bg-red-400 w-full hover:text-white rounded-full"

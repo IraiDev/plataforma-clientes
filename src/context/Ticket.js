@@ -34,6 +34,7 @@ function TicketProvider({ children }) {
     const resp = await fetchUnToken('auth-ticket/login', data, 'POST')
     const body = await resp.json()
     const { ok, resUser, token, tipo } = body
+    console.log(body)
 
     toggleLoading(false)
 
@@ -50,7 +51,8 @@ function TicketProvider({ children }) {
         fullName: resUser.nombre,
         email: resUser.correo,
         phone: b.usuario.phone,
-        pin: b.usuario.pin
+        pin: b.usuario.pin,
+        isAdmin: resUser.es_admin
       }
 
       setUser(data)
@@ -95,6 +97,8 @@ function TicketProvider({ children }) {
     const body = await resp.json()
     const { ok, resUser, token } = body
 
+    console.log('renew', body)
+
     toggleLoading(false)
 
     if (ok) {
@@ -111,7 +115,8 @@ function TicketProvider({ children }) {
         fullName: resUser.nombre,
         email: resUser.correo,
         phone: b.usuario.phone,
-        pin: b.usuario.pin
+        pin: b.usuario.pin,
+        isAdmin: resUser.es_admin
       }
       setUser(data)
       return true
@@ -182,7 +187,6 @@ function TicketProvider({ children }) {
     const { ok, resp: res } = body
 
     toggleLoading(false)
-    console.log(body)
 
     if (ok) setTicketList(res)
     else { console.log('fallo la peticion (getTicketList): ', body) }
@@ -194,8 +198,6 @@ function TicketProvider({ children }) {
     const { ok, arrayResp } = body
 
     toggleLoading(false)
-
-    console.log(body)
 
     if (ok) {
       setTicketDetail(arrayResp[0])
@@ -338,6 +340,25 @@ function TicketProvider({ children }) {
     }
   }
 
+  const insertUser = async (data) => {
+    const resp = await fetchToken('auth-ticket/insert-user', data, 'POST')
+    const body = await resp.json()
+
+    toggleLoading(false)
+
+    if (body.ok) return body
+    else return body
+
+  }
+
+  const getUser = async (rut) => {
+    const resp = await fetchToken('auth-ticket/get-info-to-change-user', { rut_user: rut }, 'POST')
+    const body = await resp.json()
+
+    if (body.ok) return body
+    else return body
+  }
+
   const saveFilters = ({ rut_usuario = user.rut, emisores = [], proyectos = [], estados = [] }) => {
     setFilters({
       rut_usuario,
@@ -353,6 +374,7 @@ function TicketProvider({ children }) {
     logout,
     getProjects,
     getUsers,
+    getUser,
     getStates,
     getTicketList,
     getTicketDetails,
@@ -369,7 +391,8 @@ function TicketProvider({ children }) {
     user,
     ticketList,
     ticketDetail,
-    filters
+    filters,
+    insertUser
   }
 
   return (
