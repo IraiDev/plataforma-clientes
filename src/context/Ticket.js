@@ -360,7 +360,7 @@ function TicketProvider({ children }) {
 
   }
 
-  const getUser = async (rut) => {
+  const getMantainerUser = async (rut) => {
     const resp = await fetchToken('auth-ticket/get-info-to-change-user', { rut_user: rut }, 'POST')
     const body = await resp.json()
 
@@ -385,7 +385,7 @@ function TicketProvider({ children }) {
     logout,
     getProjects,
     getUsers,
-    getUser,
+    getMantainerUser,
     getStates,
     getTicketList,
     getTicketDetails,

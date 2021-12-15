@@ -24,7 +24,7 @@ const initValuesState = {
 
 const UserMaintainer = () => {
    const navigate = useNavigate()
-   const { getProjects, getUsers, getStates, user, updataMantainerUser, insertMantainerUser, getUser } = useContext(Ticket)
+   const { getProjects, getUsers, getStates, user, updataMantainerUser, insertMantainerUser, getMantainerUser } = useContext(Ticket)
    const { toggleLoading } = useContext(Ui)
    const [tempSons, setTempSons] = useState([])
    const [tempFather, setTempFather] = useState([])
@@ -34,10 +34,6 @@ const UserMaintainer = () => {
    const [states, setStates] = useState([])
    const [sons, setSons] = useState([])
    const [father, setFather] = useState([])
-   const [projectsAll, setProjectsAll] = useState(false)
-   const [statesAll, setStatesAll] = useState(false)
-   const [fatherAll, setFatherAll] = useState(false)
-   const [sonsAll, setSonsAll] = useState(false)
    // checkbox
 
    // select
@@ -157,6 +153,7 @@ const UserMaintainer = () => {
    }
 
    const handleSelectOnChange = async (option) => {
+      let newPr = []
 
       toggleLoading(true)
 
@@ -168,11 +165,13 @@ const UserMaintainer = () => {
          return
       }
 
-      const resp = await getUser(option.value)
+      const resp = await getMantainerUser(option.value)
 
       if (resp.ok) {
          const { id_user, rut_user, nom_user, nombre, correo, telefono } = resp.usuario
          const { arreglo_estados, arreglo_hijos, arreglo_padres, arreglo_proyectos } = resp
+
+         console.log(arreglo_proyectos);
 
          setValues({
             id_user,
@@ -187,13 +186,20 @@ const UserMaintainer = () => {
          setTempFather(arreglo_padres)
          setTempStates(arreglo_estados)
 
-         setProjects(projects.map(item => {
-            const temp = arreglo_proyectos.filter(pr => pr.id_proy === item.value)
-            return {
-               ...item,
-               select: temp.length > 0
-            }
-         }))
+         projects.forEach(item => {
+            const temp = arreglo_proyectos.filter(t => t.id_proy === item.value)
+            newPr.push({ ...item, select: temp.length > 0 })
+         })
+
+         setProjects(newPr)
+
+         // setProjects(projects.map(item => {
+         //    const temp = arreglo_proyectos.filter(pr => pr.id_proy === item.value)
+         //    return {
+         //       ...item,
+         //       select: temp.length > 0
+         //    }
+         // }))
       }
       else {
          Alert({
@@ -213,11 +219,6 @@ const UserMaintainer = () => {
          let p = projects.filter(item => item.select)
          p = p.map(item => item.value)
 
-         setProjectsAll(projects.every(item => item.select))
-         setStatesAll(false)
-         setFatherAll(false)
-         setSonsAll(false)
-
          if (p.length > 0) {
 
             setStates([])
@@ -227,7 +228,6 @@ const UserMaintainer = () => {
             const data = { rut_usuario: user.rut, proyectos: p }
             const us = await getUsers(data)
             const st = await getStates(data)
-            console.log(st);
 
             await us.forEach(item => {
                const temp = tempSons.filter(t => t.rut_hijo === item.rut)
@@ -246,10 +246,6 @@ const UserMaintainer = () => {
                newSt.push({ value: item.id, label: item.est, select: temp.length > 0 })
             })
             setStates(newSt)
-
-            setStatesAll(newSt.every(item => item.select))
-            setFatherAll(newFa.every(item => item.select))
-            setSonsAll(newSo.every(item => item.select))
 
          }
       }
@@ -323,103 +319,21 @@ const UserMaintainer = () => {
                   />
                </section>
                <HRLabel content='Privilegios' />
-               <section className="text-sm grid grid-cols-1 md:grid-cols-2 gap-6 mb-4 mt-6 mx-20">
-                  <Container className="w-full" tag="Seleccione Proyectos">
-                     {projects.length > 0 ?
-                        <ul className="h-full overflow-custom uppercase">
-                           <li>
-                              <input
-                                 className="mr-2 cursor-pointer"
-                                 type="checkbox"
-                                 checked={projectsAll}
-                                 onChange={
-                                    (e) => {
-                                       const check = e.target.checked
-                                       setProjectsAll(check)
-                                       setProjects(projects.map(el => {
-                                          el.select = check
-                                          return el
-                                       }))
-                                    }
-                                 } />
-                              Todos
-                           </li>
-                           {
-
-                              projects.map((item) => (
-                                 <li key={item.value}>
-                                    <input
-                                       key={item.value}
-                                       id={item.value}
-                                       className="mr-2 cursor-pointer"
-                                       type="checkbox"
-                                       checked={item.select}
-                                       onChange={(e) => {
-                                          const check = e.target.checked
-                                          setProjects(projects.map(el => {
-                                             if (item.value === el.value) {
-                                                el.select = check
-                                             }
-                                             return el
-                                          }))
-                                          setProjectsAll(projects.every(el => el.select === true))
-                                       }}
-                                    />
-                                    {item.label}
-                                 </li>
-                              ))
-                           }
-                        </ul> : <p className="animate-pulse">cargando <i className="fas fa-spinner animate-spin"></i></p>
-                     }
-                  </Container>
-                  <Container className="w-full" tag="Seleccione Estados">
-                     {states.length > 0 ?
-                        <ul className="h-full overflow-custom uppercase">
-                           <li>
-                              <input
-                                 className="mr-2 cursor-pointer"
-                                 type="checkbox"
-                                 checked={statesAll}
-                                 onChange={
-                                    (e) => {
-                                       const check = e.target.checked
-                                       setStatesAll(check)
-                                       setStates(states.map(el => {
-                                          el.select = check
-                                          return el
-                                       }))
-                                    }
-                                 } />
-                              Todos
-                           </li>
-                           {
-
-                              states.map((item) => (
-                                 <li key={item.value}>
-                                    <input
-                                       key={item.value}
-                                       id={item.value}
-                                       className="mr-2 cursor-pointer"
-                                       type="checkbox"
-                                       checked={item.select}
-                                       onChange={(e) => {
-                                          const check = e.target.checked
-                                          setStates(states.map(el => {
-                                             if (item.value === el.value) {
-                                                el.select = check
-                                             }
-                                             return el
-                                          }))
-                                          setStatesAll(states.every(el => el.select === true))
-                                       }}
-                                    />
-                                    {item.label}
-                                 </li>
-                              ))
-                           }
-                        </ul> : <p className="animate-pulse">cargando <i className="fas fa-spinner animate-spin"></i></p>
-                     }
-                  </Container>
+               <section className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <div className='grid gap-4'>
+                     <label className='capitalize text-gray-600'>Proyectos del usuario:</label>
+                     <Select
+                        className='w-full lg:w-1/2 uppercase'
+                     />
+                  </div>
+                  <div className='grid gap-4'>
+                     <label className='capitalize text-gray-600'>agregar proyecto:</label>
+                     <Select
+                        className='w-full lg:w-1/2 uppercase'
+                     />
+                  </div>
+               </section>
+               <section className="text-sm grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-4 mt-6">
                   <Container className="w-full" tag="Seleccione padres">
                      {father.length > 0 ?
                         <ul className="h-full overflow-custom uppercase">
@@ -427,11 +341,10 @@ const UserMaintainer = () => {
                               <input
                                  className="mr-2 cursor-pointer"
                                  type="checkbox"
-                                 checked={fatherAll}
+                                 checked={father.every(item => item.select)}
                                  onChange={
                                     (e) => {
                                        const check = e.target.checked
-                                       setFatherAll(check)
                                        setFather(father.map(el => {
                                           el.select = check
                                           return el
@@ -441,7 +354,6 @@ const UserMaintainer = () => {
                               Todos
                            </li>
                            {
-
                               father.map((item) => (
                                  <li key={`${item.value}F`}>
                                     <input
@@ -457,7 +369,6 @@ const UserMaintainer = () => {
                                              }
                                              return el
                                           }))
-                                          setFatherAll(father.every(el => el.select === true))
                                        }}
                                     />
                                     {item.label}
@@ -474,11 +385,10 @@ const UserMaintainer = () => {
                               <input
                                  className="mr-2 cursor-pointer"
                                  type="checkbox"
-                                 checked={sonsAll}
+                                 checked={sons.every(item => item.select)}
                                  onChange={
                                     (e) => {
                                        const check = e.target.checked
-                                       setSonsAll(check)
                                        setSons(sons.map(el => {
                                           el.select = check
                                           return el
@@ -488,7 +398,6 @@ const UserMaintainer = () => {
                               Todos
                            </li>
                            {
-
                               sons.map((item) => (
                                  <li key={item.value}>
                                     <input
@@ -504,7 +413,51 @@ const UserMaintainer = () => {
                                              }
                                              return el
                                           }))
-                                          setSonsAll(sons.every(el => el.select === true))
+                                       }}
+                                    />
+                                    {item.label}
+                                 </li>
+                              ))
+                           }
+                        </ul> : <p className="animate-pulse">cargando <i className="fas fa-spinner animate-spin"></i></p>
+                     }
+                  </Container>
+                  <Container className="w-full" tag="Seleccione Estados">
+                     {states.length > 0 ?
+                        <ul className="h-full overflow-custom uppercase">
+                           <li>
+                              <input
+                                 className="mr-2 cursor-pointer"
+                                 type="checkbox"
+                                 checked={states.every(item => item.select)}
+                                 onChange={
+                                    (e) => {
+                                       const check = e.target.checked
+                                       setStates(states.map(el => {
+                                          el.select = check
+                                          return el
+                                       }))
+                                    }
+                                 } />
+                              Todos
+                           </li>
+                           {
+                              states.map((item) => (
+                                 <li key={item.value}>
+                                    <input
+                                       key={item.value}
+                                       id={item.value}
+                                       className="mr-2 cursor-pointer"
+                                       type="checkbox"
+                                       checked={item.select}
+                                       onChange={(e) => {
+                                          const check = e.target.checked
+                                          setStates(states.map(el => {
+                                             if (item.value === el.value) {
+                                                el.select = check
+                                             }
+                                             return el
+                                          }))
                                        }}
                                     />
                                     {item.label}
