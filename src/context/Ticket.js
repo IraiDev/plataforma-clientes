@@ -97,8 +97,6 @@ function TicketProvider({ children }) {
     const body = await resp.json()
     const { ok, resUser, token } = body
 
-    console.log('renew', body)
-
     toggleLoading(false)
 
     if (ok) {
@@ -340,8 +338,19 @@ function TicketProvider({ children }) {
     }
   }
 
-  const insertUser = async (data) => {
+  const insertMantainerUser = async (data) => {
     const resp = await fetchToken('auth-ticket/insert-user', data, 'POST')
+    const body = await resp.json()
+
+    toggleLoading(false)
+
+    if (body.ok) return body
+    else return body
+
+  }
+
+  const updataMantainerUser = async (data) => {
+    const resp = await fetchToken('auth-ticket/update-user', data, 'POST')
     const body = await resp.json()
 
     toggleLoading(false)
@@ -354,6 +363,8 @@ function TicketProvider({ children }) {
   const getUser = async (rut) => {
     const resp = await fetchToken('auth-ticket/get-info-to-change-user', { rut_user: rut }, 'POST')
     const body = await resp.json()
+
+    toggleLoading(false)
 
     if (body.ok) return body
     else return body
@@ -392,7 +403,8 @@ function TicketProvider({ children }) {
     ticketList,
     ticketDetail,
     filters,
-    insertUser
+    updataMantainerUser,
+    insertMantainerUser
   }
 
   return (

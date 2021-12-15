@@ -18,12 +18,13 @@ const initValuesState = {
    userName: '',
    fullName: '',
    email: '',
-   phone: ''
+   phone: '',
+   id_user: ''
 }
 
 const UserMaintainer = () => {
    const navigate = useNavigate()
-   const { getProjects, getUsers, getStates, user, insertUser, getUser } = useContext(Ticket)
+   const { getProjects, getUsers, getStates, user, updataMantainerUser, insertMantainerUser, getUser } = useContext(Ticket)
    const { toggleLoading } = useContext(Ui)
    const [tempSons, setTempSons] = useState([])
    const [tempFather, setTempFather] = useState([])
@@ -48,7 +49,7 @@ const UserMaintainer = () => {
    const [values, setValues] = useState(initValuesState)
    // custom hooks
    // destructuring
-   const { rut, userName, fullName, email, phone } = values
+   const { rut, userName, fullName, email, phone, id_user } = values
    // destructuring
 
    const getFilters = async () => {
@@ -59,21 +60,23 @@ const UserMaintainer = () => {
 
       const tempPr = pr.map(item => ({ value: item.id_proyecto, label: item.desc_proyecto, select: false }))
       const tempUs = us.map(item => ({ value: item.rut, label: item.nombre, select: false }))
+      const tempUs2 = us.map(item => ({ value: item.rut, label: item.nombre, select: false }))
       const tempSt = st.map(item => ({ value: item.id, label: item.est, select: false }))
 
       setProjects(tempPr)
       setFather(tempUs)
-      setSons(tempUs)
+      setSons(tempUs2)
       setStates(tempSt)
       setOptions([{ value: null, label: 'Ninguno' }, ...tempUs])
+      toggleLoading(false)
    }
 
    const handleCancel = () => {
       navigate('/')
    }
 
-   const handleCreateUser = async () => {
-
+   const handleCreateOrUpdateUser = async ({ isUpdate = false }) => {
+      let resp
       let pr = projects.filter(item => item.select)
       pr = pr.map(item => item.value)
       let st = states.filter(item => item.select)
@@ -86,7 +89,7 @@ const UserMaintainer = () => {
       if (pr.length === 0 || st.length === 0 || fa.length === 0 || so.length === 0) {
          Alert({
             title: 'Atencion',
-            content: 'Debe seleccionar al menos un proyecto, un estado, un padre y un hijo para crear un usuario',
+            content: 'Debe seleccionar al menos un proyecto, un estado, un padre y un hijo para crear/actualizar un usuario',
             showCancelButton: false,
             timer: 7000
          })
@@ -106,7 +109,7 @@ const UserMaintainer = () => {
       if (rut === '' || email === '' || userName === '' || fullName === '' || phone === '') {
          Alert({
             title: 'Atencion',
-            content: 'Debe completar todos los campos para crear un usuario',
+            content: 'Debe completar todos los campos para crear/actualizar un usuario',
             showCancelButton: false,
             timer: 7000
          })
@@ -116,6 +119,7 @@ const UserMaintainer = () => {
       toggleLoading(true)
 
       const data = {
+         id_user,
          rut: prettifyRut(rut),
          email,
          nom_user: userName,
@@ -127,12 +131,16 @@ const UserMaintainer = () => {
          permises: st
       }
 
-      const resp = await insertUser(data)
+      if (isUpdate) {
+         resp = await updataMantainerUser(data)
+      } else {
+         resp = await insertMantainerUser(data)
+      }
 
       if (resp.ok) {
          Alert({
             title: 'Atencion',
-            content: 'Usuario creado correctamente',
+            content: resp.response,
             showCancelButton: false,
             timer: 7000
          })
@@ -149,18 +157,25 @@ const UserMaintainer = () => {
    }
 
    const handleSelectOnChange = async (option) => {
+
+      toggleLoading(true)
+
+      setSelect(option)
+
       if (option.value === null) {
          setValues(initValuesState)
          getFilters()
          return
       }
-      setSelect(option)
+
       const resp = await getUser(option.value)
-      console.log(resp);
+
       if (resp.ok) {
-         const { rut_user, nom_user, nombre, correo, telefono } = resp.usuario
+         const { id_user, rut_user, nom_user, nombre, correo, telefono } = resp.usuario
          const { arreglo_estados, arreglo_hijos, arreglo_padres, arreglo_proyectos } = resp
+
          setValues({
+            id_user,
             rut: rut_user,
             userName: nom_user,
             fullName: nombre,
@@ -168,19 +183,17 @@ const UserMaintainer = () => {
             phone: telefono
          })
 
-         await arreglo_proyectos.forEach(item => {
-            setProjects(projects.map(pr => {
-               if (pr.value === item.id_proy) {
-                  pr.select = true
-               }
-               return pr
-            }))
-         })
-
          setTempSons(arreglo_hijos)
          setTempFather(arreglo_padres)
          setTempStates(arreglo_estados)
 
+         setProjects(projects.map(item => {
+            const temp = arreglo_proyectos.filter(pr => pr.id_proy === item.value)
+            return {
+               ...item,
+               select: temp.length > 0
+            }
+         }))
       }
       else {
          Alert({
@@ -195,60 +208,53 @@ const UserMaintainer = () => {
 
    useEffect(() => {
       const loadUsersFilter = async () => {
-         let p = projects.filter(item => item.select === true)
+
+         let newSt = [], newFa = [], newSo = []
+         let p = projects.filter(item => item.select)
          p = p.map(item => item.value)
 
+         setProjectsAll(projects.every(item => item.select))
+         setStatesAll(false)
+         setFatherAll(false)
+         setSonsAll(false)
+
          if (p.length > 0) {
+
             setStates([])
             setFather([])
             setSons([])
-            setStatesAll(false)
-            setFatherAll(false)
-            setSonsAll(false)
+
             const data = { rut_usuario: user.rut, proyectos: p }
             const us = await getUsers(data)
             const st = await getStates(data)
+            console.log(st);
 
-            tempSons.forEach(t => {
-               setSons(us.map(item => ({
-                  value: item.rut,
-                  label: item.nombre,
-                  select: t.rut_hijo === item.rut
-               })))
+            await us.forEach(item => {
+               const temp = tempSons.filter(t => t.rut_hijo === item.rut)
+               newSo.push({ value: item.rut, label: item.nombre, select: temp.length > 0 })
             })
+            setSons(newSo)
 
-            tempFather.forEach(t => {
-               setFather(us.map(item => ({
-                  value: item.rut,
-                  label: item.nombre,
-                  select: t.rut_padre === item.rut
-               })))
+            await us.forEach(item => {
+               const temp = tempFather.filter(t => t.rut_padre === item.rut)
+               newFa.push({ value: item.rut, label: item.nombre, select: temp.length > 0 })
             })
+            setFather(newFa)
 
-            // tempStates.forEach(t => {
-            //    setStates(st.map(item => ({
-            //       value: item.id,
-            //       label: item.est,
-            //       select: t.estado === item.id
-            //    })))
-            // })
-
-
-            // TODO: repetir esto para todos las demas listas
-            let newSt = []
-            st.forEach(item => {
-               const temp = tempStates.filter(t => t.id === item.estado)
-               newSt.push({
-                  value: item.id,
-                  label: item.est,
-                  select: temp.length > 0
-               })
+            await st.forEach(item => {
+               const temp = tempStates.filter(t => t.estado === item.id)
+               newSt.push({ value: item.id, label: item.est, select: temp.length > 0 })
             })
             setStates(newSt)
+
+            setStatesAll(newSt.every(item => item.select))
+            setFatherAll(newFa.every(item => item.select))
+            setSonsAll(newSo.every(item => item.select))
+
          }
       }
       loadUsersFilter()
-   }, [projects, tempSons, tempStates, tempFather])
+   }, [projects])
 
    useEffect(() => {
       getFilters()
@@ -437,9 +443,8 @@ const UserMaintainer = () => {
                            {
 
                               father.map((item) => (
-                                 <li key={item.value}>
+                                 <li key={`${item.value}F`}>
                                     <input
-                                       key={item.value}
                                        id={item.value}
                                        className="mr-2 cursor-pointer"
                                        type="checkbox"
@@ -487,7 +492,6 @@ const UserMaintainer = () => {
                               sons.map((item) => (
                                  <li key={item.value}>
                                     <input
-                                       key={item.value}
                                        id={item.value}
                                        className="mr-2 cursor-pointer"
                                        type="checkbox"
@@ -519,8 +523,11 @@ const UserMaintainer = () => {
                   />
                   <Button
                      className="bg-blue-400 hover:bg-blue-500 text-white rounded-full w-full md:w-1/2 place-self-end"
-                     name="crear usuario"
-                     onClick={handleCreateUser}
+                     name={select.value !== null ? 'Actualizar usuario' : 'crear usuario'}
+                     onClick={
+                        select.value !== null ? () => handleCreateOrUpdateUser({ isUpdate: true })
+                           : () => handleCreateOrUpdateUser({ isUpdate: false })
+                     }
                   />
                </footer>
             </div>
