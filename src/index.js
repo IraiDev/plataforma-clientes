@@ -10,7 +10,7 @@ import UiProvider from './context/Ui'
 import TicketProvider from './context/Ticket'
 
 ReactDOM.render(
-  <BrowserRouter>
+  <BrowserRouter basename='/'>
     <UiProvider>
       <TicketProvider>
         <React.StrictMode>
