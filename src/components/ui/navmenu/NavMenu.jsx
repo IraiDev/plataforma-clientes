@@ -8,6 +8,7 @@ function NavMenu({ children, }) {
   return (
     <div className={`fixed top-0 right-0 left-0 bottom-0 z-40 lg:hidden
       animate__animated animate__faster
+      ${showMenu === null && 'hidden'}
       ${showMenu ? 'block animate__slideInLeft' : 'animate__slideOutLeft'}`}>
       <div
         onClick={() => toggleNavMenu()}

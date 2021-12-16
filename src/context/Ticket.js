@@ -42,6 +42,9 @@ function TicketProvider({ children }) {
       const b = await r.json()
 
       localStorage.setItem('ticketToken', token)
+      const lastuser = window.localStorage.getItem('last-ticket-user')
+      lastuser !== resUser.rut_user && window.localStorage.setItem('lastPath-ticket', '/')
+      window.localStorage.setItem('last-ticket-user', resUser.rut_user)
 
       const data = {
         ok,
@@ -104,6 +107,7 @@ function TicketProvider({ children }) {
 
       window.localStorage.setItem('ticketToken', token)
       window.localStorage.setItem('lastPath-ticket', pathname)
+      window.localStorage.setItem('last-ticket-user', resUser.rut_user)
 
       const data = {
         ok,

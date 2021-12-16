@@ -326,11 +326,7 @@ function NavBar({
       }
     }
 
-    // FIXME: error en el actualizar datos de usuario en BE
-
-    // toggleLoading(true)
-
-    console.log(data);
+    toggleLoading(true)
 
     const { ok } = await updateUser(data)
 

@@ -5,7 +5,7 @@ export const Ui = React.createContext()
 function UiProvider({ children }) {
 
   const [loading, toggleLoading] = useState(false)
-  const [showMenu, setMenu] = useState(false)
+  const [showMenu, setMenu] = useState(null)
 
   const toggleNavMenu = () => {
     setMenu(!showMenu)

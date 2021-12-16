@@ -81,7 +81,7 @@ const UserMaintainer = () => {
    }
 
    const handleCreateOrUpdateUser = async ({ isUpdate = false }) => {
-      let resp, proy, padres, hijos, estados
+      let resp, proy = []
       let st = states.filter(item => item.select)
       st = st.map(item => item.value)
       let fa = father.filter(item => item.select)
@@ -92,7 +92,7 @@ const UserMaintainer = () => {
       if (st.length === 0 || fa.length === 0 || so.length === 0) {
          Alert({
             title: 'Atencion',
-            content: 'Debe seleccionar al menos un proyecto, un estado, un padre y un hijo para crear/actualizar un usuario',
+            content: 'Debe seleccionar al menos un un estado, un padre y un hijo para crear/actualizar un usuario',
             showCancelButton: false,
             timer: 7000
          })
@@ -119,10 +119,10 @@ const UserMaintainer = () => {
          return
       }
 
-      // toggleLoading(true)
+      toggleLoading(true)
 
       if (isUpdate) {
-         if (selectProject.value === null || setOptionAddProject.value === null) {
+         if (selectProject.value === null && setOptionAddProject.value === null) {
             Alert({
                title: 'Atencion',
                content: 'Debe seleccionar un proyecto para actualizar un usuario',
@@ -132,15 +132,8 @@ const UserMaintainer = () => {
             return
          }
 
-         if (selectProject.value !== null) {
-            proy = selectProject.value
-            // console.log('arr fa', father);
-
-            padres = tempFather.filter(item => item.id_proy === selectProject.value)
-
-            console.log('padres segun select: ', padres);
-         }
-         if (setOptionAddProject.value !== null) proy = setOptionAddProject.value
+         if (selectProject.value !== null) proy = [selectProject.value]
+         if (selectAddProject.value !== null) proy = [selectAddProject.value]
 
          const data = {
             id_user,
@@ -149,14 +142,12 @@ const UserMaintainer = () => {
             nom_user: userName,
             name: fullName,
             phone,
-            proyects: [proy],
+            proyects: proy,
             father_users: fa,
             sons_users: so,
             permises: st
          }
-
-         console.log('data update: ', data);
-         // resp = await updataMantainerUser(data)
+         resp = await updataMantainerUser(data)
       } else {
          const data = {
             rut: prettifyRut(rut),
@@ -169,27 +160,31 @@ const UserMaintainer = () => {
             sons_users: so,
             permises: st
          }
-         console.log('data insert: ', data);
-         // resp = await insertMantainerUser(data)
+         resp = await insertMantainerUser(data)
       }
 
-      // if (resp.ok) {
-      //    Alert({
-      //       title: 'Atencion',
-      //       content: resp.response,
-      //       showCancelButton: false,
-      //       timer: 7000
-      //    })
-      //    getFilters()
-      // }
-      // else {
-      //    Alert({
-      //       title: 'Atencion',
-      //       content: resp.response,
-      //       showCancelButton: false,
-      //       timer: 7000
-      //    })
-      // }
+      if (resp.ok) {
+         Alert({
+            title: 'Atencion',
+            content: resp.response,
+            showCancelButton: false,
+            timer: 7000
+         })
+         getFilters()
+      }
+      else {
+         Alert({
+            title: 'Atencion',
+            content: resp.response,
+            showCancelButton: false,
+            timer: 7000
+         })
+      }
+      setSelect(initOptions)
+      setSelectAddProject(initOptions)
+      setSelectProject(initOptions)
+      setOptionAddProject(projects)
+      setOptionsProjects(projects)
    }
 
    const handleSelectOnChange = async (option) => {
@@ -213,9 +208,9 @@ const UserMaintainer = () => {
          const { id_user, rut_user, nom_user, nombre, correo, telefono } = resp.usuario
          const { arreglo_estados, arreglo_hijos, arreglo_padres, arreglo_proyectos } = resp
 
-         console.log('padres', arreglo_padres);
-         console.log('hijos', arreglo_hijos);
-         console.log('estados', arreglo_estados);
+         // console.log('padres', arreglo_padres);
+         // console.log('hijos', arreglo_hijos);
+         // console.log('estados', arreglo_estados);
 
          setValues({
             id_user,
@@ -248,6 +243,16 @@ const UserMaintainer = () => {
       }
    }
 
+   const handleOnChangeUserProject = (option) => {
+      setSelectProject(option)
+      setSelectAddProject(initOptions)
+   }
+
+   const handleOnChangeNewProject = (option) => {
+      setSelectAddProject(option)
+      setSelectProject(initOptions)
+   }
+
    useEffect(() => {
       const loadUsersFilter = async () => {
 
@@ -267,13 +272,13 @@ const UserMaintainer = () => {
             const st = await getStates(data)
 
             await us.forEach(item => {
-               const temp = tempSons.filter(t => t.rut_hijo === item.rut)
+               const temp = tempSons.filter(t => t.rut_hijo === item.rut && t.id_proy === p)
                newSo.push({ value: item.rut, label: item.nombre, select: temp.length > 0 })
             })
             setSons(newSo)
 
             await us.forEach(item => {
-               const temp = tempFather.filter(t => t.rut_padre === item.rut)
+               const temp = tempFather.filter(t => t.rut_padre === item.rut && t.id_proy === p)
                newFa.push({ value: item.rut, label: item.nombre, select: temp.length > 0 })
             })
             setFather(newFa)
@@ -363,10 +368,7 @@ const UserMaintainer = () => {
                         className='w-full lg:w-1/2 uppercase'
                         options={optionsProjects}
                         value={selectProject}
-                        onChange={option => {
-                           setSelectProject(option)
-                           setSelectAddProject(initOptions)
-                        }}
+                        onChange={handleOnChangeUserProject}
                      />
                   </div>
                   <div className='grid gap-4'>
@@ -375,10 +377,7 @@ const UserMaintainer = () => {
                         className='w-full lg:w-1/2 uppercase'
                         options={optionAddProject}
                         value={selectAddProject}
-                        onChange={option => {
-                           setSelectAddProject(option)
-                           setSelectProject(initOptions)
-                        }}
+                        onChange={handleOnChangeNewProject}
                      />
                   </div>
                </section>
