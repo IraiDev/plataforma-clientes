@@ -22,23 +22,31 @@ const initValuesState = {
    id_user: ''
 }
 
+const initOptions = { value: null, label: 'Sin seleccion' }
+
 const UserMaintainer = () => {
    const navigate = useNavigate()
    const { getProjects, getUsers, getStates, user, updataMantainerUser, insertMantainerUser, getMantainerUser } = useContext(Ticket)
    const { toggleLoading } = useContext(Ui)
+   const [projects, setProjects] = useState([])
    const [tempSons, setTempSons] = useState([])
    const [tempFather, setTempFather] = useState([])
    const [tempStates, setTempStates] = useState([])
    // checkbox
-   const [projects, setProjects] = useState([])
    const [states, setStates] = useState([])
    const [sons, setSons] = useState([])
    const [father, setFather] = useState([])
    // checkbox
 
-   // select
+   // options select
    const [options, setOptions] = useState([])
-   const [select, setSelect] = useState({ value: null, label: 'Ninguno' })
+   const [optionsProjects, setOptionsProjects] = useState([])
+   const [optionAddProject, setOptionAddProject] = useState([])
+   // optons select
+   // select
+   const [select, setSelect] = useState(initOptions)
+   const [selectProject, setSelectProject] = useState(initOptions)
+   const [selectAddProject, setSelectAddProject] = useState(initOptions)
    // select
 
    // custom hooks
@@ -63,6 +71,7 @@ const UserMaintainer = () => {
       setFather(tempUs)
       setSons(tempUs2)
       setStates(tempSt)
+      setOptionAddProject(tempPr)
       setOptions([{ value: null, label: 'Ninguno' }, ...tempUs])
       toggleLoading(false)
    }
@@ -72,9 +81,7 @@ const UserMaintainer = () => {
    }
 
    const handleCreateOrUpdateUser = async ({ isUpdate = false }) => {
-      let resp
-      let pr = projects.filter(item => item.select)
-      pr = pr.map(item => item.value)
+      let resp, proy, padres, hijos, estados
       let st = states.filter(item => item.select)
       st = st.map(item => item.value)
       let fa = father.filter(item => item.select)
@@ -82,7 +89,7 @@ const UserMaintainer = () => {
       let so = sons.filter(item => item.select)
       so = so.map(item => item.value)
 
-      if (pr.length === 0 || st.length === 0 || fa.length === 0 || so.length === 0) {
+      if (st.length === 0 || fa.length === 0 || so.length === 0) {
          Alert({
             title: 'Atencion',
             content: 'Debe seleccionar al menos un proyecto, un estado, un padre y un hijo para crear/actualizar un usuario',
@@ -112,55 +119,90 @@ const UserMaintainer = () => {
          return
       }
 
-      toggleLoading(true)
-
-      const data = {
-         id_user,
-         rut: prettifyRut(rut),
-         email,
-         nom_user: userName,
-         name: fullName,
-         phone,
-         proyects: pr,
-         father_users: fa,
-         sons_users: so,
-         permises: st
-      }
+      // toggleLoading(true)
 
       if (isUpdate) {
-         resp = await updataMantainerUser(data)
+         if (selectProject.value === null || setOptionAddProject.value === null) {
+            Alert({
+               title: 'Atencion',
+               content: 'Debe seleccionar un proyecto para actualizar un usuario',
+               showCancelButton: false,
+               timer: 7000
+            })
+            return
+         }
+
+         if (selectProject.value !== null) {
+            proy = selectProject.value
+            // console.log('arr fa', father);
+
+            padres = tempFather.filter(item => item.id_proy === selectProject.value)
+
+            console.log('padres segun select: ', padres);
+         }
+         if (setOptionAddProject.value !== null) proy = setOptionAddProject.value
+
+         const data = {
+            id_user,
+            rut: prettifyRut(rut),
+            email,
+            nom_user: userName,
+            name: fullName,
+            phone,
+            proyects: [proy],
+            father_users: fa,
+            sons_users: so,
+            permises: st
+         }
+
+         console.log('data update: ', data);
+         // resp = await updataMantainerUser(data)
       } else {
-         resp = await insertMantainerUser(data)
+         const data = {
+            rut: prettifyRut(rut),
+            email,
+            nom_user: userName,
+            name: fullName,
+            phone,
+            proyects: [selectAddProject.value],
+            father_users: fa,
+            sons_users: so,
+            permises: st
+         }
+         console.log('data insert: ', data);
+         // resp = await insertMantainerUser(data)
       }
 
-      if (resp.ok) {
-         Alert({
-            title: 'Atencion',
-            content: resp.response,
-            showCancelButton: false,
-            timer: 7000
-         })
-         getFilters()
-      }
-      else {
-         Alert({
-            title: 'Atencion',
-            content: resp.response,
-            showCancelButton: false,
-            timer: 7000
-         })
-      }
+      // if (resp.ok) {
+      //    Alert({
+      //       title: 'Atencion',
+      //       content: resp.response,
+      //       showCancelButton: false,
+      //       timer: 7000
+      //    })
+      //    getFilters()
+      // }
+      // else {
+      //    Alert({
+      //       title: 'Atencion',
+      //       content: resp.response,
+      //       showCancelButton: false,
+      //       timer: 7000
+      //    })
+      // }
    }
 
    const handleSelectOnChange = async (option) => {
-      let newPr = []
 
       toggleLoading(true)
 
       setSelect(option)
 
       if (option.value === null) {
+         setProjects(projects)
          setValues(initValuesState)
+         setOptionAddProject(projects)
+         setOptionsProjects(projects)
          getFilters()
          return
       }
@@ -171,7 +213,9 @@ const UserMaintainer = () => {
          const { id_user, rut_user, nom_user, nombre, correo, telefono } = resp.usuario
          const { arreglo_estados, arreglo_hijos, arreglo_padres, arreglo_proyectos } = resp
 
-         console.log(arreglo_proyectos);
+         console.log('padres', arreglo_padres);
+         console.log('hijos', arreglo_hijos);
+         console.log('estados', arreglo_estados);
 
          setValues({
             id_user,
@@ -185,21 +229,13 @@ const UserMaintainer = () => {
          setTempSons(arreglo_hijos)
          setTempFather(arreglo_padres)
          setTempStates(arreglo_estados)
+         setOptionsProjects([])
+         setOptionAddProject([])
 
-         projects.forEach(item => {
-            const temp = arreglo_proyectos.filter(t => t.id_proy === item.value)
-            newPr.push({ ...item, select: temp.length > 0 })
-         })
+         setOptionsProjects(projects.filter(item => arreglo_proyectos.find(p => p.id_proy === item.value)))
 
-         setProjects(newPr)
+         setOptionAddProject(projects.filter(item => !arreglo_proyectos.find(p => p.id_proy === item.value)))
 
-         // setProjects(projects.map(item => {
-         //    const temp = arreglo_proyectos.filter(pr => pr.id_proy === item.value)
-         //    return {
-         //       ...item,
-         //       select: temp.length > 0
-         //    }
-         // }))
       }
       else {
          Alert({
@@ -215,17 +251,18 @@ const UserMaintainer = () => {
    useEffect(() => {
       const loadUsersFilter = async () => {
 
-         let newSt = [], newFa = [], newSo = []
-         let p = projects.filter(item => item.select)
-         p = p.map(item => item.value)
+         let newSt = [], newFa = [], newSo = [], p
 
-         if (p.length > 0) {
+         if (selectProject.value !== null) p = selectProject.value
+         if (selectAddProject.value !== null) p = selectAddProject.value
+
+         if (selectProject.value !== null || selectAddProject.value !== null) {
 
             setStates([])
             setFather([])
             setSons([])
 
-            const data = { rut_usuario: user.rut, proyectos: p }
+            const data = { rut_usuario: user.rut, proyectos: [p] }
             const us = await getUsers(data)
             const st = await getStates(data)
 
@@ -250,7 +287,7 @@ const UserMaintainer = () => {
          }
       }
       loadUsersFilter()
-   }, [projects])
+   }, [selectProject, selectAddProject])
 
    useEffect(() => {
       getFilters()
@@ -324,12 +361,24 @@ const UserMaintainer = () => {
                      <label className='capitalize text-gray-600'>Proyectos del usuario:</label>
                      <Select
                         className='w-full lg:w-1/2 uppercase'
+                        options={optionsProjects}
+                        value={selectProject}
+                        onChange={option => {
+                           setSelectProject(option)
+                           setSelectAddProject(initOptions)
+                        }}
                      />
                   </div>
                   <div className='grid gap-4'>
                      <label className='capitalize text-gray-600'>agregar proyecto:</label>
                      <Select
                         className='w-full lg:w-1/2 uppercase'
+                        options={optionAddProject}
+                        value={selectAddProject}
+                        onChange={option => {
+                           setSelectAddProject(option)
+                           setSelectProject(initOptions)
+                        }}
                      />
                   </div>
                </section>

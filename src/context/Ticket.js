@@ -34,7 +34,6 @@ function TicketProvider({ children }) {
     const resp = await fetchUnToken('auth-ticket/login', data, 'POST')
     const body = await resp.json()
     const { ok, resUser, token, tipo } = body
-    console.log(body)
 
     toggleLoading(false)
 

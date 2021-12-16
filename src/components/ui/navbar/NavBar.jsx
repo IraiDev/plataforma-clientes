@@ -39,15 +39,13 @@ function NavBar({
   const [questions, setQuestions] = useState([])
   const [filter, setFilter] = useState({ pr: ['???'], us: ['???'], st: ['???'] })
   const [tooltip, setTooltip] = useState({ pr: '', us: '', st: '' })
+  const [prevState, setPrevState] = useState({ pr: [], us: [], st: [] })
 
   // checkboxes
   const [check, setCheck] = useState(false)
   const [projects, setProjects] = useState([])
   const [users, setUsers] = useState([])
   const [states, setStates] = useState([])
-  const [projectsAll, setProjectsAll] = useState(false)
-  const [usersAll, setUsersAll] = useState(false)
-  const [statesAll, setStatesAll] = useState(false)
   // checkboxes
 
   // custom hooks
@@ -103,7 +101,7 @@ function NavBar({
 
     const id = filter.map(item => item.value)
 
-    return { complete: arr, id, name, tooltip }
+    return { filter, id, name, tooltip }
   }
 
   const onChangeFile = (e) => {
@@ -206,7 +204,7 @@ function NavBar({
 
     Alert({ title: 'Atencion', icon: 'error', content: 'Error al crear ticket, vuelva a intentarlo.', showCancelButton: false, timer: 5000 })
   }
-  // FIXME: ver el porque no se se guarda el estado antiguo
+
   const handleFilter = () => {
     const pr = getFilterSelection(projects)
     const us = getFilterSelection(users)
@@ -214,39 +212,11 @@ function NavBar({
 
     if (pr.id.length > 0 && us.id.length > 0 && st.id.length > 0) toggleLoading(true)
 
-    setFilter({
-      pr: pr.name,
-      us: us.name,
-      st: st.name,
-    })
+    setFilter({ pr: pr.name, us: us.name, st: st.name })
 
-    setTooltip({
-      pr: pr.tooltip,
-      us: us.tooltip,
-      st: st.tooltip,
-    })
+    setTooltip({ pr: pr.tooltip, us: us.tooltip, st: st.tooltip })
 
-    // const f = () => {
-    //   const pp = projects.map(item => {
-    //     if (pr.id.includes(item.value)) return { ...item, select: true }
-    //     else return { ...item, select: false }
-    //   })
-
-    //   const uu = users.map(item => {
-    //     if (us.id.includes(item.value)) return { ...item, select: true }
-    //     else return { ...item, select: false }
-    //   })
-
-    //   const ss = states.map(item => {
-    //     if (st.id.includes(item.value)) return { ...item, select: true }
-    //     else return { ...item, select: false }
-    //   })
-
-    //   console.log('se ejecuta la funcionnnnnn');
-
-    // }
-    // f()
-    // setOldState({ p: pr.complete, u: us.complete, s: st.complete })
+    setPrevState({ pr: pr.filter, us: us.filter, st: st.filter })
 
     const data = {
       rut_usuario: user.rut, proyectos: pr.id, emisores: us.id, estados: st.id
@@ -256,90 +226,118 @@ function NavBar({
     getTicketList(data)
     setModalFilter(false)
   }
-  // FIXME: ver porque no funciona el cancelar para volver al estado antiguo  
+
   const handleCancel = () => {
-    // console.log(p);
-    // setProjects(p)
-    // setUsers(u)
-    // setStates(s)
-    // setProjectsAll(p.every(item => item.select === true))
-    // setUsersAll(u.every(item => item.select === true))
-    // setStatesAll(s.every(item => item.select === true))
+    let newPr = []
+
+    projects.forEach(item => {
+      const temp = prevState.pr.filter(t => t.value === item.value)
+      newPr.push({ ...item, select: temp.length > 0 })
+    })
+    setProjects(newPr)
+
     setModalFilter(false)
   }
 
   const handleUpdateUser = async () => {
+    let data
 
-    if (pin === '' || pin !== user.pin) {
-      Alert({
-        icon: 'warn',
-        title: 'Atencion',
-        content: 'Su pin actual no coincide con el ingresado o el campo esta vacio, por favor verifiquelo y vuelva a intentarlo',
-        showCancelButton: false,
-        timer: 5000
-      })
-      return
+    if (newPin.trim() === '') {
+
+      if (email === '' || phone === '') {
+        Alert({
+          title: 'Atencion',
+          icon: 'warn',
+          content: 'Debes llenar los campos de correo y telefono',
+          showCancelButton: false,
+          timer: 7000
+        })
+        return
+      }
+
+      data = {
+        correo: email,
+        telefono: phone,
+        rut_user: user.rut
+      }
+
     }
-    if (newPin.length !== 8) {
-      Alert({
-        icon: 'warn',
-        title: 'Atencion',
-        content: 'El pin debe tener 8 caracteres, solo numeros y letras',
-        showCancelButton: false,
-        timer: 5000
-      })
-      return
+    else {
+      if (pin === '' || pin !== user.pin) {
+        Alert({
+          icon: 'warn',
+          title: 'Atencion',
+          content: 'Su pin actual no coincide con el ingresado o el campo esta vacio, por favor verifiquelo y vuelva a intentarlo',
+          showCancelButton: false,
+          timer: 5000
+        })
+        return
+      }
+      if (newPin.length !== 8) {
+        Alert({
+          icon: 'warn',
+          title: 'Atencion',
+          content: 'El pin debe tener 8 caracteres, solo numeros y letras',
+          showCancelButton: false,
+          timer: 5000
+        })
+        return
+      }
+
+      if (!/^[a-zA-Z0-9]*$/g.test(newPin)) {
+        Alert({
+          icon: 'warn',
+          title: 'Atencion',
+          content: 'El pin debe tener solo letras y numeros',
+          showCancelButton: false,
+          timer: 5000
+        })
+        return
+      }
+
+      if (newPin !== repeatPin) {
+        Alert({
+          icon: 'warn',
+          title: 'Atencion',
+          content: 'El pin nuevo no coincide con su reingreso, verifiquelo y vuelva a intentarlo',
+          showCancelButton: false,
+          timer: 5000
+        })
+        return
+      }
+      if (newPin === pin) {
+        Alert({
+          icon: 'warn',
+          title: 'Atencion',
+          content: 'El nuevo pin no puede ser igual a su pin actual, por favor modifiquelo y vuelva a intentarlo',
+          showCancelButton: false,
+          timer: 5000
+        })
+        return
+      }
+
+      data = {
+        correo: email,
+        telefono: phone,
+        old_pass: user.pin,
+        new_pass: newPin,
+        repeat_pass: repeatPin,
+        rut_user: user.rut
+      }
     }
 
-    if (!/^[a-zA-Z0-9]*$/g.test(newPin)) {
-      Alert({
-        icon: 'warn',
-        title: 'Atencion',
-        content: 'El pin debe tener solo letras y numeros',
-        showCancelButton: false,
-        timer: 5000
-      })
-      return
-    }
+    // FIXME: error en el actualizar datos de usuario en BE
 
-    if (newPin !== repeatPin) {
-      Alert({
-        icon: 'warn',
-        title: 'Atencion',
-        content: 'El pin nuevo no coincide con su reingreso, verifiquelo y vuelva a intentarlo',
-        showCancelButton: false,
-        timer: 5000
-      })
-      return
-    }
-    if (newPin === pin) {
-      Alert({
-        icon: 'warn',
-        title: 'Atencion',
-        content: 'El nuevo pin no puede ser igual a su pin actual, por favor modifiquelo y vuelva a intentarlo',
-        showCancelButton: false,
-        timer: 5000
-      })
-      return
-    }
+    // toggleLoading(true)
 
-    const data = {
-      correo: email,
-      telefono: phone,
-      old_pass: user.pin,
-      new_pass: newPin,
-      repeat_pass: repeatPin,
-      rut_user: user.rut
-    }
-
-    toggleLoading(true)
+    console.log(data);
 
     const { ok } = await updateUser(data)
 
     if (ok) {
       Alert({
         title: 'Usuario actualizado',
-        content: 'Usuario actualizado correctamente, se enviara un correo con los datos actualizados',
+        content: 'Usuario actualizado correctamente',
         showCancelButton: false,
         timer: 7000
       })
@@ -382,28 +380,28 @@ function NavBar({
 
   useEffect(() => {
     const loadUsersFilter = async () => {
-      let p = projects.filter(item => item.select === true)
+      let p = [], newUs = [], newSt = []
+      p = projects.filter(item => item.select === true)
       p = p.map(item => item.value)
 
       if (p.length > 0) {
         setStates([])
         setUsers([])
-        setStatesAll(false)
-        setUsersAll(false)
         const data = { rut_usuario: user.rut, proyectos: p }
-        const us = await getUsers(data)
-        setUsers(us.map(item => ({
-          value: item.rut,
-          label: item.nombre,
-          select: false
-        })))
-
         const st = await getStates(data)
-        setStates(st.map(item => ({
-          value: item.id,
-          label: item.est,
-          select: false
-        })))
+        const us = await getUsers(data)
+
+        us.forEach(item => {
+          const temp = prevState.us.filter(t => t.value === item.rut)
+          newUs.push({ value: item.rut, label: item.nombre, select: temp.length > 0 })
+        })
+        setUsers(newUs)
+
+        st.forEach(item => {
+          const temp = prevState.st.filter(t => t.value === item.id)
+          newSt.push({ value: item.id, label: item.est, select: temp.length > 0 })
+        })
+        setStates(newSt)
       }
     }
     loadUsersFilter()
@@ -789,11 +787,10 @@ function NavBar({
                   <input
                     className="mr-2 cursor-pointer"
                     type="checkbox"
-                    checked={projectsAll}
+                    checked={projects.every(project => project.select)}
                     onChange={
                       (e) => {
                         const check = e.target.checked
-                        setProjectsAll(check)
                         setProjects(projects.map(el => {
                           el.select = check
                           return el
@@ -803,11 +800,9 @@ function NavBar({
                   Todos
                 </li>
                 {
-
                   projects.map((item) => (
                     <li key={item.value}>
                       <input
-                        key={item.value}
                         id={item.value}
                         className="mr-2 cursor-pointer"
                         type="checkbox"
@@ -820,7 +815,6 @@ function NavBar({
                             }
                             return el
                           }))
-                          setProjectsAll(projects.every(el => el.select === true))
                         }}
                       />
                       {item.label}
@@ -837,11 +831,10 @@ function NavBar({
                   <input
                     className="mr-2 cursor-pointer"
                     type="checkbox"
-                    checked={usersAll}
+                    checked={users.every(user => user.select)}
                     onChange={
                       (e) => {
                         const check = e.target.checked
-                        setUsersAll(check)
                         setUsers(users.map(el => {
                           el.select = check
                           return el
@@ -851,11 +844,9 @@ function NavBar({
                   Todos
                 </li>
                 {
-
                   users.map((item) => (
                     <li key={item.value}>
                       <input
-                        key={item.value}
                         id={item.value}
                         className="mr-2 cursor-pointer"
                         type="checkbox"
@@ -868,7 +859,6 @@ function NavBar({
                             }
                             return el
                           }))
-                          setUsersAll(users.every(el => el.select === true))
                         }}
                       />
                       {item.label}
@@ -885,11 +875,10 @@ function NavBar({
                   <input
                     className="mr-2 cursor-pointer"
                     type="checkbox"
-                    checked={statesAll}
+                    checked={states.every(state => state.select)}
                     onChange={
                       (e) => {
                         const check = e.target.checked
-                        setStatesAll(check)
                         setStates(states.map(el => {
                           el.select = check
                           return el
@@ -899,11 +888,9 @@ function NavBar({
                   Todos
                 </li>
                 {
-
                   states.map((item) => (
                     <li key={item.value}>
                       <input
-                        key={item.value}
                         id={item.value}
                         className="mr-2 cursor-pointer"
                         type="checkbox"
@@ -916,7 +903,6 @@ function NavBar({
                             }
                             return el
                           }))
-                          setStatesAll(states.every(el => el.select === true))
                         }}
                       />
                       {item.label}
