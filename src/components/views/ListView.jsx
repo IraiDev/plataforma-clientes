@@ -56,7 +56,7 @@ function ListView({ multiLine }) {
     return (
       <div className="max-w-3xl bg-white rounded-md p-8 text-center mx-3 md:mx-auto shadow-lg mt-20">
         <p>
-          No se encontraron tickets que coincidadn con los filtros aplicados, por favor modificque su seleccion de <label className="font-bold text-yellow-500 uppercase">filtros</label> para realizar una nueva busqueda.
+          No se encontraron tickets que coincidadn con los filtros aplicados, por favor modifique su seleccion de <label className="font-bold text-yellow-500 uppercase">filtros</label> para realizar una nueva busqueda.
         </p>
       </div>
     )

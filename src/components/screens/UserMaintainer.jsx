@@ -89,10 +89,14 @@ const UserMaintainer = () => {
       let so = sons.filter(item => item.select)
       so = so.map(item => item.value)
 
-      if (st.length === 0 || fa.length === 0 || so.length === 0) {
+      if (rut === '' || email === '' || userName === '' || fullName === '' || phone === '') {
          Alert({
             title: 'Atencion',
-            content: 'Debe seleccionar al menos un un estado, un padre y un hijo para crear/actualizar un usuario',
+            content: `
+            <p>Debe completar todos los campos para crear/actualizar un usuario</p>
+            <br />
+            <strong class="text-sm text-gray-700">RUT, USUARIO, NOMBRE Y APELLIDO, CORREO, TELEFONO</USU></strong>
+            `,
             showCancelButton: false,
             timer: 7000
          })
@@ -109,10 +113,20 @@ const UserMaintainer = () => {
          return
       }
 
-      if (rut === '' || email === '' || userName === '' || fullName === '' || phone === '') {
+      if (selectProject.value === null && selectAddProject.value === null) {
          Alert({
             title: 'Atencion',
-            content: 'Debe completar todos los campos para crear/actualizar un usuario',
+            content: 'Debe seleccionar un proyecto para crear/actualizar un usuario',
+            showCancelButton: false,
+            timer: 7000
+         })
+         return
+      }
+
+      if (st.length === 0 || fa.length === 0 || so.length === 0) {
+         Alert({
+            title: 'Atencion',
+            content: 'Debe seleccionar al menos un estado, un padre y un hijo para crear/actualizar un usuario',
             showCancelButton: false,
             timer: 7000
          })
@@ -121,19 +135,10 @@ const UserMaintainer = () => {
 
       toggleLoading(true)
 
-      if (isUpdate) {
-         if (selectProject.value === null && setOptionAddProject.value === null) {
-            Alert({
-               title: 'Atencion',
-               content: 'Debe seleccionar un proyecto para actualizar un usuario',
-               showCancelButton: false,
-               timer: 7000
-            })
-            return
-         }
+      if (selectProject.value !== null) proy = [selectProject.value]
+      if (selectAddProject.value !== null) proy = [selectAddProject.value]
 
-         if (selectProject.value !== null) proy = [selectProject.value]
-         if (selectAddProject.value !== null) proy = [selectAddProject.value]
+      if (isUpdate) {
 
          const data = {
             id_user,
@@ -149,13 +154,14 @@ const UserMaintainer = () => {
          }
          resp = await updataMantainerUser(data)
       } else {
+
          const data = {
             rut: prettifyRut(rut),
             email,
             nom_user: userName,
             name: fullName,
             phone,
-            proyects: [selectAddProject.value],
+            proyects: proy,
             father_users: fa,
             sons_users: so,
             permises: st
@@ -180,6 +186,8 @@ const UserMaintainer = () => {
             timer: 7000
          })
       }
+      getFilters()
+      setValues(initValuesState)
       setSelect(initOptions)
       setSelectAddProject(initOptions)
       setSelectProject(initOptions)
@@ -207,10 +215,6 @@ const UserMaintainer = () => {
       if (resp.ok) {
          const { id_user, rut_user, nom_user, nombre, correo, telefono } = resp.usuario
          const { arreglo_estados, arreglo_hijos, arreglo_padres, arreglo_proyectos } = resp
-
-         // console.log('padres', arreglo_padres);
-         // console.log('hijos', arreglo_hijos);
-         // console.log('estados', arreglo_estados);
 
          setValues({
             id_user,
@@ -365,6 +369,7 @@ const UserMaintainer = () => {
                   <div className='grid gap-4'>
                      <label className='capitalize text-gray-600'>Proyectos del usuario:</label>
                      <Select
+                        isDisabled={select.value === null}
                         className='w-full lg:w-1/2 uppercase'
                         options={optionsProjects}
                         value={selectProject}
