@@ -7,7 +7,7 @@ function LiNotes(props) {
 
     Alert({
       title: props.children,
-      content: props.resp,
+      content: `<div class='whitespace-pre-wrap text-left max-h-96 overflow-custom'>${props.resp}</div>`,
       showCancelButton: false
     })
 
