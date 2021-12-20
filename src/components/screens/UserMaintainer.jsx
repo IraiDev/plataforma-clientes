@@ -385,40 +385,45 @@ const UserMaintainer = () => {
                      {father.length > 0 ?
                         <ul className="h-full overflow-custom uppercase">
                            <li>
-                              <input
-                                 className="mr-2 cursor-pointer"
-                                 type="checkbox"
-                                 checked={father.every(item => item.select)}
-                                 onChange={
-                                    (e) => {
-                                       const check = e.target.checked
-                                       setFather(father.map(el => {
-                                          el.select = check
-                                          return el
-                                       }))
-                                    }
-                                 } />
-                              Todos
+                              <label htmlFor="allFather" className='cursor-pointer'>
+                                 <input
+                                    className="mr-2 cursor-pointer"
+                                    id='allFather'
+                                    type="checkbox"
+                                    checked={father.every(item => item.select)}
+                                    onChange={
+                                       (e) => {
+                                          const check = e.target.checked
+                                          setFather(father.map(el => {
+                                             el.select = check
+                                             return el
+                                          }))
+                                       }
+                                    } />
+                                 Todos
+                              </label>
                            </li>
                            {
                               father.map((item) => (
                                  <li key={`${item.value}F`}>
-                                    <input
-                                       id={item.value}
-                                       className="mr-2 cursor-pointer"
-                                       type="checkbox"
-                                       checked={item.select}
-                                       onChange={(e) => {
-                                          const check = e.target.checked
-                                          setFather(father.map(el => {
-                                             if (item.value === el.value) {
-                                                el.select = check
-                                             }
-                                             return el
-                                          }))
-                                       }}
-                                    />
-                                    {item.label}
+                                    <label htmlFor={`${item.value}F`} className='cursor-pointer'>
+                                       <input
+                                          id={`${item.value}F`}
+                                          className="mr-2 cursor-pointer"
+                                          type="checkbox"
+                                          checked={item.select}
+                                          onChange={(e) => {
+                                             const check = e.target.checked
+                                             setFather(father.map(el => {
+                                                if (item.value === el.value) {
+                                                   el.select = check
+                                                }
+                                                return el
+                                             }))
+                                          }}
+                                       />
+                                       {item.label}
+                                    </label>
                                  </li>
                               ))
                            }
@@ -429,40 +434,45 @@ const UserMaintainer = () => {
                      {sons.length > 0 ?
                         <ul className="h-full overflow-custom uppercase">
                            <li>
-                              <input
-                                 className="mr-2 cursor-pointer"
-                                 type="checkbox"
-                                 checked={sons.every(item => item.select)}
-                                 onChange={
-                                    (e) => {
-                                       const check = e.target.checked
-                                       setSons(sons.map(el => {
-                                          el.select = check
-                                          return el
-                                       }))
-                                    }
-                                 } />
-                              Todos
+                              <label htmlFor="allSons" className='cursor-pointer'>
+                                 <input
+                                    className="mr-2 cursor-pointer"
+                                    id='allSons'
+                                    type="checkbox"
+                                    checked={sons.every(item => item.select)}
+                                    onChange={
+                                       (e) => {
+                                          const check = e.target.checked
+                                          setSons(sons.map(el => {
+                                             el.select = check
+                                             return el
+                                          }))
+                                       }
+                                    } />
+                                 Todos
+                              </label>
                            </li>
                            {
                               sons.map((item) => (
                                  <li key={item.value}>
-                                    <input
-                                       id={item.value}
-                                       className="mr-2 cursor-pointer"
-                                       type="checkbox"
-                                       checked={item.select}
-                                       onChange={(e) => {
-                                          const check = e.target.checked
-                                          setSons(sons.map(el => {
-                                             if (item.value === el.value) {
-                                                el.select = check
-                                             }
-                                             return el
-                                          }))
-                                       }}
-                                    />
-                                    {item.label}
+                                    <label htmlFor={item.value} className='cursor-pointer'>
+                                       <input
+                                          id={item.value}
+                                          className="mr-2 cursor-pointer"
+                                          type="checkbox"
+                                          checked={item.select}
+                                          onChange={(e) => {
+                                             const check = e.target.checked
+                                             setSons(sons.map(el => {
+                                                if (item.value === el.value) {
+                                                   el.select = check
+                                                }
+                                                return el
+                                             }))
+                                          }}
+                                       />
+                                       {item.label}
+                                    </label>
                                  </li>
                               ))
                            }
@@ -473,41 +483,45 @@ const UserMaintainer = () => {
                      {states.length > 0 ?
                         <ul className="h-full overflow-custom uppercase">
                            <li>
-                              <input
-                                 className="mr-2 cursor-pointer"
-                                 type="checkbox"
-                                 checked={states.every(item => item.select)}
-                                 onChange={
-                                    (e) => {
-                                       const check = e.target.checked
-                                       setStates(states.map(el => {
-                                          el.select = check
-                                          return el
-                                       }))
-                                    }
-                                 } />
-                              Todos
+                              <label htmlFor="allstate" className='cursor-pointer'>
+                                 <input
+                                    className="mr-2 cursor-pointer"
+                                    id='allstate'
+                                    type="checkbox"
+                                    checked={states.every(item => item.select)}
+                                    onChange={
+                                       (e) => {
+                                          const check = e.target.checked
+                                          setStates(states.map(el => {
+                                             el.select = check
+                                             return el
+                                          }))
+                                       }
+                                    } />
+                                 Todos
+                              </label>
                            </li>
                            {
                               states.map((item) => (
                                  <li key={item.value}>
-                                    <input
-                                       key={item.value}
-                                       id={item.value}
-                                       className="mr-2 cursor-pointer"
-                                       type="checkbox"
-                                       checked={item.select}
-                                       onChange={(e) => {
-                                          const check = e.target.checked
-                                          setStates(states.map(el => {
-                                             if (item.value === el.value) {
-                                                el.select = check
-                                             }
-                                             return el
-                                          }))
-                                       }}
-                                    />
-                                    {item.label}
+                                    <label htmlFor={item.value} className='cursor-pointer'>
+                                       <input
+                                          id={item.value}
+                                          className="mr-2 cursor-pointer"
+                                          type="checkbox"
+                                          checked={item.select}
+                                          onChange={(e) => {
+                                             const check = e.target.checked
+                                             setStates(states.map(el => {
+                                                if (item.value === el.value) {
+                                                   el.select = check
+                                                }
+                                                return el
+                                             }))
+                                          }}
+                                       />
+                                       {item.label}
+                                    </label>
                                  </li>
                               ))
                            }

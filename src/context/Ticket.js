@@ -24,8 +24,7 @@ function TicketProvider({ children }) {
         icon: 'warn',
         title: 'Atencion',
         content: 'El campo pin esta vacio, por favor introduce tu pin',
-        showCancelButton: false,
-        timer: 5000
+        showCancelButton: false
       })
       toggleLoading(false)
       return
@@ -66,8 +65,7 @@ function TicketProvider({ children }) {
           title: 'Atencion',
           icon: 'info',
           content: msg,
-          showCancelButton: false,
-          timer: 7000
+          showCancelButton: false
         })
         return false
       }
@@ -76,8 +74,7 @@ function TicketProvider({ children }) {
           title: 'Atencion',
           icon: 'info',
           content: msg,
-          showCancelButton: false,
-          timer: 7000
+          showCancelButton: false
         })
         return false
       }
@@ -86,8 +83,7 @@ function TicketProvider({ children }) {
           title: 'PIN recuperado',
           icon: 'info',
           content: msg,
-          showCancelButton: false,
-          timer: 7000
+          showCancelButton: false
         })
         return false
       }

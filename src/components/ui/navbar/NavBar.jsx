@@ -780,40 +780,45 @@ function NavBar({
             {projects.length > 0 ?
               <ul className="h-full overflow-custom uppercase">
                 <li>
-                  <input
-                    className="mr-2 cursor-pointer"
-                    type="checkbox"
-                    checked={projects.every(project => project.select)}
-                    onChange={
-                      (e) => {
-                        const check = e.target.checked
-                        setProjects(projects.map(el => {
-                          el.select = check
-                          return el
-                        }))
-                      }
-                    } />
-                  Todos
+                  <label htmlFor="allProjects" className='cursor-pointer'>
+                    <input
+                      className="mr-2 cursor-pointer"
+                      id="allProjects"
+                      type="checkbox"
+                      checked={projects.every(project => project.select)}
+                      onChange={
+                        (e) => {
+                          const check = e.target.checked
+                          setProjects(projects.map(el => {
+                            el.select = check
+                            return el
+                          }))
+                        }
+                      } />
+                    Todos
+                  </label>
                 </li>
                 {
                   projects.map((item) => (
                     <li key={item.value}>
-                      <input
-                        id={item.value}
-                        className="mr-2 cursor-pointer"
-                        type="checkbox"
-                        checked={item.select}
-                        onChange={(e) => {
-                          const check = e.target.checked
-                          setProjects(projects.map(el => {
-                            if (item.value === el.value) {
-                              el.select = check
-                            }
-                            return el
-                          }))
-                        }}
-                      />
-                      {item.label}
+                      <label htmlFor={item.value} className='cursor-pointer'>
+                        <input
+                          id={item.value}
+                          className="mr-2 cursor-pointer"
+                          type="checkbox"
+                          checked={item.select}
+                          onChange={(e) => {
+                            const check = e.target.checked
+                            setProjects(projects.map(el => {
+                              if (item.value === el.value) {
+                                el.select = check
+                              }
+                              return el
+                            }))
+                          }}
+                        />
+                        {item.label}
+                      </label>
                     </li>
                   ))
                 }
@@ -824,40 +829,45 @@ function NavBar({
             {users.length > 0 ?
               <ul className="h-full overflow-custom uppercase">
                 <li>
-                  <input
-                    className="mr-2 cursor-pointer"
-                    type="checkbox"
-                    checked={users.every(user => user.select)}
-                    onChange={
-                      (e) => {
-                        const check = e.target.checked
-                        setUsers(users.map(el => {
-                          el.select = check
-                          return el
-                        }))
-                      }
-                    } />
-                  Todos
+                  <label htmlFor="allUsers" className='cursor-pointer'>
+                    <input
+                      id="allUsers"
+                      className="mr-2 cursor-pointer"
+                      type="checkbox"
+                      checked={users.every(user => user.select)}
+                      onChange={
+                        (e) => {
+                          const check = e.target.checked
+                          setUsers(users.map(el => {
+                            el.select = check
+                            return el
+                          }))
+                        }
+                      } />
+                    Todos
+                  </label>
                 </li>
                 {
                   users.map((item) => (
                     <li key={item.value}>
-                      <input
-                        id={item.value}
-                        className="mr-2 cursor-pointer"
-                        type="checkbox"
-                        checked={item.select}
-                        onChange={(e) => {
-                          const check = e.target.checked
-                          setUsers(users.map(el => {
-                            if (item.value === el.value) {
-                              el.select = check
-                            }
-                            return el
-                          }))
-                        }}
-                      />
-                      {item.label}
+                      <label htmlFor={item.value} className='cursor-pointer'>
+                        <input
+                          id={item.value}
+                          className="mr-2 cursor-pointer"
+                          type="checkbox"
+                          checked={item.select}
+                          onChange={(e) => {
+                            const check = e.target.checked
+                            setUsers(users.map(el => {
+                              if (item.value === el.value) {
+                                el.select = check
+                              }
+                              return el
+                            }))
+                          }}
+                        />
+                        {item.label}
+                      </label>
                     </li>
                   ))
                 }
@@ -868,40 +878,45 @@ function NavBar({
             {states.length > 0 ?
               <ul className="h-full overflow-custom uppercase">
                 <li>
-                  <input
-                    className="mr-2 cursor-pointer"
-                    type="checkbox"
-                    checked={states.every(state => state.select)}
-                    onChange={
-                      (e) => {
-                        const check = e.target.checked
-                        setStates(states.map(el => {
-                          el.select = check
-                          return el
-                        }))
-                      }
-                    } />
-                  Todos
+                  <label htmlFor="allStates" className='cursor-pointer'>
+                    <input
+                      className="mr-2 cursor-pointer"
+                      id='allStates'
+                      type="checkbox"
+                      checked={states.every(state => state.select)}
+                      onChange={
+                        (e) => {
+                          const check = e.target.checked
+                          setStates(states.map(el => {
+                            el.select = check
+                            return el
+                          }))
+                        }
+                      } />
+                    Todos
+                  </label>
                 </li>
                 {
                   states.map((item) => (
                     <li key={item.value}>
-                      <input
-                        id={item.value}
-                        className="mr-2 cursor-pointer"
-                        type="checkbox"
-                        checked={item.select}
-                        onChange={(e) => {
-                          const check = e.target.checked
-                          setStates(states.map(el => {
-                            if (item.value === el.value) {
-                              el.select = check
-                            }
-                            return el
-                          }))
-                        }}
-                      />
-                      {item.label}
+                      <label htmlFor={item.value} className='cursor-pointer'>
+                        <input
+                          id={item.value}
+                          className="mr-2 cursor-pointer"
+                          type="checkbox"
+                          checked={item.select}
+                          onChange={(e) => {
+                            const check = e.target.checked
+                            setStates(states.map(el => {
+                              if (item.value === el.value) {
+                                el.select = check
+                              }
+                              return el
+                            }))
+                          }}
+                        />
+                        {item.label}
+                      </label>
                     </li>
                   ))
                 }
