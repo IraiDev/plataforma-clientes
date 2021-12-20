@@ -97,8 +97,7 @@ const UserMaintainer = () => {
             <br />
             <strong class="text-sm text-gray-700">RUT, USUARIO, NOMBRE Y APELLIDO, CORREO, TELEFONO</USU></strong>
             `,
-            showCancelButton: false,
-            timer: 7000
+            showCancelButton: false
          })
          return
       }
@@ -107,8 +106,7 @@ const UserMaintainer = () => {
          Alert({
             title: 'Atencion',
             content: 'El rut ingresado no es valido, vuelva a ingresarlo',
-            showCancelButton: false,
-            timer: 7000
+            showCancelButton: false
          })
          return
       }
@@ -117,8 +115,7 @@ const UserMaintainer = () => {
          Alert({
             title: 'Atencion',
             content: 'Debe seleccionar un proyecto para crear/actualizar un usuario',
-            showCancelButton: false,
-            timer: 7000
+            showCancelButton: false
          })
          return
       }
@@ -127,8 +124,7 @@ const UserMaintainer = () => {
          Alert({
             title: 'Atencion',
             content: 'Debe seleccionar al menos un estado, un padre y un hijo para crear/actualizar un usuario',
-            showCancelButton: false,
-            timer: 7000
+            showCancelButton: false
          })
          return
       }
@@ -182,8 +178,7 @@ const UserMaintainer = () => {
          Alert({
             title: 'Atencion',
             content: resp.response,
-            showCancelButton: false,
-            timer: 7000
+            showCancelButton: false
          })
       }
       getFilters()
@@ -241,8 +236,7 @@ const UserMaintainer = () => {
             icon: 'error',
             title: 'Atencion',
             content: 'Error al obtener datos del usuario',
-            showCancelButton: false,
-            timer: 7000
+            showCancelButton: false
          })
       }
    }

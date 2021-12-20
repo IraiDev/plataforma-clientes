@@ -21,8 +21,7 @@ function Row({ id, children, width = 'min-w-table', isModal = true, className, a
         icon: 'error',
         title: 'Error',
         content: 'No se pudo obtener los datos del ticket',
-        showCancelButton: false,
-        timer: 5000
+        showCancelButton: false
       })
     }
   }

@@ -44,8 +44,7 @@ const LoginScreen = () => {
       Alert({
         title: 'Atencion',
         content: 'El campo esta vacio o el RUT invalido, por favor verifiquelo y vuelva a intentarlo',
-        showCancelButton: false,
-        timer: 7000
+        showCancelButton: false
       })
       return
     }
@@ -70,8 +69,7 @@ const LoginScreen = () => {
         title: 'Atencion',
         icon: 'warn',
         content: 'El usuario no existe o formato del RUT es incorrecto, <b>recuerde los puntos y el guion</b> </br> ej: 12.345.678-9',
-        showCancelButton: false,
-        timer: 5000
+        showCancelButton: false
       })
     }
   }

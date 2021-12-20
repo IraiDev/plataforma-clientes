@@ -178,6 +178,7 @@ function TicketProvider({ children }) {
   const getTicketList = async (params = null) => {
 
     if (params === null) params = filters
+    if (Object.keys(params).length === 0) return toggleLoading(false)
     if (params.emisores.length < 1 || params.estados.length < 1 || params.proyectos.length < 1) setTicketList([])
     if (params.emisores.length < 1) return
     if (params.estados.length < 1) return

@@ -105,7 +105,7 @@ function NavBar({
   }
 
   const onChangeFile = (e) => {
-    if (e.target.files[0].size < 1) {
+    if (e.target.files[0].size < 5242881) {
       setFile(e.target.files[0])
     }
     else {
@@ -115,8 +115,7 @@ function NavBar({
         title: 'Atencion',
         icon: 'warn',
         content: 'Archivo excede el peso permitido por el sistema, <b>peso maximo 5MB</b>',
-        showCancelButton: false,
-        timer: 7000
+        showCancelButton: false
       })
       return
     }
@@ -150,23 +149,23 @@ function NavBar({
     }
 
     if (ts) {
-      Alert({ title: 'Atencion', icon: 'warn', content: AlertContent(tc, 'titulo', tl), showCancelButton: false, timer: 7000 })
+      Alert({ title: 'Atencion', icon: 'warn', content: AlertContent(tc, 'titulo', tl), showCancelButton: false })
       return
     }
     if (cs) {
-      Alert({ title: 'Atencion', icon: 'warn', content: AlertContent(cc, 'correo', cl), showCancelButton: false, timer: 7000 })
+      Alert({ title: 'Atencion', icon: 'warn', content: AlertContent(cc, 'correo', cl), showCancelButton: false })
       return
     }
     if (ps) {
-      Alert({ title: 'Atencion', icon: 'warn', content: AlertContent(pc, 'telefono', pl), showCancelButton: false, timer: 7000 })
+      Alert({ title: 'Atencion', icon: 'warn', content: AlertContent(pc, 'telefono', pl), showCancelButton: false })
       return
     }
     if (ds) {
-      Alert({ title: 'Atencion', icon: 'warn', content: AlertContent(dc, 'descripcion', dl), showCancelButton: false, timer: 7000 })
+      Alert({ title: 'Atencion', icon: 'warn', content: AlertContent(dc, 'descripcion', dl), showCancelButton: false })
       return
     }
     if (title === '' || desc === '' || email === '' || phone === '' || option === null) {
-      Alert({ title: 'Atencion', icon: 'warn', content: 'Debes seleccionar proyecto y llenar todos los campos', showCancelButton: false, timer: 5000 })
+      Alert({ title: 'Atencion', icon: 'warn', content: 'Debes seleccionar proyecto y llenar todos los campos', showCancelButton: false })
       return
     }
 
@@ -179,8 +178,7 @@ function NavBar({
           title: 'Advertencia',
           icon: 'error',
           content: 'No se puede subir archivos con extensiones: .exe, .js, estos seran removidos de la seleccion.',
-          showCancelButton: false,
-          timer: 5000
+          showCancelButton: false
         })
         setFile(null)
         return
@@ -202,7 +200,7 @@ function NavBar({
 
     if (resp) return onCloseTicket()
 
-    Alert({ title: 'Atencion', icon: 'error', content: 'Error al crear ticket, vuelva a intentarlo.', showCancelButton: false, timer: 5000 })
+    Alert({ title: 'Atencion', icon: 'error', content: 'Error al crear ticket, vuelva a intentarlo.', showCancelButton: false })
   }
 
   const handleFilter = () => {
@@ -249,8 +247,7 @@ function NavBar({
           title: 'Atencion',
           icon: 'warn',
           content: 'Debes llenar los campos de correo y telefono',
-          showCancelButton: false,
-          timer: 7000
+          showCancelButton: false
         })
         return
       }
@@ -268,8 +265,7 @@ function NavBar({
           icon: 'warn',
           title: 'Atencion',
           content: 'Su pin actual no coincide con el ingresado o el campo esta vacio, por favor verifiquelo y vuelva a intentarlo',
-          showCancelButton: false,
-          timer: 5000
+          showCancelButton: false
         })
         return
       }
@@ -278,8 +274,7 @@ function NavBar({
           icon: 'warn',
           title: 'Atencion',
           content: 'El pin debe tener 8 caracteres, solo numeros y letras',
-          showCancelButton: false,
-          timer: 5000
+          showCancelButton: false
         })
         return
       }
@@ -289,8 +284,7 @@ function NavBar({
           icon: 'warn',
           title: 'Atencion',
           content: 'El pin debe tener solo letras y numeros',
-          showCancelButton: false,
-          timer: 5000
+          showCancelButton: false
         })
         return
       }
@@ -300,8 +294,7 @@ function NavBar({
           icon: 'warn',
           title: 'Atencion',
           content: 'El pin nuevo no coincide con su reingreso, verifiquelo y vuelva a intentarlo',
-          showCancelButton: false,
-          timer: 5000
+          showCancelButton: false
         })
         return
       }
@@ -310,8 +303,7 @@ function NavBar({
           icon: 'warn',
           title: 'Atencion',
           content: 'El nuevo pin no puede ser igual a su pin actual, por favor modifiquelo y vuelva a intentarlo',
-          showCancelButton: false,
-          timer: 5000
+          showCancelButton: false
         })
         return
       }
@@ -335,7 +327,7 @@ function NavBar({
         title: 'Usuario actualizado',
         content: 'Usuario actualizado correctamente',
         showCancelButton: false,
-        timer: 7000
+        timer: 5000
       })
       setCheck(false)
       reset()
@@ -346,8 +338,7 @@ function NavBar({
         icon: 'warn',
         title: 'Atencion',
         content: 'Error al actualizar usuario, por favor verifique los datos y vuelva a intentarlo',
-        showCancelButton: false,
-        timer: 5000
+        showCancelButton: false
       })
     }
   }
@@ -365,6 +356,15 @@ function NavBar({
       pin: user.pin
     })
     setModalUser(true)
+  }
+
+  const handleOpenNewTicketModal = () => {
+    setModalTicket(true)
+    setValues({
+      email: user.email,
+      phone: user.phone,
+      pin: user.pin
+    })
   }
 
   const handleLogout = () => {
@@ -496,7 +496,7 @@ function NavBar({
                   className={`bg-green-500 hover:bg-green-400 text-white rounded-full ${hiddenOption && 'hidden'}`}
                   shadow
                   name="nuevo ticket"
-                  onClick={() => setModalTicket(true)} />
+                  onClick={handleOpenNewTicketModal} />
               </>
             }
           </div>

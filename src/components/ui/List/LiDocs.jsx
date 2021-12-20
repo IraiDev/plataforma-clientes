@@ -26,8 +26,7 @@ function LiDocs(props) {
           icon: 'error',
           title: 'Error',
           content: 'Error al eliminar el archivo, vuelva a intentarlo.',
-          showCancelButton: false,
-          timer: 5000
+          showCancelButton: false
         })
       }
     }
@@ -55,8 +54,7 @@ function LiDocs(props) {
           title: 'Error',
           icon: 'error',
           content: 'Hubo un error al cambiar el estado del archivo, vuelva a intentarlo',
-          showCancelButton: false,
-          timer: 5000
+          showCancelButton: false
         })
         setCheck(isPublic === 'PU')
       }

@@ -59,8 +59,7 @@ function Form({ onClick, data, from = 'EX' }) {
         icon: 'warn',
         title: 'Atencion',
         content: 'Archivo excede el peso permitido por el sistema, peso maximo 5MB',
-        showCancelButton: false,
-        timer: 5000
+        showCancelButton: false
       })
       return
     }
@@ -109,8 +108,7 @@ function Form({ onClick, data, from = 'EX' }) {
         Caracteres no permitidos por el sistema: </br>
         <b>${list}</b>
         `,
-        showCancelButton: false,
-        timer: 5000
+        showCancelButton: false
       })
       return
     }
@@ -128,8 +126,7 @@ function Form({ onClick, data, from = 'EX' }) {
           icon: 'error',
           title: 'Advertencia',
           content: 'No se puede subir archivos con extensiones, .exe, .js, estos seran removidos de la seleccion',
-          showCancelButton: false,
-          timer: 5000
+          showCancelButton: false
         })
         return
       }
@@ -142,8 +139,7 @@ function Form({ onClick, data, from = 'EX' }) {
         icon: 'warn',
         title: 'Atencion',
         content: 'No puedes crear un evento sin descripcion',
-        showCancelButton: false,
-        timer: 5000
+        showCancelButton: false
       })
       return
     }
@@ -181,8 +177,7 @@ function Form({ onClick, data, from = 'EX' }) {
         icon: 'error',
         title: 'Error',
         content: 'Error al guardar el evento guardar el evento.',
-        showCancelButton: false,
-        timer: 5000
+        showCancelButton: false
       })
     }
     setReceiver(null)
