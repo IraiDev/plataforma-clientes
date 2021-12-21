@@ -31,10 +31,9 @@ function Form({ onClick, data, from = 'EX' }) {
 
   let randomString = Math.random().toString(36)
   const {
-    ticket, desc_detalle, desc_proyecto, desc_empresa,
+    ticket, desc_detalle, desc_empresa,
     desc_usuario, documentos, historial, id_actividad,
-    id_proyecto, nombre_actividad, prioridad_cliente,
-    prioridad_zionit
+    id_proyecto, nombre_actividad, prioridad_cliente
   } = data
 
   const navigate = useNavigate()
