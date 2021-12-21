@@ -12,6 +12,8 @@ function DetailsView({ from }) {
   useEffect(() => {
     const getDetail = async () => await getTicketDetails(id)
     getDetail()
+
+    // eslint-disable-next-line
   }, [])
 
   return (

@@ -290,10 +290,13 @@ const UserMaintainer = () => {
          }
       }
       loadUsersFilter()
+
+      // eslint-disable-next-line
    }, [selectProject, selectAddProject])
 
    useEffect(() => {
       getFilters()
+      // eslint-disable-next-line
    }, [])
 
    return (

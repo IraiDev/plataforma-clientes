@@ -33,7 +33,7 @@ function Button({
       <button
         title={tooltip}
         onClick={onClick}
-        className={`focus:outline-none transition duration-500 capitalize py-2 px-4 font-semibold text-tiny ${className} ${shadow && 'shadow-md'} ${block && 'block w-full'}`}
+        className={`focus:outline-none transition duration-500 capitalize py-1.5 px-3.5 font-semibold text-tiny ${className} ${shadow && 'shadow-md'} ${block && 'block w-full'}`}
       >
         {iconFirst ?
           <>
@@ -55,7 +55,7 @@ function Button({
     <button
       title={tooltip}
       onClick={onClick}
-      className={`focus:outline-none transition duration-500 capitalize py-2 px-6 font-semibold text-tiny ${className} ${shadow && 'shadow-md'}  ${block && 'block w-full'}`}>
+      className={`focus:outline-none transition duration-500 capitalize py-1.5 px-3.5 font-semibold text-tiny ${className} ${shadow && 'shadow-md'}  ${block && 'block w-full'}`}>
       {name}
     </button>
 

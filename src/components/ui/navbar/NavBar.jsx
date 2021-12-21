@@ -71,35 +71,12 @@ function NavBar({
   }
 
   const getFilterSelection = (arr) => {
-    let name = []
-    let tooltip = ''
-    const filter = arr.filter(item => item.select === true)
-
-    if (filter.length !== 0) {
-      if (filter.length === arr.length) name.push('todos')
-      else {
-        if (filter.length > 3) {
-          name = filter.map((item, index) => {
-            if (index < 2) return `${item.label}, `
-            else if (index === 3) return `${item.label}...`
-            else return ''
-          })
-        }
-        else {
-          name = filter.map((item, index) => {
-            if (index < filter.length - 1) return `${item.label}, `
-            else return item.label
-          })
-        }
-      }
-    } else name.push('???')
-
-    filter.forEach((item, index) => {
-      if (index < filter.length - 1) tooltip = `${tooltip} ${item.label}, `
-      else tooltip = `${tooltip} ${item.label}`
-    })
-
-    const id = filter.map(item => item.value)
+    const filter = arr.filter(item => item.select)
+    const id = filter.map(f => f.value)
+    const tooltip = filter.map((f, i) => i === filter.length - 1 ? '  ' + f.label + '.' : '  ' + f.label)
+    let name = filter.slice(0, 3).map((f, i) => i === 2 ? f.label + '...' : f.label + ',  ')
+    arr.length === filter.length && (name = ['Todos'])
+    filter.length === 0 && (name = ['???'])
 
     return { filter, id, name, tooltip }
   }
@@ -401,10 +378,13 @@ function NavBar({
       }
     }
     loadUsersFilter()
+
+    // eslint-disable-next-line
   }, [projects])
 
   useEffect(() => {
     getFilters()
+    // eslint-disable-next-line
   }, [])
 
   useEffect(() => {
@@ -416,6 +396,8 @@ function NavBar({
       }
       loadQuestions()
     }
+
+    // eslint-disable-next-line
   }, [option])
 
   return (
@@ -428,10 +410,10 @@ function NavBar({
             onClick={() => toggleNavMenu()} />
           {
             !isMantainerRoute &&
-            <div className={`max-w-xs ${hiddenOption && 'hidden'}`} >
-              <TextContent className="text-xs uppercase font-light" tag="proyectos" value={filter.pr} toolptipValue={tooltip.pr} />
-              <TextContent className="text-xs uppercase font-light" tag="emisores" value={filter.us} toolptipValue={tooltip.us} />
-              <TextContent className="text-xs uppercase font-light" tag="estados" value={filter.st} toolptipValue={tooltip.st} />
+            <div className={`max-w-xs text-xs uppercase font-light ${hiddenOption && 'hidden'}`} >
+              <TextContent tag="proyectos" value={filter.pr} toolptipValue={tooltip.pr} />
+              <TextContent tag="emisores" value={filter.us} toolptipValue={tooltip.us} />
+              <TextContent tag="estados" value={filter.st} toolptipValue={tooltip.st} />
             </div>
           }
           <Button

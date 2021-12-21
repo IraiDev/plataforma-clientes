@@ -4,7 +4,7 @@ module.exports = {
   theme: {
     extend: {
       fontSize: {
-        'tiny': '.905rem'
+        'tiny': '.95rem'
       },
       minWidth: {
         '0': '0',

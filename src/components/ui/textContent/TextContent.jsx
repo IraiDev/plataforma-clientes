@@ -17,7 +17,7 @@ function TextContent({ tag = '', value = '', type, className, bold = false, tool
 
   return (
     <div className={className}>
-      {tag !== '' && <p title={tooltipTag} className={`inline mr-1 capitalize ${bold ? 'font-bold' : 'font-semibold'}`}>{tag}:</p>}
+      {tag !== '' && <p title={tooltipTag} className={`inline mr-1 ${bold ? 'font-bold' : 'font-semibold'}`}>{tag}:</p>}
       {value !== '' && <p title={toolptipValue} className="inline">{value}</p>}
     </div>
   )
