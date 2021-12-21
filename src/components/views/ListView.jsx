@@ -1,6 +1,5 @@
 import React, { useContext, useState } from 'react'
 import moment from 'moment'
-import { v4 as uuidv4 } from 'uuid'
 import { Ticket } from '../../context/Ticket'
 import Table from '../ui/table/Table'
 import THead from '../ui/table/THead'
