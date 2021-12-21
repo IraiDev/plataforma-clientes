@@ -14,6 +14,7 @@ function TicketProvider({ children }) {
   const { toggleLoading } = useContext(Ui)
   const [user, setUser] = useState({ ok: false })
   const [ticketList, setTicketList] = useState([])
+  const [ticketDetail, setTicketDetail] = useState({})
   const [filters, setFilters] = useState({})
 
   const login = async (data) => {
@@ -202,6 +203,7 @@ function TicketProvider({ children }) {
     toggleLoading(false)
 
     if (ok) {
+      setTicketDetail(arrayResp[0])
       return { ok, data: arrayResp[0] }
     }
     else {
@@ -407,7 +409,8 @@ function TicketProvider({ children }) {
     ticketList,
     filters,
     updataMantainerUser,
-    insertMantainerUser
+    insertMantainerUser,
+    ticketDetail
   }
 
   return (
