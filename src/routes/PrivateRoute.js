@@ -9,7 +9,7 @@ const PrivateRoute = ({ children }) => {
 
   window.localStorage.setItem('lastPath-ticket', pathname + search)
 
-  return user.ok ? children : <Navigate to="/login" />
+  return user.ok ? children : <Navigate to='/login' />
 }
 
 export default PrivateRoute

@@ -238,15 +238,15 @@ function Form({ onClick, data, from = 'EX' }) {
           </div>
         </div>
         <section>
-          <Table width='w-full' height='max-h-evt-table'>
+          <Table width='min-w-table-md' height='max-h-evt-table'>
             <THead>
-              <tr className='text-sm font-semibold text-center capitalize text-white bg-gray-700'>
-                <Th>#</Th>
-                <Th className='bg-gray-600'>estado</Th>
-                <Th>fecha</Th>
-                <Th className='bg-gray-600'>actividad</Th>
-                <Th>emisor</Th>
-                <Th className='bg-gray-600'>receptor</Th>
+              <tr className='text-sm text-center capitalize text-white bg-gray-700'>
+                <Th width='w-14'>#</Th>
+                <Th width='w-14' className='bg-gray-600'>estado</Th>
+                <Th width='w-14'>fecha</Th>
+                <Th width='w-14' className='bg-gray-600'>actividad</Th>
+                <Th width='w-20'>emisor</Th>
+                <Th width='w-24' className='bg-gray-600'>receptor</Th>
                 <Th>contenido</Th>
               </tr>
             </THead>
@@ -256,16 +256,16 @@ function Form({ onClick, data, from = 'EX' }) {
                 historial.map((evt, i) => (
                   <tr
                     key={i}
-                    className='text-gray-700 bg-gray-100 border-b text-sm w-max'
+                    className='text-gray-700 bg-gray-100 border-b border-gray-300 text-sm w-max align-text-top'
                   >
                     <Td borderLeft={false}>
                       <span
-                        className="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-md"
+                        className='px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-md'
                       >
                         {i + 1}
                       </span>
                     </Td>
-                    <Td borderLeft>
+                    <Td borderLeft className='font-semibold'>
                       {evt.est_evento}
                       <input
                         disabled={evt.origen === from}
@@ -289,20 +289,13 @@ function Form({ onClick, data, from = 'EX' }) {
                       />
                     </Td>
                     <Td borderLeft>
-                      {moment(evt.fecha_hora).format('DD/MM/YYYY HH:mm')}
+                      {moment(evt.fecha_hora).format('DD/MM/YYYY')}
+                      <span className='text-gray-400 block'>{moment(evt.fecha_hora).format('HH:mm')}</span>
                     </Td>
-                    <Td borderLeft>
-                      {evt.id_actividad}
-                    </Td>
-                    <Td borderLeft>
-                      {evt.desc_emisor}
-                    </Td>
-                    <Td borderLeft>
-                      {evt.desc_receptor}
-                    </Td>
-                    <Td borderLeft align='text-left'>
-                      {evt.contenido}
-                    </Td>
+                    <Td borderLeft>{evt.id_actividad}</Td>
+                    <Td borderLeft>{evt.desc_emisor} </Td>
+                    <Td borderLeft>{evt.desc_receptor}</Td>
+                    <Td borderLeft align='text-left'>{evt.contenido}</Td>
                   </tr>
                 ))
               }

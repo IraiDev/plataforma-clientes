@@ -78,7 +78,7 @@ function ListView({ multiLine }) {
 
   return (
     <>
-      <div className='px-10'>
+      <div className='px-8 2xl:px-32'>
         <Table width='w-table'>
           <THead>
             <tr className='text-sm font-semibold text-center capitalize text-white bg-gray-700'>
@@ -96,7 +96,7 @@ function ListView({ multiLine }) {
               <Th width='w-24'>
                 solicita
               </Th>
-              <Th width='w-48' className='bg-gray-600'>
+              <Th width='w-60' className='bg-gray-600'>
                 titulo
               </Th>
               <Th width='w-128'>
@@ -123,6 +123,7 @@ function ListView({ multiLine }) {
                   hover:bg-blue-100 transition duration-300 cursor-pointer
                   ${i % 2 === 0 ? 'bg-gray-100' : 'bg-white'}
                   ${idRow === ticket.id_ticket && 'bg-purple-100'}
+                  ${!multiLine && 'align-text-top'}
                   `}
                 >
                   <Td>
@@ -146,7 +147,7 @@ function ListView({ multiLine }) {
                   <Td className='uppercase'>
                     {ticket.user_ticket}
                   </Td>
-                  <Td className='font-semibold text-black' isMultiLine={multiLine} width='w-48' align='text-left'>
+                  <Td className='font-semibold text-black' isMultiLine={multiLine} width='max-w-title' align='text-left'>
                     {ticket.titulo_ticket}
                   </Td>
                   <Td width='max-w-desc' isMultiLine={multiLine} align='text-left' >

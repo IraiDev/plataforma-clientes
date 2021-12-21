@@ -13,7 +13,7 @@ export const findParam = (url, param) => {
   }
 }
 
-export const checkForms = (value) => {
+export const checkForms = (value = '') => {
   const noPermitidos = ['#', '$', '%', '^', '&', '"', "'", '<', '>', ';', '{', '}', '[', ']', '*']
   const obj = {
     state: false,

@@ -27,7 +27,7 @@ function NavBar({
 
   let randomString = Math.random().toString(36)
   const navigate = useNavigate()
-  const { updateUser, createTicket, getQuestion, saveFilters, getTicketList, getProjects, getUsers, getStates, logout, user } = useContext(Ticket)
+  const { updateUser, createTicket, getQuestion, saveFilters, getTicketList, getProjects, getUsers, getStates, logout, user, filters } = useContext(Ticket)
   const { toggleLoading, toggleNavMenu } = useContext(Ui)
   const [values, setValues] = useState({ email: '', phone: '', pin: '' })
   const [modalTicket, setModalTicket] = useState(showModalTicket)
@@ -37,9 +37,8 @@ function NavBar({
   const [file, setFile] = useState(null)
   const [resetFile, setResetFile] = useState(randomString)
   const [questions, setQuestions] = useState([])
-  const [filter, setFilter] = useState({ pr: ['???'], us: ['???'], st: ['???'] })
-  const [tooltip, setTooltip] = useState({ pr: '', us: '', st: '' })
-  const [prevState, setPrevState] = useState({ pr: [], us: [], st: [] })
+  // const [filter, setFilter] = useState({ pr: ['???'], us: ['???'], st: ['???'] })
+  // const [tooltip, setTooltip] = useState({ pr: '', us: '', st: '' })
 
   // checkboxes
   const [check, setCheck] = useState(false)
@@ -54,20 +53,46 @@ function NavBar({
 
   // object destructuring
   const { email, phone, pin } = values
+  const { emisores, proyectos, estados, tooltip, name } = filters
+
+  // object destructuring
 
   const getFilters = async () => {
+    let newPr = [], newUs = [], newSt = []
     const data = { rut_usuario: user.rut, proyectos: [] }
     const pr = await getProjects()
     const us = await getUsers(data)
     const st = await getStates(data)
 
-    const tempPr = pr.map(item => ({ value: item.id_proyecto, label: item.desc_proyecto, select: false }))
-    const tempUs = us.map(item => ({ value: item.rut, label: item.nombre, select: false }))
-    const tempSt = st.map(item => ({ value: item.id, label: item.est, select: false }))
+    const tempE = emisores ? emisores : []
+    const tempS = estados ? estados : []
+    const tempP = proyectos ? proyectos : []
 
-    setProjects(tempPr)
-    setUsers(tempUs)
-    setStates(tempSt)
+    pr.forEach(item => {
+      const temp = tempP.filter(t => t === item.id_proyecto)
+      newPr.push({ value: item.id_proyecto, label: item.desc_proyecto, select: temp.length > 0 })
+    })
+    setProjects(newPr)
+
+    us.forEach(item => {
+      const temp = tempE.filter(t => t === item.rut)
+      newUs.push({ value: item.rut, label: item.nombre, select: temp.length > 0 })
+    })
+    setUsers(newUs)
+
+    st.forEach(item => {
+      const temp = tempS.filter(t => t === item.id)
+      newSt.push({ value: item.id, label: item.est, select: temp.length > 0 })
+    })
+    setStates(newSt)
+
+    // const tempPr = pr.map(item => ({ value: item.id_proyecto, label: item.desc_proyecto, select: false }))
+    // const tempUs = us.map(item => ({ value: item.rut, label: item.nombre, select: false }))
+    // const tempSt = st.map(item => ({ value: item.id, label: item.est, select: false }))
+
+    // setProjects(tempPr)
+    // setUsers(tempUs)
+    // setStates(tempSt)
   }
 
   const getFilterSelection = (arr) => {
@@ -104,10 +129,13 @@ function NavBar({
     setFile(null)
     setResetFile(randomString)
     reset()
+    const ph = user.phone ? user.phone : ''
+    const em = user.email ? user.email : ''
+    const pi = user.pin ? user.pin : ''
     setValues({
-      email: user.email,
-      phone: user.phone,
-      pin: user.pin
+      email: em,
+      phone: ph,
+      pin: pi
     })
   }
 
@@ -187,14 +215,13 @@ function NavBar({
 
     if (pr.id.length > 0 && us.id.length > 0 && st.id.length > 0) toggleLoading(true)
 
-    setFilter({ pr: pr.name, us: us.name, st: st.name })
-
-    setTooltip({ pr: pr.tooltip, us: us.tooltip, st: st.tooltip })
-
-    setPrevState({ pr: pr.filter, us: us.filter, st: st.filter })
-
     const data = {
-      rut_usuario: user.rut, proyectos: pr.id, emisores: us.id, estados: st.id
+      rut_usuario: user.rut,
+      proyectos: pr.id,
+      emisores: us.id,
+      estados: st.id,
+      tooltip: { pr: pr.name, us: us.name, st: st.name },
+      name: { pr: pr.name, us: us.name, st: st.name }
     }
 
     saveFilters(data)
@@ -202,11 +229,11 @@ function NavBar({
     setModalFilter(false)
   }
 
-  const handleCancel = () => {
+  const handleCancelFilter = () => {
     let newPr = []
 
     projects.forEach(item => {
-      const temp = prevState.pr.filter(t => t.value === item.value)
+      const temp = proyectos.filter(t => t === item.value)
       newPr.push({ ...item, select: temp.length > 0 })
     })
     setProjects(newPr)
@@ -324,23 +351,37 @@ function NavBar({
     setModalUser(false)
     setCheck(false)
     reset()
+    const ph = user.phone ? user.phone : ''
+    const em = user.email ? user.email : ''
+    const pi = user.pin ? user.pin : ''
+    setValues({
+      email: em,
+      phone: ph,
+      pin: pi
+    })
   }
 
   const handleOpenUserModal = () => {
+    const ph = user.phone ? user.phone : ''
+    const em = user.email ? user.email : ''
+    const pi = user.pin ? user.pin : ''
     setValues({
-      email: user.email,
-      phone: user.phone,
-      pin: user.pin
+      email: em,
+      phone: ph,
+      pin: pi
     })
     setModalUser(true)
   }
 
   const handleOpenNewTicketModal = () => {
     setModalTicket(true)
+    const ph = user.phone ? user.phone : ''
+    const em = user.email ? user.email : ''
+    const pi = user.pin ? user.pin : ''
     setValues({
-      email: user.email,
-      phone: user.phone,
-      pin: user.pin
+      email: em,
+      phone: ph,
+      pin: pi
     })
   }
 
@@ -363,15 +404,17 @@ function NavBar({
         const data = { rut_usuario: user.rut, proyectos: p }
         const st = await getStates(data)
         const us = await getUsers(data)
+        const tempE = emisores ? emisores : []
+        const tempS = estados ? estados : []
 
         us.forEach(item => {
-          const temp = prevState.us.filter(t => t.value === item.rut)
+          const temp = tempE.filter(t => t === item.rut)
           newUs.push({ value: item.rut, label: item.nombre, select: temp.length > 0 })
         })
         setUsers(newUs)
 
         st.forEach(item => {
-          const temp = prevState.st.filter(t => t.value === item.id)
+          const temp = tempS.filter(t => t === item.id)
           newSt.push({ value: item.id, label: item.est, select: temp.length > 0 })
         })
         setStates(newSt)
@@ -411,9 +454,9 @@ function NavBar({
           {
             !isMantainerRoute &&
             <div className={`max-w-xs text-xs uppercase font-light ${hiddenOption && 'hidden'}`} >
-              <TextContent tag="proyectos" value={filter.pr} toolptipValue={tooltip.pr} />
-              <TextContent tag="emisores" value={filter.us} toolptipValue={tooltip.us} />
-              <TextContent tag="estados" value={filter.st} toolptipValue={tooltip.st} />
+              <TextContent tag="proyectos" value={name?.pr ? name.pr : '???'} toolptipValue={tooltip?.pr} />
+              <TextContent tag="emisores" value={name?.us ? name.us : '???'} toolptipValue={tooltip?.us} />
+              <TextContent tag="estados" value={name?.st ? name.st : '???'} toolptipValue={tooltip?.st} />
             </div>
           }
           <Button
@@ -486,9 +529,9 @@ function NavBar({
             {
               !isMantainerRoute &&
               <div className={`mr-2 max-w-xs text-xs uppercase font-light ${hiddenOption && 'hidden'}`} >
-                <TextContent tag="proyectos" value={filter.pr} toolptipValue={tooltip.pr} />
-                <TextContent tag="emisores" value={filter.us} toolptipValue={tooltip.us} />
-                <TextContent tag="estados" value={filter.st} toolptipValue={tooltip.st} />
+                <TextContent tag="proyectos" value={name?.pr ? name.pr : '???'} toolptipValue={tooltip?.pr} />
+                <TextContent tag="emisores" value={name?.us ? name.us : '???'} toolptipValue={tooltip?.us} />
+                <TextContent tag="estados" value={name?.st ? name.st : '???'} toolptipValue={tooltip?.st} />
               </div>
             }
             <Button
@@ -910,7 +953,7 @@ function NavBar({
           <Button
             className="border border-red-400 hover:bg-red-400 text-red-400 hover:text-white rounded-full w-full md:w-2/5 lg:w-1/5"
             name="cancelar"
-            onClick={() => handleCancel()} />
+            onClick={() => handleCancelFilter()} />
           <Button
             className="bg-green-500 hover:bg-green-400 text-white rounded-full w-full md:w-2/5 lg:w-1/5"
             name="aplicar"

@@ -2,7 +2,7 @@ import React from 'react'
 
 const Td = ({ borderLeft = false, children, align = 'text-center', isMultiLine, width, className }) => {
    return (
-      <td className={`py-1.5 ${borderLeft && 'border-l'} ${width}`}>
+      <td className={`py-1.5 ${borderLeft && 'border-l border-gray-300'} ${width}`}>
          <div
             className={`
                ${align} ${isMultiLine ? 'truncate' : 'whitespace-pre-wrap'} 

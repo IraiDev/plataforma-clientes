@@ -16,10 +16,11 @@ module.exports = {
         'full': '100%',
       },
       maxWidth: {
-        'desc': '400px',
+        'desc': '25rem',
+        'title': '15rem',
       },
       width: {
-        '128': '32rem'
+        '128': '25rem'
       },
       maxHeight: {
         '75vh': '80vh',

@@ -10,9 +10,13 @@ const msg = '-- “Estimado Usuario este pin no es reconocido por el sistema, de
 
 function TicketProvider({ children }) {
 
+  const token = window.localStorage.getItem('ticketToken')
+  const rut = window.localStorage.getItem('last-ticket-user')
+  const initiUser = token ? { ok: true, rut } : { ok: false }
+
   const { pathname } = useLocation()
   const { toggleLoading } = useContext(Ui)
-  const [user, setUser] = useState({ ok: false })
+  const [user, setUser] = useState(initiUser)
   const [ticketList, setTicketList] = useState([])
   const [ticketDetail, setTicketDetail] = useState({})
   const [filters, setFilters] = useState({})
@@ -115,6 +119,7 @@ function TicketProvider({ children }) {
         pin: b.usuario.pin,
         isAdmin: resUser.es_admin
       }
+
       setUser(data)
       return true
     }
@@ -375,13 +380,21 @@ function TicketProvider({ children }) {
     else return body
   }
 
-  const saveFilters = ({ rut_usuario = user.rut, emisores = [], proyectos = [], estados = [] }) => {
-    console.log({ rut_usuario, emisores, proyectos, estados })
+  const saveFilters = ({
+    rut_usuario = user.rut,
+    emisores = [],
+    proyectos = [],
+    estados = [],
+    tooltip,
+    name
+  }) => {
     setFilters({
       rut_usuario,
       emisores,
       proyectos,
-      estados
+      estados,
+      tooltip,
+      name
     })
   }
 

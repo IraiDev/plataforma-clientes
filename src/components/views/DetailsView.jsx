@@ -1,5 +1,5 @@
 import { useContext, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { Ticket } from '../../context/Ticket'
 import { Alert } from '../../helpers/alerts'
 import Form from '../ui/form/Form'
@@ -8,16 +8,18 @@ import NavBar from '../ui/navbar/NavBar'
 function DetailsView({ from }) {
 
   const { id } = useParams()
+  const navigate = useNavigate()
   const { getTicketDetails, ticketDetail } = useContext(Ticket)
 
   const getDetail = async () => {
     const resp = await getTicketDetails(id)
     const { ok } = resp
     if (!ok) {
+      navigate('/', { replace: true })
       Alert({
         icon: 'error',
-        title: 'Error',
-        content: 'Error al obtener los datos del ticket',
+        title: 'Atencion',
+        content: 'El ticket apuntado no existe, se rediccionara a la pagina de inicio',
         showCancelButton: false,
       })
     }
