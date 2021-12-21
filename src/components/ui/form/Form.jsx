@@ -206,163 +206,163 @@ function Form({ onClick, data, from = 'EX' }) {
       name: el.desc_emisor,
       rut: el.emisor
     })))
+    // eslint-disable-next-line
   }, [])
 
   useEffect(() => {
     if (idEvent.length > 0) setReceiver(events.find(item => item.id === idEvent[0]))
     else setReceiver(null)
+    // eslint-disable-next-line
   }, [events])
 
   return (
-    <>
-      <div className="w-full mb-5">
-        <div className="text-2xl capitalize">
-          <h1 className="font-semibold inline">Ticket:</h1>
-          <h1 className="inline ml-2">{ticket}</h1>
-          <h1 className="font-semibold inline">; actividad:</h1>
-          <h1 className="inline ml-2">{id_actividad}, {nombre_actividad}</h1>
-          <br />
-          <h1 className="font-semibold inline">Empresa:</h1>
-          <h1 className="inline ml-2">{desc_empresa}, {desc_usuario}</h1>
-        </div>
-        <div className="border-b border-t border-gray-300 py-5 my-5">
-          <h5 className="capitalize text-xl font-semibold mb-2">mensaje ticket</h5>
-          <p className="font-light">{desc_detalle}</p>
-        </div>
-        <div className="h-96 mb-10">
-          <div className="mb-5 flex justify-between items-center">
-            <h5 className="text-xl font-semibold">Historial</h5>
-            <div className="flex items-center gap-2">
-              <h5 className="capitalize mt-1 text-sm font-semibold">Prioridad cliente</h5>
-              <Input
-                disabled={from !== 'EX' || id_actividad === ''}
-                isNumber
-                tooltip={id_actividad === '' ? 'No puedes modificar este campo si este ticket no tiene asignada una actividad' : ''}
-                width="w-20"
-                placeholder=""
-                name="priority"
-                value={priority}
-                onChange={onChangeValues}
-              />
-            </div>
+    <div className="w-full mb-5">
+      <header className="text-2xl capitalize">
+        <h1 className="font-semibold inline">Ticket:</h1>
+        <h1 className="inline ml-2">{ticket}</h1>
+        <h1 className="font-semibold inline">; actividad:</h1>
+        <h1 className="inline ml-2">{id_actividad}, {nombre_actividad}</h1>
+        <br />
+        <h1 className="font-semibold inline">Empresa:</h1>
+        <h1 className="inline ml-2">{desc_empresa}, {desc_usuario}</h1>
+      </header>
+      <section className="border-b border-t border-gray-300 py-5 my-5">
+        <h5 className="capitalize text-xl font-semibold mb-2">mensaje ticket</h5>
+        <p className="font-light">{desc_detalle}</p>
+      </section>
+      <section className="h-96 mb-10">
+        <div className="mb-5 flex justify-between items-center">
+          <h5 className="text-xl font-semibold">Historial</h5>
+          <div className="flex items-center gap-2">
+            <h5 className="capitalize mt-1 text-sm font-semibold">Prioridad cliente</h5>
+            <Input
+              disabled={from !== 'EX' || id_actividad === ''}
+              isNumber
+              tooltip={id_actividad === '' ? 'No puedes modificar este campo si este ticket no tiene asignada una actividad' : ''}
+              width="w-20"
+              placeholder=""
+              name="priority"
+              value={priority}
+              onChange={onChangeValues}
+            />
           </div>
-          <Table position margin >
-            <THead width="min-w-table-md">
-              {
-                columnEvents.map((item, index) => (
-                  <Column
-                    key={item.id}
-                    className={`text-white text-center font-semibold text-base py-3 capitalize
+        </div>
+        <Table position margin >
+          <THead width="min-w-table-md">
+            {
+              columnEvents.map((item, index) => (
+                <Column
+                  key={item.id}
+                  className={`text-white text-center font-semibold text-base py-3 capitalize
                   ${index % 2 === 0 ? 'bg-gray-600' : 'bg-gray-700'}
                   ${index === 5 ? 'col-span-7' : 'col-span-1'}
                   ${index === 0 ? 'rounded-l-md' : index === 5 && 'rounded-r-md'}
                   `} >
-                    {item.title}
-                  </Column>
-                ))
-              }
-            </THead>
-            {
-              historial.length > 0 &&
-              historial.map(item => (
-                <Row key={item.id_evento} className="text-xs text-center text-gray-600" width="min-w-table-md" isModal={false}>
-                  <Column className="p-1.5">
-                    {item.est_evento}
-                    <input
-                      disabled={item.origen === from}
-                      className={`ml-2 ${item.est_evento !== 'P' && 'hidden'}`}
-                      type="checkbox"
-                      onChange={(e) => {
-                        const check = e.target.checked
-                        setEvents(events.map(ev => {
-                          if (ev.id === item.id_evento) {
-                            if (check) {
-                              setIdEvent([...idEvent, ev.id])
-                            }
-                            else {
-                              setIdEvent(idEvent.filter(item => item !== ev.id))
-                            }
-                            ev.select = check
-                          }
-                          return ev
-                        }))
-                      }}
-                    />
-                  </Column>
-                  <Column className="bg-gray-100 py-1.5">{moment(item.fecha_hora).format('DD-MM-yyyy')}</Column>
-                  <Column className="py-1.5">{item.id_actividad}</Column>
-                  <Column className="bg-gray-100 p-1.5">{item.desc_emisor}</Column>
-                  <Column className="py-1.5">{item.desc_receptor}</Column>
-                  <Column className="col-span-7 bg-gray-100 p-1.5 text-justify rounded-r-md">{item.contenido}</Column>
-                </Row>
+                  {item.title}
+                </Column>
               ))
             }
-          </Table>
+          </THead>
+          {
+            historial.length > 0 &&
+            historial.map(item => (
+              <Row key={item.id_evento} className="text-xs text-center text-gray-600" width="min-w-table-md" isModal={false}>
+                <Column className="p-1.5">
+                  {item.est_evento}
+                  <input
+                    disabled={item.origen === from}
+                    className={`ml-2 ${item.est_evento !== 'P' && 'hidden'}`}
+                    type="checkbox"
+                    onChange={(e) => {
+                      const check = e.target.checked
+                      setEvents(events.map(ev => {
+                        if (ev.id === item.id_evento) {
+                          if (check) {
+                            setIdEvent([...idEvent, ev.id])
+                          }
+                          else {
+                            setIdEvent(idEvent.filter(item => item !== ev.id))
+                          }
+                          ev.select = check
+                        }
+                        return ev
+                      }))
+                    }}
+                  />
+                </Column>
+                <Column className="bg-gray-100 py-1.5">{moment(item.fecha_hora).format('DD-MM-yyyy')}</Column>
+                <Column className="py-1.5">{item.id_actividad}</Column>
+                <Column className="bg-gray-100 p-1.5">{item.desc_emisor}</Column>
+                <Column className="py-1.5">{item.desc_receptor}</Column>
+                <Column className="col-span-7 bg-gray-100 p-1.5 text-justify rounded-r-md">{item.contenido}</Column>
+              </Row>
+            ))
+          }
+        </Table>
+      </section>
+      {receiver !== null &&
+        <h5 className="mb-5 text-xl font-semibold">
+          Para: <p className="text-gray-700 font-normal inline">{receiver.name}</p>
+        </h5>
+      }
+      <TextArea
+        field="Descripcion evento"
+        name="desc"
+        value={desc}
+        onChange={onChangeValues}
+      />
+      <footer className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-10 items-center">
+        <div className="text-sm bg-gray-100 rounded-lg p-2 w-full">
+          <p className="capitalize">archivo seleccionado (max 5MB):</p>
+          <p className="font-semibold mb-2">{file !== null ? file.name : 'no hay archivo seleccionado'}</p>
+          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-28 overflow-custom">
+            {
+              documentos.length > 0 &&
+              documentos.map(doc => (
+                <LiDocs
+                  key={doc.id_docum}
+                  id={doc.id_docum}
+                  from={from}
+                  isPublic={doc.publico_privado}
+                  type={doc.tipo}
+                  route={doc.ruta_docum}
+                  idActivity={doc.id_det}
+                  idTicket={ticket}
+                  ticket={ticket}
+                  onClick={handleDeleteDoc}>
+                  {doc.nom_docum}
+                </LiDocs>
+              ))
+            }
+          </ul>
         </div>
-        {receiver !== null &&
-          <h5 className="mb-5 text-xl font-semibold">
-            Para: <p className="text-gray-700 font-normal inline">{receiver.name}</p>
-          </h5>
-        }
-        <TextArea
-          field="Descripcion evento"
-          name="desc"
-          value={desc}
-          onChange={onChangeValues}
-        />
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-10 items-center">
-          <div className="text-sm bg-gray-100 rounded-lg p-2 w-full">
-            <p className="capitalize">archivo seleccionado (max 5MB):</p>
-            <p className="font-semibold mb-2">{file !== null ? file.name : 'no hay archivo seleccionado'}</p>
-            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-28 overflow-custom">
-              {
-                documentos.length > 0 &&
-                documentos.map(doc => (
-                  <LiDocs
-                    key={doc.id_docum}
-                    id={doc.id_docum}
-                    from={from}
-                    isPublic={doc.publico_privado}
-                    type={doc.tipo}
-                    route={doc.ruta_docum}
-                    idActivity={doc.id_det}
-                    idTicket={ticket}
-                    ticket={ticket}
-                    onClick={handleDeleteDoc}>
-                    {doc.nom_docum}
-                  </LiDocs>
-                ))
-              }
-            </ul>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Button
-              tooltip="Puedes guardar el archivo seleccionado presionando este boton"
-              className="bg-yellow-500 hover:bg-yellow-400 text-white rounded-full w-full"
-              shadow
-              name="guardar pendiente"
-              onClick={() => handleNewEvent('P')} />
-            <Button
-              tooltip="Puedes guardar el archivo seleccionado presionando este boton"
-              className="bg-green-500 hover:bg-green-400 text-white rounded-full w-full"
-              shadow
-              name="guardar OK"
-              onClick={() => handleNewEvent('OK')} />
-            <label
-              className="capitalize text-center cursor-pointer bg-blue-500 hover:bg-blue-400 text-white transition duration-500 rounded-full py-2 px-4 font-semibold shadow-md w-full"
-              htmlFor="inputFile">
-              <input key={resetFile || ''} className="hidden" type="file" id="inputFile" onChange={onChangeFile} />
-              Seleccionar archivo
-            </label>
-            <Button
-              className="text-red-500 border border-red-400 hover:bg-red-400 w-full hover:text-white rounded-full"
-              shadow
-              name="cancelar"
-              onClick={handleCancel} />
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Button
+            tooltip="Puedes guardar el archivo seleccionado presionando este boton"
+            className="bg-yellow-500 hover:bg-yellow-400 text-white rounded-full w-full"
+            shadow
+            name="guardar pendiente"
+            onClick={() => handleNewEvent('P')} />
+          <Button
+            tooltip="Puedes guardar el archivo seleccionado presionando este boton"
+            className="bg-green-500 hover:bg-green-400 text-white rounded-full w-full"
+            shadow
+            name="guardar OK"
+            onClick={() => handleNewEvent('OK')} />
+          <label
+            className="capitalize text-center cursor-pointer bg-blue-500 hover:bg-blue-400 text-white transition duration-500 rounded-full py-1.5 px-3.5 font-semibold shadow-md w-full"
+            htmlFor="inputFile">
+            <input key={resetFile || ''} className="hidden" type="file" id="inputFile" onChange={onChangeFile} />
+            Seleccionar archivo
+          </label>
+          <Button
+            className="text-red-500 border border-red-400 hover:bg-red-400 w-full hover:text-white rounded-full"
+            shadow
+            name="cancelar"
+            onClick={handleCancel} />
         </div>
-      </div>
-    </>
+      </footer>
+    </div>
   )
 }
 

@@ -485,10 +485,10 @@ function NavBar({
           <div className="flex items-center">
             {
               !isMantainerRoute &&
-              <div className={`mr-2 max-w-xs ${hiddenOption && 'hidden'}`} >
-                <TextContent className="text-xs uppercase font-light" tag="proyectos" value={filter.pr} toolptipValue={tooltip.pr} />
-                <TextContent className="text-xs uppercase font-light" tag="emisores" value={filter.us} toolptipValue={tooltip.us} />
-                <TextContent className="text-xs uppercase font-light" tag="estados" value={filter.st} toolptipValue={tooltip.st} />
+              <div className={`mr-2 max-w-xs text-xs uppercase font-light ${hiddenOption && 'hidden'}`} >
+                <TextContent tag="proyectos" value={filter.pr} toolptipValue={tooltip.pr} />
+                <TextContent tag="emisores" value={filter.us} toolptipValue={tooltip.us} />
+                <TextContent tag="estados" value={filter.st} toolptipValue={tooltip.st} />
               </div>
             }
             <Button
