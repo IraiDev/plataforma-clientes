@@ -1,11 +1,11 @@
 import React from 'react'
 
-function THead({ children, width = 'min-w-table' }) {
-  return (
-    <div className={`sticky top-0 grid grid-cols-12 text-sm mb-4 ${width}`}>
-      {children}
-    </div>
-  )
+const THead = ({ children, className = 'sticky top-0' }) => {
+   return (
+      <thead className={`${className} z-20`}>
+         {children}
+      </thead>
+   )
 }
 
 export default THead

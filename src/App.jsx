@@ -16,6 +16,7 @@ const App = () => {
       }
       reNew()
     }
+    // eslint-disable-next-line
   }, [])
 
   return (

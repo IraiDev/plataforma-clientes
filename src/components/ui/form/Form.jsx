@@ -1,31 +1,22 @@
 import { useContext, useEffect, useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom';
 import TextArea from '../input/TextArea'
-import Table from '../table/Table'
-import THead from '../table/THead'
-import { v4 as uuidv4 } from 'uuid'
-import Column from '../table/Column'
-import Row from '../table/Row'
 import Button from '../button/Button'
 import moment from 'moment'
 import LiDocs from '../List/LiDocs'
 import Input from '../input/Input'
 import { useForm } from '../../../hooks/useForm'
 import { checkForms } from '../../../helpers/helpers'
-
 import { Ticket } from '../../../context/Ticket'
 import { Ui } from '../../../context/Ui'
 import { Alert } from '../../../helpers/alerts'
+import Table from '../table/Table';
+import Th from '../table/Th';
+import THead from '../table/THead';
+import TBody from '../table/TBody';
+import Td from '../table/Td';
 const notAllow = ['exe', 'js']
 
-const columnEvents = [
-  { id: uuidv4(), title: '#' },
-  { id: uuidv4(), title: 'fecha' },
-  { id: uuidv4(), title: 'actividad' },
-  { id: uuidv4(), title: 'emisor' },
-  { id: uuidv4(), title: 'receptor' },
-  { id: uuidv4(), title: 'contenido' }
-]
 
 function Form({ onClick, data, from = 'EX' }) {
 
@@ -246,58 +237,78 @@ function Form({ onClick, data, from = 'EX' }) {
             />
           </div>
         </div>
-        <Table position margin >
-          <THead width="min-w-table-md">
-            {
-              columnEvents.map((item, index) => (
-                <Column
-                  key={item.id}
-                  className={`text-white text-center font-semibold text-base py-3 capitalize
-                  ${index % 2 === 0 ? 'bg-gray-600' : 'bg-gray-700'}
-                  ${index === 5 ? 'col-span-7' : 'col-span-1'}
-                  ${index === 0 ? 'rounded-l-md' : index === 5 && 'rounded-r-md'}
-                  `} >
-                  {item.title}
-                </Column>
-              ))
-            }
-          </THead>
-          {
-            historial.length > 0 &&
-            historial.map(item => (
-              <Row key={item.id_evento} className="text-xs text-center text-gray-600" width="min-w-table-md" isModal={false}>
-                <Column className="p-1.5">
-                  {item.est_evento}
-                  <input
-                    disabled={item.origen === from}
-                    className={`ml-2 ${item.est_evento !== 'P' && 'hidden'}`}
-                    type="checkbox"
-                    onChange={(e) => {
-                      const check = e.target.checked
-                      setEvents(events.map(ev => {
-                        if (ev.id === item.id_evento) {
-                          if (check) {
-                            setIdEvent([...idEvent, ev.id])
-                          }
-                          else {
-                            setIdEvent(idEvent.filter(item => item !== ev.id))
-                          }
-                          ev.select = check
-                        }
-                        return ev
-                      }))
-                    }}
-                  />
-                </Column>
-                <Column className="bg-gray-100 py-1.5">{moment(item.fecha_hora).format('DD-MM-yyyy')}</Column>
-                <Column className="py-1.5">{item.id_actividad}</Column>
-                <Column className="bg-gray-100 p-1.5">{item.desc_emisor}</Column>
-                <Column className="py-1.5">{item.desc_receptor}</Column>
-                <Column className="col-span-7 bg-gray-100 p-1.5 text-justify rounded-r-md">{item.contenido}</Column>
-              </Row>
-            ))
-          }
-        </Table>
+        <section>
+          <Table width='w-full' height='max-h-evt-table'>
+            <THead>
+              <tr className='text-sm font-semibold text-center capitalize text-white bg-gray-700'>
+                <Th>#</Th>
+                <Th className='bg-gray-600'>estado</Th>
+                <Th>fecha</Th>
+                <Th className='bg-gray-600'>actividad</Th>
+                <Th>emisor</Th>
+                <Th className='bg-gray-600'>receptor</Th>
+                <Th>contenido</Th>
+              </tr>
+            </THead>
+            <TBody>
+              {
+                historial.length > 0 &&
+                historial.map((evt, i) => (
+                  <tr
+                    key={evt.id}
+                    className='text-gray-700 bg-gray-100 border-b text-sm w-max'
+                  >
+                    <Td borderLeft={false}>
+                      <span
+                        className="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-md"
+                      >
+                        {i + 1}
+                      </span>
+                    </Td>
+                    <Td borderLeft>
+                      {evt.est_evento}
+                      <input
+                        disabled={evt.origen === from}
+                        className={`ml-2 ${evt.est_evento !== 'P' && 'hidden'}`}
+                        type="checkbox"
+                        onChange={(e) => {
+                          const check = e.target.checked
+                          setEvents(events.map(ev => {
+                            if (ev.id === evt.id_evento) {
+                              if (check) {
+                                setIdEvent([...idEvent, ev.id])
+                              }
+                              else {
+                                setIdEvent(idEvent.filter(item => item !== ev.id))
+                              }
+                              ev.select = check
+                            }
+                            return ev
+                          }))
+                        }}
+                      />
+                    </Td>
+                    <Td borderLeft>
+                      {moment(evt.fecha_hora).format('DD/MM/YYYY HH:mm')}
+                    </Td>
+                    <Td borderLeft>
+                      {evt.id_actividad}
+                    </Td>
+                    <Td borderLeft>
+                      {evt.desc_emisor}
+                    </Td>
+                    <Td borderLeft>
+                      {evt.desc_receptor}
+                    </Td>
+                    <Td borderLeft align='text-left'>
+                      {evt.contenido}
+                    </Td>
+                  </tr>
+                ))
+              }
+            </TBody>
+          </Table>
+        </section>
       </section>
       {receiver !== null &&
         <h5 className="mb-5 text-xl font-semibold">

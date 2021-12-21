@@ -1,11 +1,16 @@
-import React from 'react'
 
-function Table({ children, position = 'fixed fixed top-20 left-0 right-0 bottom-0', margin = 'mx-5 xl:mx-16 2xl:mx-30 mt-10' }) {
-  return (
-    <div className={`h-5/6 overflow-custom ${margin} ${position}`}>
-      {children}
-    </div>
-  )
+const Table = ({ children, width = 'w-max', height = 'max-h-75vh' }) => {
+   return (
+      <section className="mt-6 w-full overflow-custom animate__animated animate__fadeIn">
+         <div className={`${width} mx-auto overflow-hidden rounded-lg shadow-lg`}>
+            <div className={`${height} w-full overflow-custom`}>
+               <table className="w-full relative">
+                  {children}
+               </table>
+            </div>
+         </div>
+      </section>
+   )
 }
 
 export default Table

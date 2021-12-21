@@ -10,7 +10,7 @@ export const HomeScreen = ({ showNewTicket = false }) => {
 
   return (
     <>
-      <div className="h-screen w-full">
+      <div className="h-screen w-full bg-gray-50">
         <NavBar
           onMultiLine={() => setMultiline(!multiLine)}
           isMultiLine={multiLine}

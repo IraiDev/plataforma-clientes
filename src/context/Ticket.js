@@ -14,7 +14,6 @@ function TicketProvider({ children }) {
   const { toggleLoading } = useContext(Ui)
   const [user, setUser] = useState({ ok: false })
   const [ticketList, setTicketList] = useState([])
-  const [ticketDetail, setTicketDetail] = useState({})
   const [filters, setFilters] = useState({})
 
   const login = async (data) => {
@@ -126,7 +125,6 @@ function TicketProvider({ children }) {
   const logout = () => {
     setUser({ ok: false })
     setTicketList([])
-    setTicketDetail({})
     setFilters({})
     localStorage.removeItem('ticketToken')
     window.console.clear()
@@ -143,13 +141,19 @@ function TicketProvider({ children }) {
   }
 
   const getUsers = async (data) => {
-    const resp = await fetchToken('ticket/get-user-empresa', data, 'POST')
-    const body = await resp.json()
-    const { ok, msg } = body
-    if (ok) {
-      return msg
+    try {
+      const resp = await fetchToken('ticket/get-user-empresa', data, 'POST')
+      const body = await resp.json()
+      const { ok, msg } = body
+      if (ok) {
+        return msg
+      }
+      console.log('fallo la peticion (getusers)', body)
     }
-    console.log('fallo la peticion (getusers)', body)
+    catch (e) {
+      console.log(e)
+    }
+
   }
 
   const getStates = async (data) => {
@@ -194,16 +198,16 @@ function TicketProvider({ children }) {
     const resp = await fetchToken(`ticket?id_ticket=${id}`)
     const body = await resp.json()
     const { ok, arrayResp } = body
+    console.log('detalle: ', arrayResp[0])
 
     toggleLoading(false)
 
     if (ok) {
-      setTicketDetail(arrayResp[0])
-      return true
+      return { ok, data: arrayResp[0] }
     }
     else {
       console.log('fallo la peticion (getTicketDetails): ', body)
-      return false
+      return { ok, data: {} }
     }
   }
 
@@ -401,7 +405,6 @@ function TicketProvider({ children }) {
     createEvent,
     user,
     ticketList,
-    ticketDetail,
     filters,
     updataMantainerUser,
     insertMantainerUser

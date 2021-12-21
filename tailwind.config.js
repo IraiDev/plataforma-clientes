@@ -14,7 +14,17 @@ module.exports = {
         'table': '1300px',
         'table-md': '900px',
         'full': '100%',
-      }
+      },
+      maxWidth: {
+        'desc': '400px',
+      },
+      width: {
+        '128': '32rem'
+      },
+      maxHeight: {
+        '75vh': '80vh',
+        'evt-table': '300px'
+      },
     }
   },
   variants: {
