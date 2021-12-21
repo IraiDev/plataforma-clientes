@@ -255,7 +255,7 @@ function Form({ onClick, data, from = 'EX' }) {
                 historial.length > 0 &&
                 historial.map((evt, i) => (
                   <tr
-                    key={evt.id}
+                    key={i}
                     className='text-gray-700 bg-gray-100 border-b text-sm w-max'
                   >
                     <Td borderLeft={false}>

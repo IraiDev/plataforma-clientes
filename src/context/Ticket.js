@@ -198,7 +198,6 @@ function TicketProvider({ children }) {
     const resp = await fetchToken(`ticket?id_ticket=${id}`)
     const body = await resp.json()
     const { ok, arrayResp } = body
-    console.log('detalle: ', arrayResp[0])
 
     toggleLoading(false)
 
@@ -375,6 +374,7 @@ function TicketProvider({ children }) {
   }
 
   const saveFilters = ({ rut_usuario = user.rut, emisores = [], proyectos = [], estados = [] }) => {
+    console.log({ rut_usuario, emisores, proyectos, estados })
     setFilters({
       rut_usuario,
       emisores,
