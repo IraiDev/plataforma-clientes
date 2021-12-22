@@ -90,8 +90,8 @@ function ListView({ multiLine }) {
                 fecha
               </Th>
               <Th width='w-36' className='bg-gray-600'>
-                empresa
-                <span className='block text-gray-300 font-normal'>(proyecto)</span>
+                proyecto
+                <span className='block text-gray-300'>(empresa)</span>
               </Th>
               <Th width='w-24'>
                 solicita

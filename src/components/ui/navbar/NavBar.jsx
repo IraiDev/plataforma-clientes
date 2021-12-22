@@ -37,8 +37,6 @@ function NavBar({
   const [file, setFile] = useState(null)
   const [resetFile, setResetFile] = useState(randomString)
   const [questions, setQuestions] = useState([])
-  // const [filter, setFilter] = useState({ pr: ['???'], us: ['???'], st: ['???'] })
-  // const [tooltip, setTooltip] = useState({ pr: '', us: '', st: '' })
 
   // checkboxes
   const [check, setCheck] = useState(false)
@@ -48,7 +46,17 @@ function NavBar({
   // checkboxes
 
   // custom hooks
-  const [{ title, desc, newPin, repeatPin }, onChangeValues, reset] = useForm({ title: '', desc: '', newPin: '', repeatPin: '' })
+  const [{
+    title,
+    desc,
+    newPin,
+    repeatPin
+  }, onChangeValues, reset] = useForm({
+    title: '',
+    desc: '',
+    newPin: '',
+    repeatPin: ''
+  })
   // custom hooks
 
   // object destructuring
@@ -96,12 +104,33 @@ function NavBar({
   }
 
   const getFilterSelection = (arr) => {
+
+    let tooltip = '', name = ''
+
     const filter = arr.filter(item => item.select)
-    const id = filter.map(f => f.value)
-    const tooltip = filter.map((f, i) => i === filter.length - 1 ? '  ' + f.label + '.' : '  ' + f.label)
-    let name = filter.slice(0, 3).map((f, i) => i === 2 ? f.label + '...' : f.label + ',  ')
-    arr.length === filter.length && (name = ['Todos'])
-    filter.length === 0 && (name = ['???'])
+
+    const cut = filter.slice(0, 3)
+
+    const id = filter.map(item => item.value)
+
+    filter.forEach((item, i) => {
+      if (i < filter.length - 1) {
+        tooltip = tooltip + item.label + ', '
+      }
+      else {
+        tooltip = tooltip + item.label + '.'
+      }
+    })
+
+    cut.forEach((item, i) => {
+      if (i < cut.length - 1) {
+        name = name + item.label + ', '
+      }
+      else {
+        name = cut.length === 3 ? name + item.label + '...' : name + item.label + '.'
+      }
+    })
+    name = arr.length === filter.length ? 'Todos.' : filter.length === 0 ? '????' : name
 
     return { filter, id, name, tooltip }
   }
@@ -220,7 +249,7 @@ function NavBar({
       proyectos: pr.id,
       emisores: us.id,
       estados: st.id,
-      tooltip: { pr: pr.name, us: us.name, st: st.name },
+      tooltip: { pr: pr.tooltip, us: us.tooltip, st: st.tooltip },
       name: { pr: pr.name, us: us.name, st: st.name }
     }
 
@@ -244,9 +273,9 @@ function NavBar({
   const handleUpdateUser = async () => {
     let data
 
-    if (newPin.trim() === '') {
+    if (newPin.trim() === '' && repeatPin.trim() === '') {
 
-      if (email === '' || phone === '') {
+      if (email.trim() === '' || phone.trim() === '') {
         Alert({
           title: 'Atencion',
           icon: 'warn',
@@ -264,7 +293,7 @@ function NavBar({
 
     }
     else {
-      if (pin === '' || pin !== user.pin) {
+      if (pin.trim() === '' || pin.trim() !== user.pin) {
         Alert({
           icon: 'warn',
           title: 'Atencion',
@@ -639,18 +668,10 @@ function NavBar({
         <div className="grid gap-5">
           <Input
             disabled
-            type="text"
-            color="lightBlue"
-            size="regular"
-            outline={true}
             placeholder={user.fullName}
           />
           <Input
             disabled
-            type="text"
-            color="lightBlue"
-            size="regular"
-            outline={true}
             placeholder={user.rut}
           />
           <Input

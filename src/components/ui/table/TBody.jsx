@@ -1,6 +1,6 @@
 import React from 'react'
 
-const TBody = ({ children, className = 'bg-white rounded-b-lg' }) => {
+const TBody = ({ children, className }) => {
    return (
       <tbody className={className}>
          {children}
