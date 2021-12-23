@@ -12,7 +12,8 @@ function TicketProvider({ children }) {
 
   const token = window.localStorage.getItem('ticketToken')
   const rut = window.localStorage.getItem('last-ticket-user')
-  const initiUser = token ? { ok: true, rut } : { ok: false }
+  const is_admin = window.localStorage.getItem('ticket-user-isAdmin')
+  const initiUser = token ? { ok: true, rut, isAdmin: is_admin } : { ok: false }
 
   const { pathname } = useLocation()
   const { toggleLoading } = useContext(Ui)
@@ -48,6 +49,7 @@ function TicketProvider({ children }) {
       const lastuser = window.localStorage.getItem('last-ticket-user')
       lastuser !== resUser.rut_user && window.localStorage.setItem('lastPath-ticket', '/')
       window.localStorage.setItem('last-ticket-user', resUser.rut_user)
+      window.localStorage.setItem('ticket-user-isAdmin', resUser.es_admin)
 
       const data = {
         ok,
@@ -108,6 +110,7 @@ function TicketProvider({ children }) {
       window.localStorage.setItem('ticketToken', token)
       window.localStorage.setItem('lastPath-ticket', pathname)
       window.localStorage.setItem('last-ticket-user', resUser.rut_user)
+      window.localStorage.setItem('ticket-user-isAdmin', resUser.es_admin)
 
       const data = {
         ok,

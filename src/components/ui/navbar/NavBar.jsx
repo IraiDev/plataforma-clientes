@@ -261,13 +261,15 @@ function NavBar({
   const handleCancelFilter = () => {
     let newPr = []
 
+    setModalFilter(false)
+
+    const tempP = proyectos ? proyectos : []
+
     projects.forEach(item => {
-      const temp = proyectos.filter(t => t === item.value)
+      const temp = tempP.filter(t => t === item.value)
       newPr.push({ ...item, select: temp.length > 0 })
     })
     setProjects(newPr)
-
-    setModalFilter(false)
   }
 
   const handleUpdateUser = async () => {

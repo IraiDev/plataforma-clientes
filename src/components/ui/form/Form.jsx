@@ -353,9 +353,21 @@ function Form({ onClick, data, from = 'EX' }) {
             name="guardar OK"
             onClick={() => handleNewEvent('OK')} />
           <label
-            className="capitalize text-center cursor-pointer bg-blue-500 hover:bg-blue-400 text-white transition duration-500 rounded-full py-1.5 px-3.5 font-semibold shadow-md w-full"
+            disabled={id_actividad === '' && documentos.length === 1}
+            title={id_actividad === '' && documentos.length === 1 ? 'No puedes subir mas de un archivo si no tienes asignada una actividad' : ''}
+            className={
+              id_actividad === '' && documentos.length === 1 ?
+                'bg-blue-300 cursor-not-allowed text-white rounded-full w-full text-center py-1.5 px-3.5 font-semibold' :
+                "capitalize text-center cursor-pointer bg-blue-500 hover:bg-blue-400 text-white transition duration-500 rounded-full py-1.5 px-3.5 font-semibold shadow-md w-full"
+            }
             htmlFor="inputFile">
-            <input key={resetFile || ''} className="hidden" type="file" id="inputFile" onChange={onChangeFile} />
+            <input
+              key={resetFile || ''}
+              disabled={id_actividad === '' && documentos.length === 1}
+              className="hidden"
+              type="file"
+              id="inputFile"
+              onChange={onChangeFile} />
             Seleccionar archivo
           </label>
           <Button

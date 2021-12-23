@@ -1,5 +1,4 @@
 import { Route, Routes } from 'react-router-dom'
-import Error404 from '../components/screens/Error404'
 import { HomeScreen } from '../components/screens/HomeScreen'
 import DetailsView from '../components/views/DetailsView'
 import AdminRoutes from './AdminRoutes'
@@ -16,7 +15,6 @@ const DashRoutes = () => {
       <Route path='sys' element={<HomeScreen showNewTicket={true} />} />
       <Route path='email/:id' element={<DetailsView from='EX' />} />
       <Route path='/' element={<HomeScreen />} />
-      <Route path='*' element={<Error404 />} />
     </Routes>
   )
 }
