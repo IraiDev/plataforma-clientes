@@ -29,8 +29,6 @@ const LoginScreen = () => {
     navigate(lastPath, {
       replace: true,
     })
-
-    reset()
   }
 
   const onCloseModal = () => {

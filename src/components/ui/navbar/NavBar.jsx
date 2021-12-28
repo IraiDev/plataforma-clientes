@@ -649,7 +649,7 @@ function NavBar({
               block
               name="nuevo ticket"
               onClick={() => {
-                setModalTicket(true)
+                handleOpenNewTicketModal()
                 toggleNavMenu()
               }} />
           </>

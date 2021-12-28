@@ -7,7 +7,7 @@ function TextArea({
   placeholder = 'Escriba aqui',
   field = 'campo',
   rows = 7,
-  chartLimit = 500
+  chartLimit = 1500
 }) {
   return (
     <div>
