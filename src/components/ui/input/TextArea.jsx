@@ -7,12 +7,14 @@ function TextArea({
   placeholder = 'Escriba aqui',
   field = 'campo',
   rows = 7,
-  chartLimit = 1500
+  chartLimit = 1500,
+  disabled = false
 }) {
   return (
     <div>
       <p className="px-4 py-1 capitalize text-xs">{field}</p>
       <textarea
+        disabled={disabled}
         maxLength={chartLimit}
         name={name}
         rows={rows}

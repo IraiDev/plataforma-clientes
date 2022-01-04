@@ -24,8 +24,10 @@ function Form({ onClick, data, from = 'EX' }) {
   const {
     ticket, desc_detalle, desc_empresa,
     desc_usuario, documentos, historial, id_actividad,
-    id_proyecto, nombre_actividad, prioridad_cliente
+    id_proyecto, nombre_actividad, prioridad_cliente, estado
   } = data
+
+  console.log(data);
 
   const navigate = useNavigate()
   const { pathname } = useLocation()
@@ -58,7 +60,7 @@ function Form({ onClick, data, from = 'EX' }) {
   const handleNewEvent = async (state) => {
     let formData = new FormData()
     file !== null && formData.append('archivo', file)
-    formData.append('publicOrPrivate', origin ? 'PR' : 'PU')
+    formData.append('publicOrPrivate', from !== 'EX' ? 'PR' : 'PU')
     id_actividad !== '' && formData.append("id_actividad", id_actividad)
     id_actividad === '' && formData.append("id_ticket", ticket)
 
@@ -189,6 +191,19 @@ function Form({ onClick, data, from = 'EX' }) {
     else onClick()
   }
 
+  if (estado === 3) {
+    Alert({
+      icon: 'warn',
+      title: 'Atencion',
+      content: `El ticket: <strong>${ticket}, ${nombre_actividad}</strong>
+       se encuentra en estado <strong>PARA REVISION (P.R)</strong>, 
+       no es posible generar mas eventos sobre este tickets`,
+      cancelText: 'volver',
+      confirmText: 'Aceptar',
+      cancelAction: handleCancel
+    })
+  }
+
   useEffect(() => {
     setEvents(historial.map(el => ({
       select: false,
@@ -309,6 +324,7 @@ function Form({ onClick, data, from = 'EX' }) {
         </h5>
       }
       <TextArea
+        disabled={estado === 3}
         field="Descripcion evento"
         name="desc"
         value={desc}
@@ -340,38 +356,49 @@ function Form({ onClick, data, from = 'EX' }) {
           </ul>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {estado !== 3 ?
+            <>
+              <Button
+                disabled={estado === 3}
+                tooltip="Puedes guardar el archivo seleccionado presionando este boton"
+                className="bg-yellow-500 hover:bg-yellow-400 text-white rounded-full w-full"
+                shadow
+                name="guardar pendiente"
+                onClick={() => handleNewEvent('P')} />
+              <Button
+                disabled={estado === 3}
+                tooltip="Puedes guardar el archivo seleccionado presionando este boton"
+                className="bg-green-500 hover:bg-green-400 text-white rounded-full w-full"
+                shadow
+                name="guardar OK"
+                onClick={() => handleNewEvent('OK')} />
+
+              <label
+                disabled={id_actividad === '' && documentos.length === 1}
+                title={id_actividad === '' && documentos.length === 1 ? 'No puedes subir mas de un archivo si no tienes asignada una actividad' : ''}
+                className={
+                  id_actividad === '' && documentos.length === 1 ?
+                    'bg-blue-300 cursor-not-allowed text-white rounded-full w-full text-center py-1.5 px-3.5 font-semibold' :
+                    "capitalize text-center cursor-pointer bg-blue-500 hover:bg-blue-400 text-white transition duration-500 rounded-full py-1.5 px-3.5 font-semibold shadow-md w-full"
+                }
+                htmlFor="inputFile">
+                <input
+                  key={resetFile || ''}
+                  disabled={id_actividad === '' && documentos.length === 1}
+                  className="hidden"
+                  type="file"
+                  id="inputFile"
+                  onChange={onChangeFile} />
+                Seleccionar archivo
+              </label>
+            </>
+            : <span />
+          }
+
           <Button
-            tooltip="Puedes guardar el archivo seleccionado presionando este boton"
-            className="bg-yellow-500 hover:bg-yellow-400 text-white rounded-full w-full"
-            shadow
-            name="guardar pendiente"
-            onClick={() => handleNewEvent('P')} />
-          <Button
-            tooltip="Puedes guardar el archivo seleccionado presionando este boton"
-            className="bg-green-500 hover:bg-green-400 text-white rounded-full w-full"
-            shadow
-            name="guardar OK"
-            onClick={() => handleNewEvent('OK')} />
-          <label
-            disabled={id_actividad === '' && documentos.length === 1}
-            title={id_actividad === '' && documentos.length === 1 ? 'No puedes subir mas de un archivo si no tienes asignada una actividad' : ''}
-            className={
-              id_actividad === '' && documentos.length === 1 ?
-                'bg-blue-300 cursor-not-allowed text-white rounded-full w-full text-center py-1.5 px-3.5 font-semibold' :
-                "capitalize text-center cursor-pointer bg-blue-500 hover:bg-blue-400 text-white transition duration-500 rounded-full py-1.5 px-3.5 font-semibold shadow-md w-full"
-            }
-            htmlFor="inputFile">
-            <input
-              key={resetFile || ''}
-              disabled={id_actividad === '' && documentos.length === 1}
-              className="hidden"
-              type="file"
-              id="inputFile"
-              onChange={onChangeFile} />
-            Seleccionar archivo
-          </label>
-          <Button
-            className="text-red-500 border border-red-400 hover:bg-red-400 w-full hover:text-white rounded-full"
+            className={`text-red-500 border border-red-400 hover:bg-red-400 w-full
+             hover:text-white rounded-full ${estado === 3 && 'place-self-end'}
+             `}
             shadow
             name="cancelar"
             onClick={handleCancel} />

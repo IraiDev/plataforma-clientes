@@ -35,7 +35,8 @@ export const Alert = async (props) => {
     showConfirmButton = true,
     isBlur = false,
     timer = undefined,
-    action = () => { return false }
+    action = () => { return false },
+    cancelAction = () => { return false }
   } = props
 
   switch (icon) {
@@ -116,6 +117,9 @@ export const Alert = async (props) => {
     }).then((result) => {
       if (result.isConfirmed) {
         action()
+      }
+      else {
+        cancelAction()
       }
     })
   }

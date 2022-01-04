@@ -123,7 +123,7 @@ const UserMaintainer = () => {
       if (st.length === 0 || fa.length === 0 || so.length === 0) {
          Alert({
             title: 'Atencion',
-            content: 'Debe seleccionar al menos un estado, un padre y un hijo para crear/actualizar un usuario',
+            content: 'Debe seleccionar al menos un padre, un hijo y un estado,  para crear/actualizar un usuario',
             showCancelButton: false
          })
          return
