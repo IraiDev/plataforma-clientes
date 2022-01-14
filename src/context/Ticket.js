@@ -212,11 +212,11 @@ function TicketProvider({ children }) {
 
     if (ok) {
       setTicketDetail(arrayResp[0])
-      return { ok, data: arrayResp[0] }
+      return { ok: true, data: arrayResp[0] }
     }
     else {
       console.log('fallo la peticion (getTicketDetails): ', body)
-      return { ok, data: {} }
+      return { ok: false, data: {} }
     }
   }
 
