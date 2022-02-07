@@ -10,11 +10,12 @@ export const HomeScreen = ({ showNewTicket = false }) => {
 
   return (
     <>
-      <div className="h-screen w-full bg-gray-50">
+      <div className='h-screen w-full bg-gray-50 overflow-auto'>
         <NavBar
           onMultiLine={() => setMultiline(!multiLine)}
           isMultiLine={multiLine}
-          showModalTicket={showNewTicket} />
+          showModalTicket={showNewTicket}
+        />
         <ListView multiLine={multiLine} />
       </div>
 

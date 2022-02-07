@@ -10,6 +10,8 @@ import Modal from '../ui/modal/Modal'
 import Form from '../ui/form/Form'
 import { Ui } from '../../context/Ui'
 import { Alert } from '../../helpers/alerts'
+import Card from '../ui/card/Card'
+
 function ListView({ multiLine }) {
   const { ticketList, filters, user, getTicketDetails } = useContext(Ticket)
   const { toggleLoading } = useContext(Ui)
@@ -103,7 +105,7 @@ function ListView({ multiLine }) {
 
   return (
     <>
-      <div className='px-2 lg:px-10 2xl:px-32 text-xs md:text-base'>
+      <div className='px-2 lg:px-10 2xl:px-32 text-xs md:text-base hidden md:block'>
         <Table width='w-table'>
           <THead>
             <tr className='text-sm font-semibold text-center capitalize text-white bg-gray-700'>
@@ -196,6 +198,26 @@ function ListView({ multiLine }) {
               ))}
           </TBody>
         </Table>
+      </div>
+
+      <div className='grid gap-2 px-2 py-4 md:hidden'>
+        {ticketList.length > 0 &&
+          ticketList.map((ticket, i) => (
+            <Card
+              onClick={() => handleOpenFormModal(ticket.id_ticket)}
+              key={ticket.id_ticket}
+              numerator={i}
+              title={ticket.titulo_ticket}
+              date={moment(ticket.fecha_hora_tx).format('DD/MM/YYYY, HH:MM')}
+              project={ticket.proyecto + ' (' + ticket.empresa + ')'}
+              userRequest={ticket.user_ticket}
+              desc={ticket.desc_requerimiento}
+              state={ticket.desc_estado}
+              priority={ticket.prio_cl}
+              id={ticket.id_ticket}
+              isPending={ticket.tiene_pendientes}
+            />
+          ))}
       </div>
 
       <Modal

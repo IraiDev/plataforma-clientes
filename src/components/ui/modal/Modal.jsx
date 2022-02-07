@@ -45,6 +45,7 @@ const Modal = ({
             >
               <i className='fas fa-times fa-lg'></i>
             </button>
+            <span className='h-10 w-full block bg-transparent' />
             {children}
           </div>
         </div>
