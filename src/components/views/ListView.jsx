@@ -11,14 +11,13 @@ import Form from '../ui/form/Form'
 import { Ui } from '../../context/Ui'
 import { Alert } from '../../helpers/alerts'
 function ListView({ multiLine }) {
-
   const { ticketList, filters, user, getTicketDetails } = useContext(Ticket)
   const { toggleLoading } = useContext(Ui)
   const [idRow, setIdRow] = useState(null)
   const [detailData, setDetailData] = useState({})
   const [modalForm, setModalForm] = useState(false)
 
-  const handleOpenFormModal = async (id) => {
+  const handleOpenFormModal = async id => {
     setIdRow(id)
     toggleLoading(true)
     const resp = await getTicketDetails(id)
@@ -26,51 +25,77 @@ function ListView({ multiLine }) {
     if (ok) {
       setDetailData(data)
       setModalForm(true)
-    }
-    else {
+    } else {
       Alert({
         icon: 'error',
         title: 'Error',
         content: 'No se pudo obtener los datos del ticket',
-        showCancelButton: false
+        showCancelButton: false,
       })
     }
   }
 
-  if (Object.keys(filters).length > 0) { // falta seleccionar algun filtro
-    if (filters.emisores.length < 1 || filters.proyectos.length < 1 || filters.estados.length < 1) {
+  if (Object.keys(filters).length > 0) {
+    // falta seleccionar algun filtro
+    if (
+      filters.emisores.length < 1 ||
+      filters.proyectos.length < 1 ||
+      filters.estados.length < 1
+    ) {
       return (
-        <div className="max-w-3xl bg-white rounded-md p-8 text-center mx-3 md:mx-auto shadow-lg mt-20">
+        <div className='max-w-3xl bg-white rounded-md p-8 text-center mx-3 md:mx-auto shadow-lg mt-20'>
           <p>
-            Por favor seleccione las tres opciones de filtros <label className="font-semibold capitalize">(Proyectos, emisores y estados)</label>, de lo contrario no se reralizara la busqueda.
+            Por favor seleccione las tres opciones de filtros{' '}
+            <label className='font-semibold capitalize'>
+              (Proyectos, emisores y estados)
+            </label>
+            , de lo contrario no se reralizara la busqueda.
             <br />
-            <label className="font-semibold block mt-3">Falta seleccionar:</label>
+            <label className='font-semibold block mt-3'>
+              Falta seleccionar:
+            </label>
           </p>
-          <ul className="font-semibold text-red-500 uppercase mx-auto w-max text-left">
-            {filters.proyectos.length < 1 && <li className="list-inside list-disc">proyectos</li>}
-            {filters.emisores.length < 1 && <li className="list-inside list-disc">emisores</li>}
-            {filters.estados.length < 1 && <li className="list-inside list-disc">estados</li>}
+          <ul className='font-semibold text-red-500 uppercase mx-auto w-max text-left'>
+            {filters.proyectos.length < 1 && (
+              <li className='list-inside list-disc'>proyectos</li>
+            )}
+            {filters.emisores.length < 1 && (
+              <li className='list-inside list-disc'>emisores</li>
+            )}
+            {filters.estados.length < 1 && (
+              <li className='list-inside list-disc'>estados</li>
+            )}
           </ul>
         </div>
       )
     }
   }
 
-  if (ticketList.length === 0 && Object.keys(filters).length < 1) { // no hay filtros aplicados
+  if (ticketList.length === 0 && Object.keys(filters).length < 1) {
+    // no hay filtros aplicados
     return (
-      <div className="max-w-3xl bg-white rounded-md p-8 text-center mx-3 md:mx-auto shadow-lg mt-20">
+      <div className='max-w-3xl bg-white rounded-md p-8 text-center mx-3 md:mx-auto shadow-lg mt-20'>
         <p>
-          Estimado(a) <label className="font-semibold uppercase">{user.fullName}</label> dado que acaba de ingresar a la plataforma no hay criterios de filtros aplicados, por favor dirigase a la seccion <label className="font-bold text-yellow-500 uppercase">filtros</label> para aplicar criterios de busqueda.
+          Estimado(a){' '}
+          <label className='font-semibold uppercase'>{user.fullName}</label>{' '}
+          dado que acaba de ingresar a la plataforma no hay criterios de filtros
+          aplicados, por favor dirigase a la seccion{' '}
+          <label className='font-bold text-yellow-500 uppercase'>filtros</label>{' '}
+          para aplicar criterios de busqueda.
         </p>
       </div>
     )
   }
 
-  if (ticketList.length === 0 && Object.keys(filters).length > 0) { // no se encontraron coincidencias
+  if (ticketList.length === 0 && Object.keys(filters).length > 0) {
+    // no se encontraron coincidencias
     return (
-      <div className="max-w-3xl bg-white rounded-md p-8 text-center mx-3 md:mx-auto shadow-lg mt-20">
+      <div className='max-w-3xl bg-white rounded-md p-8 text-center mx-3 md:mx-auto shadow-lg mt-20'>
         <p>
-          No se encontraron tickets que coincidadn con los filtros aplicados, por favor modifique su seleccion de <label className="font-bold text-yellow-500 uppercase">filtros</label> para realizar una nueva busqueda.
+          No se encontraron tickets que coincidadn con los filtros aplicados,
+          por favor modifique su seleccion de{' '}
+          <label className='font-bold text-yellow-500 uppercase'>filtros</label>{' '}
+          para realizar una nueva busqueda.
         </p>
       </div>
     )
@@ -78,7 +103,7 @@ function ListView({ multiLine }) {
 
   return (
     <>
-      <div className='px-8 2xl:px-32'>
+      <div className='px-2 lg:px-10 2xl:px-32 text-xs md:text-base'>
         <Table width='w-table'>
           <THead>
             <tr className='text-sm font-semibold text-center capitalize text-white bg-gray-700'>
@@ -86,34 +111,29 @@ function ListView({ multiLine }) {
               <Th width='w-14' className='bg-gray-600'>
                 ID
               </Th>
-              <Th width='w-36'>
-                fecha
-              </Th>
+              <Th width='w-36'>fecha</Th>
               <Th width='w-36' className='bg-gray-600'>
                 proyecto
                 <span className='block text-gray-300'>(empresa)</span>
               </Th>
-              <Th width='w-24'>
-                solicita
-              </Th>
+              <Th width='w-24'>solicita</Th>
               <Th width='w-60' className='bg-gray-600'>
                 titulo
               </Th>
-              <Th width='w-128'>
-                descripcion
-              </Th>
+              <Th width='w-128'>descripcion</Th>
               <Th width='w-24' className='bg-gray-600'>
                 estado
               </Th>
               <Th width='w-20'>
                 prioridad
-                <span className='block text-gray-300 font-normal'>(cliente)</span>
+                <span className='block text-gray-300 font-normal'>
+                  (cliente)
+                </span>
               </Th>
             </tr>
           </THead>
           <TBody>
-            {
-              ticketList.length > 0 &&
+            {ticketList.length > 0 &&
               ticketList.map((ticket, i) => (
                 <tr
                   onDoubleClick={() => handleOpenFormModal(ticket.id_ticket)}
@@ -127,9 +147,7 @@ function ListView({ multiLine }) {
                   `}
                 >
                   <Td>
-                    <span
-                      className="px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-md"
-                    >
+                    <span className='px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-md'>
                       {i + 1}
                     </span>
                   </Td>
@@ -138,44 +156,58 @@ function ListView({ multiLine }) {
                   </Td>
                   <Td>
                     {moment(ticket.fecha_hora_tx).format('DD/MM/YYYY')}
-                    <span className='block text-gray-400'>{moment(ticket.fecha_hora_tx).format('HH:MM')}</span>
+                    <span className='block text-gray-400'>
+                      {moment(ticket.fecha_hora_tx).format('HH:MM')}
+                    </span>
                   </Td>
                   <Td>
                     {ticket.proyecto}
-                    <span className='block text-gray-400'>({ticket.empresa})</span>
+                    <span className='block text-gray-400'>
+                      ({ticket.empresa})
+                    </span>
                   </Td>
-                  <Td className='uppercase'>
-                    {ticket.user_ticket}
-                  </Td>
-                  <Td className='font-semibold text-black' isMultiLine={multiLine} width='max-w-title' align='text-left'>
+                  <Td className='uppercase'>{ticket.user_ticket}</Td>
+                  <Td
+                    className='font-semibold text-black'
+                    isMultiLine={multiLine}
+                    width='max-w-title'
+                    align='text-left'
+                  >
                     {ticket.titulo_ticket}
                   </Td>
-                  <Td width='max-w-desc' isMultiLine={multiLine} align='text-left' >
+                  <Td
+                    width='max-w-desc'
+                    isMultiLine={multiLine}
+                    align='text-left'
+                  >
                     {ticket.desc_requerimiento}
                   </Td>
-                  <Td className={`
-                    font-semibold ${ticket.tiene_pendientes ? 'text-red-600' : 'text-gray-700'}
+                  <Td
+                    className={`
+                    font-semibold ${
+                      ticket.tiene_pendientes ? 'text-red-600' : 'text-gray-700'
+                    }
                     `}
                   >
                     {ticket.desc_estado}
                   </Td>
-                  <Td>
-                    {ticket.prio_cl}
-                  </Td>
+                  <Td>{ticket.prio_cl}</Td>
                 </tr>
-              ))
-            }
+              ))}
           </TBody>
         </Table>
       </div>
 
-      <Modal showModal={modalForm} isBlur={false} onClose={() => setModalForm(false)}
-        className="max-w-7xl">
+      <Modal
+        showModal={modalForm}
+        isBlur={false}
+        onClose={() => setModalForm(false)}
+        className='max-w-7xl'
+      >
         <Form data={detailData} onClick={() => setModalForm(false)} />
       </Modal>
     </>
   )
-
 }
 
 export default ListView
