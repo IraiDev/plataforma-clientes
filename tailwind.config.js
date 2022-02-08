@@ -26,6 +26,9 @@ module.exports = {
         '75vh': '85vh',
         'evt-table': '300px',
       },
+      scale: {
+        98: '0.98',
+      },
     },
   },
   variants: {
