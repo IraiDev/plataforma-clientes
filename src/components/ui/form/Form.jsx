@@ -41,7 +41,7 @@ function Form({ onClick, data, from = 'EX' }) {
   const { toggleLoading } = useContext(Ui)
   const [{ desc, priority }, onChangeValues, reset] = useForm({
     desc: '',
-    priority: prioridad_cliente,
+    priority: prioridad_cliente || '',
   })
   const [file, setFile] = useState(null)
   const [resetFile, setResetFile] = useState(randomString)
@@ -182,10 +182,12 @@ function Form({ onClick, data, from = 'EX' }) {
         setResetFile(randomString)
         Number(priority) !== prioridad_cliente &&
           updatePriority({ data: dataPriority, id: ticket })
+        reset()
         return onClick()
       }
       Number(priority) !== prioridad_cliente &&
         updatePriority({ data: dataPriority, id: ticket })
+      reset()
     } else {
       Alert({
         icon: 'error',
