@@ -149,8 +149,8 @@ function NavBar({
       arr.length === filter.length
         ? 'Todos.'
         : filter.length === 0
-        ? '????'
-        : name
+          ? '????'
+          : name
 
     return { filter, id, name, tooltip }
   }
@@ -220,11 +220,15 @@ function NavBar({
       })
       return
     }
-    if (ps) {
+    if (ps || phone.trim().length < 9) {
+
+      const flag = phone.trim().length <= 9
+
       Alert({
         title: 'Atencion',
         icon: 'warn',
-        content: AlertContent(pc, 'telefono', pl),
+        content: flag ? 'Nuemero de telefono obligatorio o el telefono ingresado es demasiado corto'
+          : AlertContent(pc, 'telefono', pl),
         showCancelButton: false,
       })
       return
@@ -467,6 +471,7 @@ function NavBar({
     const ph = user.phone ? user.phone : ''
     const em = user.email ? user.email : ''
     const pi = user.pin ? user.pin : ''
+
     setValues({
       email: em,
       phone: ph,
@@ -553,9 +558,8 @@ function NavBar({
           />
           {!isMantainerRoute && (
             <div
-              className={`max-w-xs text-xs uppercase font-light ${
-                hiddenOption && 'hidden'
-              }`}
+              className={`max-w-xs text-xs uppercase font-light ${hiddenOption && 'hidden'
+                }`}
             >
               <TextContent
                 tag='proyectos'
@@ -575,9 +579,8 @@ function NavBar({
             </div>
           )}
           <Button
-            className={`rounded-full hover:bg-blue-100 text-blue-500 ${
-              !showGoTo && 'hidden'
-            }`}
+            className={`rounded-full hover:bg-blue-100 text-blue-500 ${!showGoTo && 'hidden'
+              }`}
             type='iconText'
             tooltip='Ir al sitio completo'
             icon='fas fa-arrow-left'
@@ -612,9 +615,8 @@ function NavBar({
               <>
                 {user.isAdmin === 1 && (
                   <Button
-                    className={`bg-black hover:bg-gray-600 text-white rounded-full ${
-                      hiddenOption && 'hidden'
-                    }`}
+                    className={`bg-black hover:bg-gray-600 text-white rounded-full ${hiddenOption && 'hidden'
+                      }`}
                     shadow
                     name='Mantenedor usuarios'
                     onClick={() => navigate('/mantenedor-usuarios')}
@@ -622,9 +624,8 @@ function NavBar({
                 )}
                 <Button
                   tooltip='mostrar todo el contenido de descripcion de ticket'
-                  className={`border border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 rounded-full ${
-                    hiddenOption && 'hidden'
-                  }`}
+                  className={`border border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 rounded-full ${hiddenOption && 'hidden'
+                    }`}
                   type='iconText'
                   icon={
                     isMultiLine
@@ -636,9 +637,8 @@ function NavBar({
                   onClick={onMultiLine}
                 />
                 <Button
-                  className={`border border-yellow-500 text-yellow-500 hover:text-white hover:bg-yellow-500 rounded-full ${
-                    hiddenOption && 'hidden'
-                  }`}
+                  className={`border border-yellow-500 text-yellow-500 hover:text-white hover:bg-yellow-500 rounded-full ${hiddenOption && 'hidden'
+                    }`}
                   type='iconText'
                   icon='fas fa-filter'
                   shadow
@@ -646,9 +646,8 @@ function NavBar({
                   onClick={() => setModalFilter(true)}
                 />
                 <Button
-                  className={`bg-green-500 hover:bg-green-400 text-white rounded-full ${
-                    hiddenOption && 'hidden'
-                  }`}
+                  className={`bg-green-500 hover:bg-green-400 text-white rounded-full ${hiddenOption && 'hidden'
+                    }`}
                   shadow
                   name='nuevo ticket'
                   onClick={handleOpenNewTicketModal}
@@ -659,9 +658,8 @@ function NavBar({
           <div className='flex items-center'>
             {!isMantainerRoute && (
               <div
-                className={`mr-2 max-w-xs text-xs uppercase font-light ${
-                  hiddenOption && 'hidden'
-                }`}
+                className={`mr-2 max-w-xs text-xs uppercase font-light ${hiddenOption && 'hidden'
+                  }`}
               >
                 <TextContent
                   tag='proyectos'
@@ -681,9 +679,8 @@ function NavBar({
               </div>
             )}
             <Button
-              className={`rounded-full hover:bg-blue-100 text-blue-500 ${
-                !showGoTo && 'hidden'
-              }`}
+              className={`rounded-full hover:bg-blue-100 text-blue-500 ${!showGoTo && 'hidden'
+                }`}
               type='iconText'
               tooltip='Ir al sitio completo'
               icon='fas fa-arrow-left'
@@ -731,9 +728,8 @@ function NavBar({
           <>
             {user.isAdmin === 1 && (
               <Button
-                className={`bg-black hover:bg-gray-600 text-white rounded-full ${
-                  hiddenOption && 'hidden'
-                }`}
+                className={`bg-black hover:bg-gray-600 text-white rounded-full ${hiddenOption && 'hidden'
+                  }`}
                 shadow
                 name='Mantenedor usuarios'
                 onClick={() => navigate('/mantenedor-usuarios')}
@@ -741,9 +737,8 @@ function NavBar({
             )}
             <Button
               tooltip='mostrar todo el contenido de descripcion de ticket'
-              className={`border border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 rounded-full ${
-                hiddenOption && 'hidden'
-              }`}
+              className={`border border-blue-500 text-blue-500 hover:text-white hover:bg-blue-500 rounded-full ${hiddenOption && 'hidden'
+                }`}
               type='iconText'
               icon={
                 isMultiLine
@@ -759,9 +754,8 @@ function NavBar({
               }}
             />
             <Button
-              className={`border border-yellow-500 text-yellow-500 hover:text-white hover:bg-yellow-500 rounded-full ${
-                hiddenOption && 'hidden'
-              }`}
+              className={`border border-yellow-500 text-yellow-500 hover:text-white hover:bg-yellow-500 rounded-full ${hiddenOption && 'hidden'
+                }`}
               type='iconText'
               icon='fas fa-filter'
               shadow
@@ -773,9 +767,8 @@ function NavBar({
               }}
             />
             <Button
-              className={`bg-green-500 hover:bg-green-400 text-white rounded-full ${
-                hiddenOption && 'hidden'
-              }`}
+              className={`bg-green-500 hover:bg-green-400 text-white rounded-full ${hiddenOption && 'hidden'
+                }`}
               shadow
               block
               name='nuevo ticket'

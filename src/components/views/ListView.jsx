@@ -11,7 +11,6 @@ import Form from '../ui/form/Form'
 import { Ui } from '../../context/Ui'
 import { Alert } from '../../helpers/alerts'
 import Card from '../ui/card/Card'
-import { useToggle } from '../../hooks/useToogle'
 import Button from '../ui/button/Button'
 import { useWindowSize } from '../../hooks/useWindowSize'
 
@@ -199,9 +198,8 @@ function ListView({ multiLine }) {
                     </Td>
                     <Td
                       className={`
-                    font-semibold ${
-                      ticket.tiene_pendientes ? 'text-red-600' : 'text-gray-700'
-                    }
+                    font-semibold ${ticket.tiene_pendientes ? 'text-red-600' : 'text-gray-700'
+                        }
                     `}
                     >
                       {ticket.desc_estado}
@@ -239,17 +237,15 @@ function ListView({ multiLine }) {
         <div>
           <Button
             disabled={size.width <= 640}
-            className={`hover:bg-gray-200 rounded-lg hover:text-blue-500 ${
-              view && 'text-blue-500'
-            }`}
+            className={`hover:bg-gray-200 rounded-lg hover:text-blue-500 ${view && 'text-blue-500'
+              }`}
             type='icon'
             icon='fas fa-th-list'
             onClick={() => toggleView(true)}
           />
           <Button
-            className={`hover:bg-gray-200 rounded-lg hover:text-blue-500 ${
-              !view && 'text-blue-500'
-            }`}
+            className={`hover:bg-gray-200 rounded-lg hover:text-blue-500 ${!view && 'text-blue-500'
+              }`}
             type='icon'
             icon='fas fa-border-all'
             onClick={() => toggleView(false)}
