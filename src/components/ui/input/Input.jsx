@@ -11,8 +11,13 @@ function Input({
   width = 'w-full',
   disabled = false,
   tooltip,
-  isNumber = false }
+  isNumber = false,
+  hidden = false
+}
 ) {
+
+  if (hidden) return null
+
   return (
     <div>
       <p className="px-4 py-1 capitalize text-xs">{field}</p>
@@ -24,7 +29,11 @@ function Input({
         onChange={onChange}
         disabled={disabled}
         type={type}
-        className={`px-4 py-2 rounded-md bg-gray-100 focus:bg-white transition duration-500 focus:ring-2 focus:shadow-lg ${width}`}
+        className={`
+          px-4 py-2 rounded-md focus:bg-white transition duration-500
+          focus:ring-2 focus:shadow-lg ${width}
+          ${disabled ? 'bg-gray-50 text-gray-400' : 'bg-gray-100'}
+          `}
         placeholder={placeholder}
         onKeyPress={e => {
           if (isNumber) {

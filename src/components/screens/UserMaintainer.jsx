@@ -19,7 +19,8 @@ const initValuesState = {
    fullName: '',
    email: '',
    phone: '',
-   id_user: ''
+   id_user: '',
+   pin: ''
 }
 
 const initOptions = { value: null, label: 'Sin seleccion' }
@@ -53,7 +54,7 @@ const UserMaintainer = () => {
    const [values, setValues] = useState(initValuesState)
    // custom hooks
    // destructuring
-   const { rut, userName, fullName, email, phone, id_user } = values
+   const { rut, userName, fullName, email, phone, id_user, pin } = values
    // destructuring
 
    const getFilters = async () => {
@@ -208,7 +209,7 @@ const UserMaintainer = () => {
       const resp = await getMantainerUser(option.value)
 
       if (resp.ok) {
-         const { id_user, rut_user, nom_user, nombre, correo, telefono } = resp.usuario
+         const { id_user, rut_user, nom_user, nombre, correo, telefono, pin } = resp.usuario
          const { arreglo_estados, arreglo_hijos, arreglo_padres, arreglo_proyectos } = resp
 
          setValues({
@@ -217,7 +218,8 @@ const UserMaintainer = () => {
             userName: nom_user,
             fullName: nombre,
             email: correo,
-            phone: telefono
+            phone: telefono,
+            pin: pin
          })
 
          setTempSons(arreglo_hijos)
@@ -304,6 +306,7 @@ const UserMaintainer = () => {
          <NavBar isMantainerRoute={true} />
          <div className='container mx-auto py-10 md:py-20'>
             <div className='bg-white w-full h-full rounded-md px-8 py-14 shadow-lg grid gap-6'>
+
                <header className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-6'>
                   <div>
                      <h1 className='font-semibold text-lg'>Mantenedor de usuarios</h1>
@@ -322,7 +325,9 @@ const UserMaintainer = () => {
                         onChange={handleSelectOnChange} />
                   </div>
                </header>
+
                <HRLabel content='Datos usuario' />
+
                <section className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4 mb-6'>
                   <Input
                      field='rut'
@@ -360,8 +365,18 @@ const UserMaintainer = () => {
                      value={phone}
                      onChange={e => setValues({ ...values, phone: e.target.value })}
                   />
+
+                  <Input
+                     hidden={pin === ''}
+                     disabled
+                     field='pin'
+                     value={pin}
+                  />
+
                </section>
+
                <HRLabel content='Privilegios' />
+
                <section className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                   <div className='grid gap-4'>
                      <label className='capitalize text-gray-600'>Proyectos del usuario:</label>
@@ -532,6 +547,7 @@ const UserMaintainer = () => {
                      }
                   </Container>
                </section>
+
                <footer className='grid grid-cols-1 md:grid-cols-2 gap-4 mt-10'>
                   <Button
                      className="border border-red-400 hover:bg-red-400 text-red-400 hover:text-white rounded-full w-full md:w-1/2 order-last md:order-first"
