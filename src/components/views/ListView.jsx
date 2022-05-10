@@ -13,13 +13,16 @@ import { Alert } from '../../helpers/alerts'
 import Card from '../ui/card/Card'
 import Button from '../ui/button/Button'
 import { useWindowSize } from '../../hooks/useWindowSize'
+import CreateActivityForm from '../forms/CreateActivityForm'
 
 function ListView({ multiLine }) {
   const { ticketList, filters, user, getTicketDetails } = useContext(Ticket)
   const { toggleLoading } = useContext(Ui)
   const [idRow, setIdRow] = useState(null)
   const [detailData, setDetailData] = useState({})
+  const [ticketData, setTicketData] = useState({})
   const [modalForm, setModalForm] = useState(false)
+  const [addModal, setAddModal] = useState(false)
   const [view, toggleView] = useState(true)
   const size = useWindowSize()
 
@@ -39,6 +42,11 @@ function ListView({ multiLine }) {
         showCancelButton: false,
       })
     }
+  }
+
+  const openModalAdd = data => {
+    setAddModal(true)
+    setTicketData(data)
   }
 
   useEffect(() => {
@@ -138,12 +146,13 @@ function ListView({ multiLine }) {
                 <Th width='w-24' className='bg-gray-600'>
                   estado
                 </Th>
-                <Th width='w-20'>
+                <Th width='w-20'>Acciones</Th>
+                {/* <Th width='w-20'>
                   prioridad
                   <span className='block text-gray-300 font-normal'>
                     (cliente)
                   </span>
-                </Th>
+                </Th> */}
               </tr>
             </THead>
             <TBody>
@@ -204,7 +213,17 @@ function ListView({ multiLine }) {
                     >
                       {ticket.desc_estado}
                     </Td>
-                    <Td>{ticket.prio_cl}</Td>
+                    <Td>
+                      <Button
+                        disabled={ticket.desc_estado !== 'En Fila'}
+                        className='bg-transparent hover:bg-blue-50 text-gray-700 hover:text-blue-500 rounded-md'
+                        type='icon'
+                        icon='fas fa-file-medical fa-lg'
+                        onClick={() => openModalAdd(ticket)}
+                      />
+                      {/* <i class="fas fa-file-export"></i> */}
+                    </Td>
+                    {/* <Td>{ticket.prio_cl}</Td> */}
                   </tr>
                 ))}
             </TBody>
@@ -260,6 +279,15 @@ function ListView({ multiLine }) {
         className='max-w-7xl'
       >
         <Form data={detailData} onClick={() => setModalForm(false)} />
+      </Modal>
+
+      <Modal
+        showModal={addModal}
+        isBlur={false}
+        onClose={() => setAddModal(false)}
+        className='max-w-3xl'
+      >
+        <CreateActivityForm data={ticketData} />
       </Modal>
     </>
   )

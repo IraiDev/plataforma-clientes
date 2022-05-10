@@ -21,6 +21,7 @@ function TicketProvider({ children }) {
   const [ticketList, setTicketList] = useState([])
   const [ticketDetail, setTicketDetail] = useState({})
   const [filters, setFilters] = useState({})
+  const [filterList, setFilterList] = useState({})
 
   const login = async (data) => {
 
@@ -137,6 +138,22 @@ function TicketProvider({ children }) {
     setFilters({})
     localStorage.removeItem('ticketToken')
     window.console.clear()
+  }
+
+  const getFilters = async () => {
+    const resp = await fetchToken('ticket/get-filters')
+    const body = await resp.json()
+    
+    const { ok, usuarios } = body
+
+    if (ok) {
+      setFilterList({
+        user_zionit: usuarios.map(u => ({
+          value: u.id_user,
+          label: u.abrev_user
+        }))
+      })
+    }
   }
 
   const getProjects = async () => {
@@ -426,7 +443,9 @@ function TicketProvider({ children }) {
     filters,
     updataMantainerUser,
     insertMantainerUser,
-    ticketDetail
+    ticketDetail,
+    getFilters, 
+    filterList
   }
 
   return (

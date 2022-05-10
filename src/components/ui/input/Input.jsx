@@ -19,8 +19,8 @@ function Input({
   if (hidden) return null
 
   return (
-    <div>
-      <p className="px-4 py-1 capitalize text-xs">{field}</p>
+    <div className='grid gap-1'>
+      <label className='bg-yellow-200 font-semibold capitalize w-max text-sm px-2 rounded-full'>{field}</label>
       <input
         id={id}
         name={name}

@@ -1,12 +1,14 @@
-import { useEffect } from 'react'
+import { useContext, useEffect } from 'react'
 import { Routes, Route, useLocation, useNavigate } from 'react-router-dom'
 import PublicRoute from './PublicRoute'
 import PrivateRoute from './PrivateRoute'
 import LoginScreen from '../components/screens/LoginScreen'
 import DashRoutes from './DashRoutes'
+import { Ticket } from '../context/Ticket'
 
 const AppRoutes = () => {
 
+  const { getFilters } = useContext(Ticket)
   const { pathname } = useLocation()
   const navigate = useNavigate()
 
@@ -14,6 +16,10 @@ const AppRoutes = () => {
     !pathname.includes('/') && navigate('/')
     // eslint-disable-next-line
   }, [pathname])
+
+  useEffect(() => {
+    getFilters()
+  }, [])
 
   return (
     <Routes>
