@@ -46,6 +46,31 @@ export const fetchToken = (endpoint, data, method = "GET") => {
   }
 }
 
+export const fetchTokenFormData = (endpoint, data, method = "GET") => {
+  try {
+    const url = `${baseUrl}/${endpoint}`;
+    const token = localStorage.getItem("ticketToken") || ""
+    if (method === "GET") {
+      return fetch(url, {
+        method,
+        headers: {
+          "x-token": token,
+        },
+      });
+    } else {
+      return fetch(url, {
+        method,
+        headers: {
+          "x-token": token,
+        },
+        body: data,
+      });
+    }
+  } catch (error) {
+    console.log("entro al catch", error)
+  }
+}
+
 export const fetchTokenFile = (endpoint, data, method = "GET") => {
   try {
     const url = `${baseUrl}/${endpoint}`;

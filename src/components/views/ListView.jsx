@@ -113,7 +113,7 @@ function ListView({ multiLine }) {
     return (
       <div className='max-w-3xl bg-white rounded-md p-8 text-center mx-3 md:mx-auto shadow-lg mt-20'>
         <p>
-          No se encontraron tickets que coincidadn con los filtros aplicados,
+          No se encontraron tickets que coincidan con los filtros aplicados,
           por favor modifique su seleccion de{' '}
           <label className='font-bold text-yellow-500 uppercase'>filtros</label>{' '}
           para realizar una nueva busqueda.
@@ -146,7 +146,7 @@ function ListView({ multiLine }) {
                 <Th width='w-24' className='bg-gray-600'>
                   estado
                 </Th>
-                <Th width='w-20'>Acciones</Th>
+                {user.isAdmin ? <Th width='w-20'>Acciones</Th> : null}
                 {/* <Th width='w-20'>
                   prioridad
                   <span className='block text-gray-300 font-normal'>
@@ -213,16 +213,19 @@ function ListView({ multiLine }) {
                     >
                       {ticket.desc_estado}
                     </Td>
-                    <Td>
-                      <Button
-                        disabled={ticket.desc_estado !== 'En Fila'}
-                        className='bg-transparent hover:bg-blue-50 text-gray-700 hover:text-blue-500 rounded-md'
-                        type='icon'
-                        icon='fas fa-file-medical fa-lg'
-                        onClick={() => openModalAdd(ticket)}
-                      />
-                      {/* <i class="fas fa-file-export"></i> */}
-                    </Td>
+                    {user.isAdmin ?
+                      <Td>
+                        <Button
+                          disabled={ticket.desc_estado !== 'En Fila'}
+                          className='bg-transparent hover:bg-blue-50 text-gray-700 hover:text-blue-500 rounded-md'
+                          type='icon'
+                          icon='fas fa-file-medical fa-lg'
+                          onClick={() => openModalAdd(ticket)}
+                        />
+                        {/* <i class="fas fa-file-export"></i> */}
+                      </Td>
+                      : null
+                    }
                     {/* <Td>{ticket.prio_cl}</Td> */}
                   </tr>
                 ))}
@@ -287,7 +290,7 @@ function ListView({ multiLine }) {
         onClose={() => setAddModal(false)}
         className='max-w-3xl'
       >
-        <CreateActivityForm data={ticketData} />
+        <CreateActivityForm data={ticketData} onClose={() => setAddModal(false)} />
       </Modal>
     </>
   )

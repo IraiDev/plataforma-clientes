@@ -1,5 +1,7 @@
 import { useContext, useEffect, useState } from "react"
 import { Ticket } from "../../context/Ticket"
+import { Ui } from "../../context/Ui"
+import { Alert } from "../../helpers/alerts"
 import Button from "../ui/button/Button"
 import ComboBox from "../ui/ComboBox"
 import Input from "../ui/input/Input"
@@ -31,9 +33,10 @@ const formatArray = (array, hashValue, hashLabel) => {
 
 }
 
-const CreateActivityForm = ({ data }) => {
+const CreateActivityForm = ({ data, onClose }) => {
 
   const { filterList, createActivity } = useContext(Ticket)
+  const { toggleLoading } = useContext(Ui)
 
   const [values, setValues] = useState({
     titulo: '',
@@ -114,7 +117,9 @@ const CreateActivityForm = ({ data }) => {
 
   }
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
+
+    toggleLoading(true)
 
     let formData = new FormData()
 
@@ -126,12 +131,31 @@ const CreateActivityForm = ({ data }) => {
     formData.append('glosa', values.glosa)
     formData.append('id_proyecto', select.proyecto.value)
     formData.append('sub_proyecto', select.subproyecto.value)
-    formData.append('solicita', select.solicita.value)
-    formData.append('encargado', select.encargado.value)
+    formData.append('solicita', select.solicita.label)
+    formData.append('encargado', select.encargado.label)
     formData.append('revisor', select.revisor.value)
 
-    createActivity(formData)
+    const resp = await createActivity(formData)
+    toggleLoading(false)
+    onClose()
 
+    if (!resp) {
+      Alert({
+        icon: 'error',
+        title: 'Error',
+        content: 'Error al crear actividad de este ticket',
+        showCancelButton: false,
+      })
+      return
+    }
+
+    Alert({
+      title: 'Actividad creada',
+      content: 'Se ha creado la actividad con exito',
+      showCancelButton: false,
+      showConfirmButton: false,
+      timer: 2000
+    })
   }
 
   const validationLength = Object.keys(validation()).length

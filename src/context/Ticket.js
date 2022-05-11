@@ -1,7 +1,7 @@
 import { useContext, useState, createContext } from 'react'
 import { useLocation } from 'react-router-dom';
 import { Alert } from '../helpers/alerts'
-import { fetchToken, fetchTokenFile, fetchUnToken } from '../helpers/fetch'
+import { fetchToken, fetchTokenFile, fetchUnToken, fetchTokenFormData } from '../helpers/fetch'
 import { Ui } from './Ui'
 
 export const Ticket = createContext()
@@ -138,16 +138,6 @@ function TicketProvider({ children }) {
     setFilters({})
     localStorage.removeItem('ticketToken')
     window.console.clear()
-  }
-
-  const createActivity = async (data) => {
-
-    const resp = await fetchToken('ticket/create-activity-ticket', data, 'POST')
-    const body = await resp.json()
-
-    if (body.ok) return true
-    return false
-
   }
 
   const getFilters = async () => {
@@ -295,6 +285,21 @@ function TicketProvider({ children }) {
       toggleLoading(false)
       return false
     }
+  }
+
+  const createActivity = async (data) => {
+
+    const resp = await fetchTokenFormData('ticket/create-activity-ticket', data, 'POST')
+    const body = await resp.json()
+
+    toggleLoading(false)
+
+    if (body.ok) {
+      getTicketList()
+      return true
+    }
+    return false
+
   }
 
   // docs CRUD
