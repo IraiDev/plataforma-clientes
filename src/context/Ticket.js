@@ -140,6 +140,16 @@ function TicketProvider({ children }) {
     window.console.clear()
   }
 
+  const createActivity = async (data) => {
+
+    const resp = await fetchToken('ticket/create-activity-ticket', data, 'POST')
+    const body = await resp.json()
+
+    if (body.ok) return true
+    return false
+
+  }
+
   const getFilters = async () => {
     const resp = await fetchToken('ticket/get-filters')
     const body = await resp.json()
@@ -445,7 +455,8 @@ function TicketProvider({ children }) {
     insertMantainerUser,
     ticketDetail,
     getFilters, 
-    filterList
+    filterList,
+    createActivity
   }
 
   return (

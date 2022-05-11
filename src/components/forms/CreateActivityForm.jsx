@@ -33,7 +33,7 @@ const formatArray = (array, hashValue, hashLabel) => {
 
 const CreateActivityForm = ({ data }) => {
 
-  const { filterList } = useContext(Ticket)
+  const { filterList, createActivity } = useContext(Ticket)
 
   const [values, setValues] = useState({
     titulo: '',
@@ -111,6 +111,26 @@ const CreateActivityForm = ({ data }) => {
     }
 
     return errors
+
+  }
+
+  const handleCreate = () => {
+
+    let formData = new FormData()
+
+    formData.append('id_ticket', data.id_ticket)
+    formData.append('titulo', values.titulo)
+    formData.append('prioridad', values.prioridad)
+    formData.append('tiempo_estimado', values.tiempo_estimado)
+    formData.append('descripcion', values.desc)
+    formData.append('glosa', values.glosa)
+    formData.append('id_proyecto', select.proyecto.value)
+    formData.append('sub_proyecto', select.subproyecto.value)
+    formData.append('solicita', select.solicita.value)
+    formData.append('encargado', select.encargado.value)
+    formData.append('revisor', select.revisor.value)
+
+    createActivity(formData)
 
   }
 
@@ -259,7 +279,7 @@ const CreateActivityForm = ({ data }) => {
             isDisabled={Object.keys(validation()).length > 0}
             className='bg-transparent hover:bg-green-500 text-green-500 hover:text-white rounded-full border border-green-500'
             name='crear actividad'
-            onClick={validation}
+            onClick={handleCreate}
           />
 
         </footer>
