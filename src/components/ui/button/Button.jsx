@@ -10,11 +10,21 @@ function Button({
   type,
   disabled = false,
   iconFirst = false,
-  tooltip
+  tooltip,
+  isDisabled = false
 }) {
 
   if (disabled) {
     return null
+  }
+
+  if (isDisabled) {
+    return (
+      <button
+        className='focus:outline-none capitalize py-1.5 px-3.5 font-semibold text-tiny bg-gray-100 text-gray-400 rounded-full cursor-default'>
+        {name}
+      </button>
+    )
   }
 
   if (type === 'icon') {

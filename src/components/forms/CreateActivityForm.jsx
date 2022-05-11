@@ -65,10 +65,56 @@ const CreateActivityForm = ({ data }) => {
 
   const handleSelectChange = (option, target) => {
     setSelect({
-      ...values,
+      ...select,
       [target.name]: option
     })
   }
+
+  const validation = () => {
+
+    const errors = {}
+
+    if (!values.titulo) {
+      errors.titulo = 'título'
+    }
+
+    if (!values.prioridad) {
+      errors.prioridad = 'prioridad'
+    }
+
+    if (!values.tiempo_estimado) {
+      errors.tiempo_estimado = 'tiempo estimado'
+    }
+
+    if (!values.desc) {
+      errors.desc = 'descripción'
+    }
+
+    if (!select.proyecto.value) {
+      errors.proyecto = 'proyecto'
+    }
+
+    if (!select.solicita.value) {
+      errors.solicita = 'solicita'
+    }
+
+    if (!select.encargado.value) {
+      errors.encargado = 'encargado'
+    }
+
+    if (!select.revisor.value) {
+      errors.revisor = 'revisor'
+    }
+
+    if (select.revisor.value === select.encargado.value) {
+      errors.revisor = 'revisor y encargado deben ser distintos'
+    }
+
+    return errors
+
+  }
+
+  const validationLength = Object.keys(validation()).length
 
   useEffect(() => {
     setValues(prevState => ({
@@ -90,113 +136,136 @@ const CreateActivityForm = ({ data }) => {
   }, [data])
 
   return (
-    <div className='grid grid-cols-2 gap-4 mt-5'>
+    <div>
+      {validationLength > 0 &&
+        <div className="bg-red-100 bg-opacity-60 p-1.5 rounded-lg text-sm w-full text-red-700">
+          <p>ATENCION!: revise los siguientes campos</p>
+          <span className="flex">
+            {
+              Object.keys(validation()).map((key, index) => (
+                <p
+                  key={key}
+                  className='mr-1 text-red-500'
+                >
+                  {validation()[key]}
+                  {index === validationLength - 1 ? '' : ','}
+                </p>
+              ))
+            }
+          </span>
+        </div>
+      }
 
       <h1 className='text-lg font-semibold capitalize absolute top-7'>
         Asignar actividad a
-        <label className='bg-yellow-100 px-2 rounded-full ml-2 text-yellow-500'>ticket: 123</label>
+        <label className='bg-yellow-100 px-2 rounded-full ml-2 text-yellow-500'>ticket: {data.id_ticket}</label>
       </h1>
 
-      <section className='grid gap-3 mb-5'>
-        <ComboBox
-          label='proyecto'
-          name='proyecto'
-          value={select.proyecto}
-          onChange={handleSelectChange}
-          options={options.proyectos}
-        />
-        <ComboBox
-          label='sub proyecto'
-          name='subproyecto'
-          value={select.subproyecto}
-          onChange={handleSelectChange}
-          options={options.sub_proyectos}
-        />
-        <ComboBox
-          label='solicita'
-          name='solicita'
-          value={select.solicita}
-          onChange={handleSelectChange}
-          options={filterList?.user_zionit}
-        />
-        <ComboBox
-          label='encargado'
-          name='encargado'
-          value={select.encargado}
-          onChange={handleSelectChange}
-          options={filterList?.user_zionit}
-        />
-        <ComboBox
-          label='revisor'
-          name='revisor'
-          value={select.revisor}
-          onChange={handleSelectChange}
-          options={filterList?.user_zionit}
-        />
-      </section>
+      <div className='grid grid-cols-2 gap-4 mt-5'>
 
-      <section className='grid gap-3 content-start mb-5'>
-        <Input
-          field='Titulo'
-          name='titulo'
-          value={values.titulo}
-          onChange={handleInputChange}
-        />
-        <Input
-          field='prioridad'
-          name='prioridad'
-          value={values.prioridad}
-          onChange={handleInputChange}
-        />
-        <Input
-          field='tiempo estimado'
-          name='tiempo_estimado'
-          value={values.tiempo_estimado}
-          onChange={handleInputChange}
-        />
-      </section>
-
-      <TextArea
-        hiddeHelperText
-        rows={4}
-        field='Descripción'
-        name='desc'
-        value={values.desc}
-        onChange={handleInputChange}
-      />
-      <TextArea
-        hiddeHelperText
-        rows={4}
-        field='Glosa'
-        name='glosa'
-        value={values.glosa}
-        onChange={handleInputChange}
-      />
-
-      <footer className='col-span-2 flex justify-between mt-10'>
-
-        <label
-          className='capitalize text-center cursor-pointer bg-blue-100 hover:bg-blue-200 text-blue-500 transition duration-500 rounded-full py-1.5 px-3.5 font-semibold h-9 w-max'
-          htmlFor='inputFile2'
-        >
-          <input
-            // key={resetFile || ''}
-            className='hidden'
-            type='file'
-            id='inputFile2'
-          // onChange={onChangeFile}
+        <section className='grid gap-3 mb-5'>
+          <ComboBox
+            label='proyecto'
+            name='proyecto'
+            value={select.proyecto}
+            onChange={handleSelectChange}
+            options={options.proyectos}
           />
-          Seleccionar archivo
-        </label>
+          <ComboBox
+            label='sub proyecto'
+            name='subproyecto'
+            value={select.subproyecto}
+            onChange={handleSelectChange}
+            options={options.sub_proyectos}
+          />
+          <ComboBox
+            label='solicita'
+            name='solicita'
+            value={select.solicita}
+            onChange={handleSelectChange}
+            options={filterList?.user_zionit}
+          />
+          <ComboBox
+            label='encargado'
+            name='encargado'
+            value={select.encargado}
+            onChange={handleSelectChange}
+            options={filterList?.user_zionit}
+          />
+          <ComboBox
+            label='revisor'
+            name='revisor'
+            value={select.revisor}
+            onChange={handleSelectChange}
+            options={filterList?.user_zionit}
+          />
+        </section>
 
-        <Button
-          className='bg-transparent hover:bg-green-500 text-green-500 hover:text-white rounded-full border border-green-500'
-          name='crear actividad'
+        <section className='grid gap-3 content-start mb-5'>
+          <Input
+            field='Titulo'
+            name='titulo'
+            value={values.titulo}
+            onChange={handleInputChange}
+          />
+          <Input
+            field='prioridad'
+            name='prioridad'
+            value={values.prioridad}
+            onChange={handleInputChange}
+          />
+          <Input
+            field='tiempo estimado'
+            name='tiempo_estimado'
+            value={values.tiempo_estimado}
+            onChange={handleInputChange}
+          />
+        </section>
+
+        <TextArea
+          hiddeHelperText
+          rows={4}
+          field='Descripción'
+          name='desc'
+          value={values.desc}
+          onChange={handleInputChange}
+        />
+        <TextArea
+          hiddeHelperText
+          rows={4}
+          field='Glosa'
+          name='glosa'
+          value={values.glosa}
+          onChange={handleInputChange}
         />
 
-      </footer>
+        <footer className='col-span-2 flex justify-between mt-10'>
 
-    </div>
+          <label
+            className='capitalize text-center cursor-pointer bg-blue-100 hover:bg-blue-200 text-blue-500 transition duration-500 rounded-full py-1.5 px-3.5 font-semibold h-9 w-max'
+            htmlFor='inputFile2'
+          >
+            <input
+              // key={resetFile || ''}
+              className='hidden'
+              type='file'
+              id='inputFile2'
+            // onChange={onChangeFile}
+            />
+            Seleccionar archivo
+          </label>
+
+          <Button
+            isDisabled={Object.keys(validation()).length > 0}
+            className='bg-transparent hover:bg-green-500 text-green-500 hover:text-white rounded-full border border-green-500'
+            name='crear actividad'
+            onClick={validation}
+          />
+
+        </footer>
+
+      </div>
+    </div >
   )
 }
 
