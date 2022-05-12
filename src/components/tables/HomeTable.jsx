@@ -96,7 +96,7 @@ const HomeTable = ({ openModal, openForm, data, multiLine, idRow }) => {
 
         <THead>
 
-          <tr className='text-sm font-semibold text-center capitalize bg-gray-700'>
+          {/* <tr className='text-sm font-semibold text-center capitalize bg-gray-700'>
             <Th width='w-10'>
               <Button
                 className='rounded-lg bg-blue-500 hover:bg-blue-600 text-white'
@@ -208,7 +208,7 @@ const HomeTable = ({ openModal, openForm, data, multiLine, idRow }) => {
                   />
                 </Th>
                 : null}
-          </tr>
+          </tr> */}
 
           <tr className='text-sm font-semibold text-center capitalize text-white bg-gray-700'>
             <Th>#</Th>
