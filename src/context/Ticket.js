@@ -289,16 +289,23 @@ function TicketProvider({ children }) {
 
   const createActivity = async (data) => {
 
-    const resp = await fetchTokenFormData('ticket/create-activity-ticket', data, 'POST')
-    const body = await resp.json()
+    try {
+      const resp = await fetchTokenFormData('ticket/create-activity-ticket', data, 'POST')
+      const body = await resp.json()
 
-    toggleLoading(false)
-
-    if (body.ok) {
-      getTicketList()
-      return true
+      if (body.ok) {
+        getTicketList()
+        return true
+      }
+      else {
+        toggleLoading(false)
+        return false
+      }
+      
+    } catch (error) {
+      toggleLoading(false)
+      console.log(error)
     }
-    return false
 
   }
 

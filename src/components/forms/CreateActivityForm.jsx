@@ -35,8 +35,12 @@ const formatArray = (array, hashValue, hashLabel) => {
 
 const CreateActivityForm = ({ data, onClose }) => {
 
+  let randomString = Math.random().toString(36)
   const { filterList, createActivity } = useContext(Ticket)
   const { toggleLoading } = useContext(Ui)
+
+  const [file, setFile] = useState(null)
+  const [resetFile, setResetFile] = useState(randomString)
 
   const [values, setValues] = useState({
     titulo: '',
@@ -134,9 +138,9 @@ const CreateActivityForm = ({ data, onClose }) => {
     formData.append('solicita', select.solicita.label)
     formData.append('encargado', select.encargado.label)
     formData.append('revisor', select.revisor.value)
+    formData.append('archivo', file)
 
     const resp = await createActivity(formData)
-    toggleLoading(false)
     onClose()
 
     if (!resp) {
@@ -156,6 +160,23 @@ const CreateActivityForm = ({ data, onClose }) => {
       showConfirmButton: false,
       timer: 2000
     })
+  }
+
+  const handleFile = e => {
+    if (e.target.files[0].size < 5242881) {
+      setFile(e.target.files[0])
+    } else {
+      setFile(null)
+      setResetFile(randomString)
+      Alert({
+        icon: 'warn',
+        title: 'Atencion',
+        content:
+          'Archivo excede el peso permitido por el sistema, peso maximo 5MB',
+        showCancelButton: false,
+      })
+      return
+    }
   }
 
   const validationLength = Object.keys(validation()).length
@@ -283,21 +304,27 @@ const CreateActivityForm = ({ data, onClose }) => {
           onChange={handleInputChange}
         />
 
-        <footer className='col-span-2 flex justify-between mt-10'>
+        <footer className='col-span-2 flex justify-between items-end mt-10'>
 
-          <label
-            className='capitalize text-center cursor-pointer bg-blue-100 hover:bg-blue-200 text-blue-500 transition duration-500 rounded-full py-1.5 px-3.5 font-semibold h-9 w-max'
-            htmlFor='inputFile2'
-          >
-            <input
-              // key={resetFile || ''}
-              className='hidden'
-              type='file'
-              id='inputFile2'
-            // onChange={onChangeFile}
-            />
-            Seleccionar archivo
-          </label>
+          <div>
+            <label
+              className='capitalize text-center cursor-pointer bg-blue-100 hover:bg-blue-200 text-blue-500 transition duration-500 rounded-full py-1.5 px-3.5 font-semibold h-9 w-max'
+              htmlFor='inputFile2'
+            >
+              <input
+                key={resetFile || ''}
+                className='hidden'
+                type='file'
+                id='inputFile2'
+                onChange={handleFile}
+              />
+              Seleccionar archivo
+            </label>
+
+            <label className='text-xs flex mt-4 justify-center'>
+              {file ? file.name : 'No hay Archivo adjunto'}
+            </label>
+          </div>
 
           <Button
             isDisabled={Object.keys(validation()).length > 0}
