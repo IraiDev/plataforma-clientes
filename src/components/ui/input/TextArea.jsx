@@ -10,6 +10,7 @@ function TextArea({
   chartLimit = 1500,
   disabled = false,
   hiddeHelperText = false,
+  isFilter = false
 }) {
   return (
     <div className='grid gap-1'>
@@ -22,7 +23,12 @@ function TextArea({
         value={value}
         onChange={onChange}
         type={type}
-        className="scroll-row px-4 py-2 text-justify rounded-md bg-gray-100 focus:bg-white w-full resize-none transition duration-500 focus:ring-2 focus:shadow-lg"
+        className={`
+          scroll-row text-justify rounded-md bg-gray-100
+          focus:bg-white w-full resize-none transition duration-500 focus:ring-2
+          focus:shadow-lg
+          ${isFilter ? 'px-2 py-1' : 'px-4 py-2'}
+          `}
         placeholder={placeholder}></textarea>
       {!hiddeHelperText &&
         <label className={`ml-4 ${value?.length === chartLimit ? 'text-red-600' : 'text-gray-700'}`}>

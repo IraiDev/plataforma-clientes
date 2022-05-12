@@ -1,11 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react'
 import moment from 'moment'
 import { Ticket } from '../../context/Ticket'
-import Table from '../ui/table/Table'
-import THead from '../ui/table/THead'
-import TBody from '../ui/table/TBody'
-import Th from '../ui/table/Th'
-import Td from '../ui/table/Td'
 import Modal from '../ui/modal/Modal'
 import Form from '../ui/form/Form'
 import { Ui } from '../../context/Ui'
@@ -14,6 +9,7 @@ import Card from '../ui/card/Card'
 import Button from '../ui/button/Button'
 import { useWindowSize } from '../../hooks/useWindowSize'
 import CreateActivityForm from '../forms/CreateActivityForm'
+import HomeTable from '../tables/HomeTable'
 
 function ListView({ multiLine }) {
   const { ticketList, filters, user, getTicketDetails } = useContext(Ticket)
@@ -125,119 +121,20 @@ function ListView({ multiLine }) {
   return (
     <>
       {view ? (
-        <div className='px-2 lg:px-10 2xl:px-32 text-xs md:text-base'>
-          <Table width='w-table'>
-            <THead>
-              <tr className='text-sm font-semibold text-center capitalize text-white bg-gray-700'>
-                <Th width='w-10'>#</Th>
-                <Th width='w-14' className='bg-gray-600'>
-                  ID
-                </Th>
-                <Th width='w-36'>fecha</Th>
-                <Th width='w-36' className='bg-gray-600'>
-                  proyecto
-                  <span className='block text-gray-300'>(empresa)</span>
-                </Th>
-                <Th width='w-24'>solicita</Th>
-                <Th width='w-60' className='bg-gray-600'>
-                  titulo
-                </Th>
-                <Th width='w-128'>descripcion</Th>
-                <Th width='w-24' className='bg-gray-600'>
-                  estado
-                </Th>
-                {user.isAdmin ? <Th width='w-20'>Acciones</Th> : null}
-                {/* <Th width='w-20'>
-                  prioridad
-                  <span className='block text-gray-300 font-normal'>
-                    (cliente)
-                  </span>
-                </Th> */}
-              </tr>
-            </THead>
-            <TBody>
-              {ticketList.length > 0 &&
-                ticketList.map((ticket, i) => (
-                  <tr
-                    onDoubleClick={() => handleOpenFormModal(ticket.id_ticket)}
-                    key={ticket.id_ticket}
-                    className={`
-                  text-gray-700 text-sm border-b w-max
-                  hover:bg-blue-100 transition duration-300 cursor-pointer
-                  ${i % 2 === 0 ? 'bg-gray-100' : 'bg-white'}
-                  ${idRow === ticket.id_ticket && 'bg-purple-100'}
-                  ${!multiLine && 'align-text-top'}
-                  `}
-                  >
-                    <Td>
-                      <span className='px-2 py-1 font-semibold leading-tight text-green-700 bg-green-100 rounded-md'>
-                        {i + 1}
-                      </span>
-                    </Td>
-                    <Td className='font-semibold text-black'>
-                      {ticket.id_ticket}
-                    </Td>
-                    <Td>
-                      {moment(ticket.fecha_hora_tx).format('DD/MM/YYYY')}
-                      <span className='block text-gray-400'>
-                        {moment(ticket.fecha_hora_tx).format('HH:MM')}
-                      </span>
-                    </Td>
-                    <Td>
-                      {ticket.proyecto}
-                      <span className='block text-gray-400'>
-                        ({ticket.empresa})
-                      </span>
-                    </Td>
-                    <Td className='uppercase'>{ticket.user_ticket}</Td>
-                    <Td
-                      className='font-semibold text-black'
-                      isMultiLine={multiLine}
-                      width='max-w-title'
-                      align='text-left'
-                    >
-                      {ticket.titulo_ticket}
-                    </Td>
-                    <Td
-                      width='max-w-desc'
-                      isMultiLine={multiLine}
-                      align='text-left'
-                    >
-                      {ticket.desc_requerimiento}
-                    </Td>
-                    <Td
-                      className={`
-                    font-semibold ${ticket.tiene_pendientes ? 'text-red-600' : 'text-gray-700'
-                        }
-                    `}
-                    >
-                      {ticket.desc_estado}
-                    </Td>
-                    {user.isAdmin ?
-                      <Td>
-                        <Button
-                          disabled={ticket.desc_estado !== 'En Fila'}
-                          className='bg-transparent hover:bg-blue-50 text-gray-700 hover:text-blue-500 rounded-md'
-                          type='icon'
-                          icon='fas fa-file-medical fa-lg'
-                          onClick={() => openModalAdd(ticket)}
-                        />
-                        {/* <i class="fas fa-file-export"></i> */}
-                      </Td>
-                      : null
-                    }
-                    {/* <Td>{ticket.prio_cl}</Td> */}
-                  </tr>
-                ))}
-            </TBody>
-          </Table>
-        </div>
+        <HomeTable
+          data={ticketList}
+          openModal={data => openModalAdd(data)}
+          openForm={id => handleOpenFormModal(id)}
+          multiLine={multiLine}
+          idRow={idRow}
+        />
       ) : (
         <div className='grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 container mx-auto gap-3 px-2 pt-4 pb-14'>
           {ticketList.length > 0 &&
             ticketList.map((ticket, i) => (
               <Card
                 onClick={() => handleOpenFormModal(ticket.id_ticket)}
+                onCreateActivity={() => openModalAdd(ticket)}
                 key={ticket.id_ticket}
                 numerator={i}
                 title={ticket.titulo_ticket}

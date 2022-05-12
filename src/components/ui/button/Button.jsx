@@ -11,7 +11,8 @@ function Button({
   disabled = false,
   iconFirst = false,
   tooltip,
-  isDisabled = false
+  isDisabled = false,
+  size = 'h-8 w-8'
 }) {
 
   if (disabled) {
@@ -32,7 +33,7 @@ function Button({
       <button
         title={tooltip}
         onClick={onClick}
-        className={`focus:outline-none transition duration-500 h-8 w-8 text-tiny ${className} ${shadow && 'shadow-md'}`}>
+        className={`focus:outline-none transition duration-500 ${size} text-tiny ${className} ${shadow && 'shadow-md'}`}>
         <i className={icon}></i>
       </button>
     )

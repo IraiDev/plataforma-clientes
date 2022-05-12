@@ -12,7 +12,8 @@ function Input({
   disabled = false,
   tooltip,
   isNumber = false,
-  hidden = false
+  hidden = false,
+  isFilter = false
 }
 ) {
 
@@ -30,9 +31,13 @@ function Input({
         disabled={disabled}
         type={type}
         className={`
-          px-4 py-2 rounded-md focus:bg-white transition duration-500
+          rounded-md transition duration-500
           focus:ring-2 focus:shadow-lg ${width}
-          ${disabled ? 'bg-gray-50 text-gray-400' : 'bg-gray-100'}
+          ${isFilter ? 'px-2 py-1' : 'px-4 py-2'}
+          ${isFilter ?
+            'bg-gray-800 bg-opacity-40 text-white focus:bg-opacity-30' :
+            disabled ? 'bg-gray-50 text-gray-400' : 'bg-gray-100 focus:bg-white'
+          }
           `}
         placeholder={placeholder}
         onKeyPress={e => {
