@@ -36,7 +36,7 @@ const formatArray = (array, hashValue, hashLabel) => {
 const CreateActivityForm = ({ data, onClose }) => {
 
   let randomString = Math.random().toString(36)
-  const { filterList, createActivity } = useContext(Ticket)
+  const { optionsList, createActivity } = useContext(Ticket)
   const { toggleLoading } = useContext(Ui)
 
   const [file, setFile] = useState(null)
@@ -248,21 +248,21 @@ const CreateActivityForm = ({ data, onClose }) => {
             name='solicita'
             value={select.solicita}
             onChange={handleSelectChange}
-            options={filterList?.user_zionit}
+            options={optionsList?.user_zionit}
           />
           <ComboBox
             label='encargado'
             name='encargado'
             value={select.encargado}
             onChange={handleSelectChange}
-            options={filterList?.user_zionit}
+            options={optionsList?.user_zionit}
           />
           <ComboBox
             label='revisor'
             name='revisor'
             value={select.revisor}
             onChange={handleSelectChange}
-            options={filterList?.user_zionit}
+            options={optionsList?.user_zionit}
           />
         </section>
 

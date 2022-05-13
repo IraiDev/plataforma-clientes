@@ -16,6 +16,19 @@ import { Alert } from '../../../helpers/alerts'
 import NavMenu from '../navmenu/NavMenu'
 const notAllow = ['exe', 'js']
 
+const formatArray = (array, hashValue, hashLabel) => {
+
+  const format = array.map(item => {
+    return {
+      label: item[hashLabel],
+      value: item[hashValue]
+    }
+  })
+
+  return format
+
+}
+
 function NavBar({
   onMultiLine,
   isMultiLine,
@@ -30,19 +43,13 @@ function NavBar({
     updateUser,
     createTicket,
     getQuestion,
-    saveFilters,
-    getTicketList,
-    getProjects,
-    getUsers,
-    getStates,
     logout,
     user,
-    filters,
+    getProjects,
   } = useContext(Ticket)
   const { toggleLoading, toggleNavMenu } = useContext(Ui)
   const [values, setValues] = useState({ email: '', phone: '', pin: '' })
   const [modalTicket, setModalTicket] = useState(showModalTicket)
-  const [modalFilter, setModalFilter] = useState(false)
   const [modalUser, setModalUser] = useState(false)
   const [option, setOption] = useState(null)
   const [file, setFile] = useState(null)
@@ -52,8 +59,6 @@ function NavBar({
   // checkboxes
   const [check, setCheck] = useState(false)
   const [projects, setProjects] = useState([])
-  const [users, setUsers] = useState([])
-  const [states, setStates] = useState([])
   // checkboxes
 
   // custom hooks
@@ -67,93 +72,93 @@ function NavBar({
 
   // object destructuring
   const { email, phone, pin } = values
-  const { emisores, proyectos, estados, tooltip, name } = filters
+  // const { emisores, proyectos, estados, tooltip, name } = filters
 
   // object destructuring
 
-  const getFilters = async () => {
-    let newPr = [],
-      newUs = [],
-      newSt = []
-    const data = { rut_usuario: user.rut, proyectos: [] }
-    const pr = await getProjects()
-    const us = await getUsers(data)
-    const st = await getStates(data)
+  // const getFilters = async () => {
+  //   let newPr = [],
+  //     newUs = [],
+  //     newSt = []
+  //   const data = { rut_usuario: user.rut, proyectos: [] }
+  //   const pr = await getProjects()
+  //   const us = await getUsers(data)
+  //   const st = await getStates(data)
 
-    const tempE = emisores ? emisores : []
-    const tempS = estados ? estados : []
-    const tempP = proyectos ? proyectos : []
+  //   const tempE = emisores ? emisores : []
+  //   const tempS = estados ? estados : []
+  //   const tempP = proyectos ? proyectos : []
 
-    pr.forEach(item => {
-      const temp = tempP.filter(t => t === item.id_proyecto)
-      newPr.push({
-        value: item.id_proyecto,
-        label: item.desc_proyecto,
-        select: temp.length > 0,
-      })
-    })
-    setProjects(newPr)
+  //   pr.forEach(item => {
+  //     const temp = tempP.filter(t => t === item.id_proyecto)
+  //     newPr.push({
+  //       value: item.id_proyecto,
+  //       label: item.desc_proyecto,
+  //       select: temp.length > 0,
+  //     })
+  //   })
+  //   setProjects(newPr)
 
-    us.forEach(item => {
-      const temp = tempE.filter(t => t === item.rut)
-      newUs.push({
-        value: item.rut,
-        label: item.nombre,
-        select: temp.length > 0,
-      })
-    })
-    setUsers(newUs)
+  //   us.forEach(item => {
+  //     const temp = tempE.filter(t => t === item.rut)
+  //     newUs.push({
+  //       value: item.rut,
+  //       label: item.nombre,
+  //       select: temp.length > 0,
+  //     })
+  //   })
+  //   setUsers(newUs)
 
-    st.forEach(item => {
-      const temp = tempS.filter(t => t === item.id)
-      newSt.push({ value: item.id, label: item.est, select: temp.length > 0 })
-    })
-    setStates(newSt)
+  //   st.forEach(item => {
+  //     const temp = tempS.filter(t => t === item.id)
+  //     newSt.push({ value: item.id, label: item.est, select: temp.length > 0 })
+  //   })
+  //   setStates(newSt)
 
-    // const tempPr = pr.map(item => ({ value: item.id_proyecto, label: item.desc_proyecto, select: false }))
-    // const tempUs = us.map(item => ({ value: item.rut, label: item.nombre, select: false }))
-    // const tempSt = st.map(item => ({ value: item.id, label: item.est, select: false }))
+  //   // const tempPr = pr.map(item => ({ value: item.id_proyecto, label: item.desc_proyecto, select: false }))
+  //   // const tempUs = us.map(item => ({ value: item.rut, label: item.nombre, select: false }))
+  //   // const tempSt = st.map(item => ({ value: item.id, label: item.est, select: false }))
 
-    // setProjects(tempPr)
-    // setUsers(tempUs)
-    // setStates(tempSt)
-  }
+  //   // setProjects(tempPr)
+  //   // setUsers(tempUs)
+  //   // setStates(tempSt)
+  // }
 
-  const getFilterSelection = arr => {
-    let tooltip = '',
-      name = ''
+  // const getFilterSelection = arr => {
+  //   let tooltip = '',
+  //     name = ''
 
-    const filter = arr.filter(item => item.select)
+  //   const filter = arr.filter(item => item.select)
 
-    const cut = filter.slice(0, 3)
+  //   const cut = filter.slice(0, 3)
 
-    const id = filter.map(item => item.value)
+  //   const id = filter.map(item => item.value)
 
-    filter.forEach((item, i) => {
-      if (i < filter.length - 1) {
-        tooltip = tooltip + item.label + ', '
-      } else {
-        tooltip = tooltip + item.label + '.'
-      }
-    })
+  //   filter.forEach((item, i) => {
+  //     if (i < filter.length - 1) {
+  //       tooltip = tooltip + item.label + ', '
+  //     } else {
+  //       tooltip = tooltip + item.label + '.'
+  //     }
+  //   })
 
-    cut.forEach((item, i) => {
-      if (i < cut.length - 1) {
-        name = name + item.label + ', '
-      } else {
-        name =
-          cut.length === 3 ? name + item.label + '...' : name + item.label + '.'
-      }
-    })
-    name =
-      arr.length === filter.length
-        ? 'Todos.'
-        : filter.length === 0
-          ? '????'
-          : name
+  //   cut.forEach((item, i) => {
+  //     if (i < cut.length - 1) {
+  //       name = name + item.label + ', '
+  //     } else {
+  //       name =
+  //         cut.length === 3 ? name + item.label + '...' : name + item.label + '.'
+  //     }
+  //   })
+  //   name =
+  //     arr.length === filter.length
+  //       ? 'Todos.'
+  //       : filter.length === 0
+  //         ? '????'
+  //         : name
 
-    return { filter, id, name, tooltip }
-  }
+  //   return { filter, id, name, tooltip }
+  // }
 
   const onChangeFile = e => {
     if (e.target.files[0].size < 5242881) {
@@ -298,41 +303,41 @@ function NavBar({
     })
   }
 
-  const handleFilter = () => {
-    const pr = getFilterSelection(projects)
-    const us = getFilterSelection(users)
-    const st = getFilterSelection(states)
+  // const handleFilter = () => {
+  //   const pr = getFilterSelection(projects)
+  //   const us = getFilterSelection(users)
+  //   const st = getFilterSelection(states)
 
-    if (pr.id.length > 0 && us.id.length > 0 && st.id.length > 0)
-      toggleLoading(true)
+  //   if (pr.id.length > 0 && us.id.length > 0 && st.id.length > 0)
+  //     toggleLoading(true)
 
-    const data = {
-      rut_usuario: user.rut,
-      proyectos: pr.id,
-      emisores: us.id,
-      estados: st.id,
-      tooltip: { pr: pr.tooltip, us: us.tooltip, st: st.tooltip },
-      name: { pr: pr.name, us: us.name, st: st.name },
-    }
+  //   const data = {
+  //     rut_usuario: user.rut,
+  //     proyectos: pr.id,
+  //     emisores: us.id,
+  //     estados: st.id,
+  //     tooltip: { pr: pr.tooltip, us: us.tooltip, st: st.tooltip },
+  //     name: { pr: pr.name, us: us.name, st: st.name },
+  //   }
 
-    saveFilters(data)
-    getTicketList(data)
-    setModalFilter(false)
-  }
+  //   saveFilters(data)
+  //   getTicketList(data)
+  //   setModalFilter(false)
+  // }
 
-  const handleCancelFilter = () => {
-    let newPr = []
+  // const handleCancelFilter = () => {
+  //   let newPr = []
 
-    setModalFilter(false)
+  //   setModalFilter(false)
 
-    const tempP = proyectos ? proyectos : []
+  //   const tempP = proyectos ? proyectos : []
 
-    projects.forEach(item => {
-      const temp = tempP.filter(t => t === item.value)
-      newPr.push({ ...item, select: temp.length > 0 })
-    })
-    setProjects(newPr)
-  }
+  //   projects.forEach(item => {
+  //     const temp = tempP.filter(t => t === item.value)
+  //     newPr.push({ ...item, select: temp.length > 0 })
+  //   })
+  //   setProjects(newPr)
+  // }
 
   const handleUpdateUser = async () => {
     let data
@@ -486,53 +491,58 @@ function NavBar({
     })
   }
 
-  useEffect(() => {
-    const loadUsersFilter = async () => {
-      let p = [],
-        newUs = [],
-        newSt = []
-      p = projects.filter(item => item.select === true)
-      p = p.map(item => item.value)
+  // useEffect(() => {
+  //   const loadUsersFilter = async () => {
+  //     let p = [],
+  //       newUs = [],
+  //       newSt = []
+  //     p = projects.filter(item => item.select === true)
+  //     p = p.map(item => item.value)
 
-      if (p.length > 0) {
-        setStates([])
-        setUsers([])
-        const data = { rut_usuario: user.rut, proyectos: p }
-        const st = await getStates(data)
-        const us = await getUsers(data)
-        const tempE = emisores ? emisores : []
-        const tempS = estados ? estados : []
+  //     if (p.length > 0) {
+  //       setStates([])
+  //       setUsers([])
+  //       const data = { rut_usuario: user.rut, proyectos: p }
+  //       const st = await getStates(data)
+  //       const us = await getUsers(data)
+  //       const tempE = emisores ? emisores : []
+  //       const tempS = estados ? estados : []
 
-        us.forEach(item => {
-          const temp = tempE.filter(t => t === item.rut)
-          newUs.push({
-            value: item.rut,
-            label: item.nombre,
-            select: temp.length > 0,
-          })
-        })
-        setUsers(newUs)
+  //       us.forEach(item => {
+  //         const temp = tempE.filter(t => t === item.rut)
+  //         newUs.push({
+  //           value: item.rut,
+  //           label: item.nombre,
+  //           select: temp.length > 0,
+  //         })
+  //       })
+  //       setUsers(newUs)
 
-        st.forEach(item => {
-          const temp = tempS.filter(t => t === item.id)
-          newSt.push({
-            value: item.id,
-            label: item.est,
-            select: temp.length > 0,
-          })
-        })
-        setStates(newSt)
-      }
-    }
-    loadUsersFilter()
+  //       st.forEach(item => {
+  //         const temp = tempS.filter(t => t === item.id)
+  //         newSt.push({
+  //           value: item.id,
+  //           label: item.est,
+  //           select: temp.length > 0,
+  //         })
+  //       })
+  //       setStates(newSt)
+  //     }
+  //   }
+  //   loadUsersFilter()
 
-    // eslint-disable-next-line
-  }, [projects])
+  //   // eslint-disable-next-line
+  // }, [projects])
 
-  useEffect(() => {
-    getFilters()
-    // eslint-disable-next-line
-  }, [])
+  // useEffect(() => {
+  //   getFilters()
+  //   // eslint-disable-next-line
+  // }, [])
+
+  const get = async () => {
+    const resp = await getProjects()
+    setProjects(formatArray(resp, 'id_proyecto', 'desc_proyecto'))
+  }
 
   useEffect(() => {
     if (option !== null) {
@@ -547,6 +557,12 @@ function NavBar({
     // eslint-disable-next-line
   }, [option])
 
+  useEffect(() => {
+
+    get()
+
+  }, [])
+
   return (
     <>
       <nav className='sticky top-0 h-20 z-40 bg-white shadow-lg grid pl-3 pr-5 lg:px-5'>
@@ -556,7 +572,7 @@ function NavBar({
             type='icon'
             onClick={() => toggleNavMenu()}
           />
-          {!isMantainerRoute && (
+          {/* {!isMantainerRoute && (
             <div
               className={`max-w-xs text-xs uppercase font-light ${hiddenOption && 'hidden'
                 }`}
@@ -577,7 +593,7 @@ function NavBar({
                 toolptipValue={tooltip?.st}
               />
             </div>
-          )}
+          )} */}
           <Button
             className={`rounded-full hover:bg-blue-100 text-blue-500 ${!showGoTo && 'hidden'
               }`}
@@ -636,7 +652,7 @@ function NavBar({
                   name='multilinea'
                   onClick={onMultiLine}
                 />
-                <Button
+                {/* <Button
                   className={`border border-yellow-500 text-yellow-500 hover:text-white hover:bg-yellow-500 rounded-full ${hiddenOption && 'hidden'
                     }`}
                   type='iconText'
@@ -644,7 +660,7 @@ function NavBar({
                   shadow
                   name='filtros'
                   onClick={() => setModalFilter(true)}
-                />
+                /> */}
                 <Button
                   className={`bg-green-500 hover:bg-green-400 text-white rounded-full ${hiddenOption && 'hidden'
                     }`}
@@ -655,7 +671,7 @@ function NavBar({
               </>
             )}
           </div>
-          <div className='flex items-center'>
+          {/* <div className='flex items-center'>
             {!isMantainerRoute && (
               <div
                 className={`mr-2 max-w-xs text-xs uppercase font-light ${hiddenOption && 'hidden'
@@ -706,7 +722,7 @@ function NavBar({
               icon='fas fa-sign-out-alt'
               onClick={handleLogout}
             />
-          </div>
+          </div> */}
         </section>
       </nav>
 
@@ -753,7 +769,7 @@ function NavBar({
                 toggleNavMenu()
               }}
             />
-            <Button
+            {/* <Button
               className={`border border-yellow-500 text-yellow-500 hover:text-white hover:bg-yellow-500 rounded-full ${hiddenOption && 'hidden'
                 }`}
               type='iconText'
@@ -765,7 +781,7 @@ function NavBar({
                 setModalFilter(true)
                 toggleNavMenu()
               }}
-            />
+            /> */}
             <Button
               className={`bg-green-500 hover:bg-green-400 text-white rounded-full ${hiddenOption && 'hidden'
                 }`}
@@ -987,7 +1003,7 @@ function NavBar({
       </Modal>
 
       {/* modal filtros */}
-      <Modal
+      {/* <Modal
         showModal={modalFilter}
         isBlur={false}
         onClose={() => setModalFilter(false)}
@@ -1172,7 +1188,7 @@ function NavBar({
             onClick={() => handleFilter()}
           />
         </div>
-      </Modal>
+      </Modal> */}
     </>
   )
 }

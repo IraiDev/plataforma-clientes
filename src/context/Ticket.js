@@ -16,12 +16,12 @@ function TicketProvider({ children }) {
   const initiUser = token ? { ok: true, rut, isAdmin: is_admin } : { ok: false }
 
   const { pathname } = useLocation()
-  const { toggleLoading } = useContext(Ui)
+  const { toggleLoading, handleRefreshTickets } = useContext(Ui)
   const [user, setUser] = useState(initiUser)
   const [ticketList, setTicketList] = useState([])
   const [ticketDetail, setTicketDetail] = useState({})
-  const [filters, setFilters] = useState({})
-  const [filterList, setFilterList] = useState({})
+  // const [filters, setFilters] = useState({})
+  const [optionsList, setOptionsList] = useState({})
 
   const login = async (data) => {
 
@@ -135,7 +135,7 @@ function TicketProvider({ children }) {
   const logout = () => {
     setUser({ ok: false })
     setTicketList([])
-    setFilters({})
+    // setFilters({})
     localStorage.removeItem('ticketToken')
     window.console.clear()
   }
@@ -147,7 +147,7 @@ function TicketProvider({ children }) {
     const { ok, usuarios } = body
 
     if (ok) {
-      setFilterList({
+      setOptionsList({
         user_zionit: usuarios.map(u => ({
           value: u.id_user,
           label: u.abrev_user
@@ -201,23 +201,29 @@ function TicketProvider({ children }) {
     console.log('fallo la peticion (getQuestion): ', body)
   }
 
-  const getTicketList = async (params = null) => {
+  const getTicketList = async (filters) => {
 
-    if (params === null) params = filters
-    if (Object.keys(params).length === 0) return toggleLoading(false)
-    if (params.emisores.length < 1 || params.estados.length < 1 || params.proyectos.length < 1) setTicketList([])
-    if (params.emisores.length < 1) return
-    if (params.estados.length < 1) return
-    if (params.proyectos.length < 1) return
+    // if (params === null) params = filters
+    // if (Object.keys(params).length === 0) return toggleLoading(false)
+    // if (params.emisores.length < 1 || params.estados.length < 1 || params.proyectos.length < 1) setTicketList([])
+    // if (params.emisores.length < 1) return
+    // if (params.estados.length < 1) return
+    // if (params.proyectos.length < 1) return
 
-    const resp = await fetchToken('ticket/get-tickets', params, 'POST')
+    const resp = await fetchToken('ticket/get-tickets', filters, 'POST')
     const body = await resp.json()
-    const { ok, resp: res } = body
+    const { ok, resp: res, total_ticket } = body
 
     toggleLoading(false)
 
-    if (ok) setTicketList(res)
-    else { console.log('fallo la peticion (getTicketList): ', body) }
+    if (ok) {
+      return {res, total_ticket}
+      // setTicketList(res)
+    }
+    else {
+      console.log('fallo la peticion (getTicketList): ', body)
+      return {res: [], total_ticket}
+    }
   }
 
   const getTicketDetails = async (id) => {
@@ -243,7 +249,7 @@ function TicketProvider({ children }) {
     const { ok } = body
 
     if (ok) {
-      getTicketList()
+      handleRefreshTickets()
       return true
     }
     else {
@@ -294,7 +300,7 @@ function TicketProvider({ children }) {
       const body = await resp.json()
 
       if (body.ok) {
-        getTicketList()
+        handleRefreshTickets()
         return true
       }
       else {
@@ -304,6 +310,26 @@ function TicketProvider({ children }) {
       
     } catch (error) {
       toggleLoading(false)
+      console.log(error)
+    }
+
+  }
+
+  const deleteTicket = async (id) => {
+    try {
+      const resp = await fetchToken(`ticket/delete-ticket`, {id_ticket: id}, 'DELETE')
+      const body = await resp.json()
+
+      if(body.ok) {
+        handleRefreshTickets()
+        return true
+      }
+      else {
+        console.log('fallo la consulta (deleteTicket)', body)
+        toggleLoading(false)
+        return false
+      }
+    } catch (error) {
       console.log(error)
     }
 
@@ -422,23 +448,23 @@ function TicketProvider({ children }) {
     else return body
   }
 
-  const saveFilters = ({
-    rut_usuario = user.rut,
-    emisores = [],
-    proyectos = [],
-    estados = [],
-    tooltip,
-    name
-  }) => {
-    setFilters({
-      rut_usuario,
-      emisores,
-      proyectos,
-      estados,
-      tooltip,
-      name
-    })
-  }
+  // const saveFilters = ({
+  //   rut_usuario = user.rut,
+  //   emisores = [],
+  //   proyectos = [],
+  //   estados = [],
+  //   tooltip,
+  //   name
+  // }) => {
+  //   setFilters({
+  //     rut_usuario,
+  //     emisores,
+  //     proyectos,
+  //     estados,
+  //     tooltip,
+  //     name
+  //   })
+  // }
 
   const value = {
     login,
@@ -458,17 +484,18 @@ function TicketProvider({ children }) {
     updateUser,
     updatePriority,
     createTicket,
-    saveFilters,
+    // saveFilters,
     createEvent,
     user,
     ticketList,
-    filters,
+    // filters,
     updataMantainerUser,
     insertMantainerUser,
     ticketDetail,
     getFilters, 
-    filterList,
-    createActivity
+    optionsList,
+    createActivity,
+    deleteTicket
   }
 
   return (

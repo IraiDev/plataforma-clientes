@@ -24,7 +24,7 @@ const Option = (props) => {
   )
 }
 
-const ComboBox = ({ label, options = [], value, name, onChange, placeholder = 'seleccione...', isMulti = false }) => {
+const ComboBox = ({ label, options = [], value, name, onChange, placeholder = 'seleccione...', isMulti = false, placement = 'auto', isNormalOptions = false }) => {
 
   const listOptions = [{ label: 'Ninguno', value: '' }, ...options]
 
@@ -38,12 +38,13 @@ const ComboBox = ({ label, options = [], value, name, onChange, placeholder = 's
         value={value}
         name={name}
         onChange={onChange}
-        options={isMulti ? options : listOptions}
+        options={isMulti ? options : isNormalOptions ? options : listOptions}
         menuPortalTarget={document.getElementById('select-root')}
         maxMenuHeight={200}
         isMulti={isMulti}
         isClearable={false}
         components={isMulti ? { Option } : null}
+        menuPlacement={placement}
         styles={{
           menuPortal: base => ({ ...base, zIndex: 99999999 }),
           control: (base) => ({
@@ -52,6 +53,7 @@ const ComboBox = ({ label, options = [], value, name, onChange, placeholder = 's
             padding: '0px 12px 0px 0px',
             position: 'relative',
             borderRadius: '5px',
+            minWidth: '90px',
           }),
           input: base => ({
             ...base,

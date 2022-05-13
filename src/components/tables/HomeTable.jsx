@@ -10,6 +10,9 @@ import Button from '../ui/button/Button'
 import Input from '../ui/input/Input'
 import ComboBox from '../ui/ComboBox'
 import { useForm } from '../../hooks/useForm'
+import { Alert } from '../../helpers/alerts'
+import { Ui } from '../../context/Ui'
+import { Pagination } from '@mui/material'
 
 const formatArray = (array, hashValue, hashLabel) => {
 
@@ -24,9 +27,15 @@ const formatArray = (array, hashValue, hashLabel) => {
 
 }
 
-const HomeTable = ({ openModal, openForm, data, multiLine, idRow }) => {
+const HomeTable = ({ openModal, openForm, multiLine, idRow }) => {
 
-  const { user, getProjects, getUsers, getStates } = useContext(Ticket)
+  const { user, getProjects, getUsers, getStates, deleteTicket, getTicketList } = useContext(Ticket)
+  const { toggleLoading, refreshTickets } = useContext(Ui)
+
+  const [tickets, setTickets] = useState([])
+  const [page, setPage] = useState(1)
+  const [offset, setOffset] = useState(0)
+  const [total, setTotal] = useState(0)
 
   const [{ id, titulo, desc }, handleChange, reset] = useForm({
     id: '',
@@ -38,6 +47,7 @@ const HomeTable = ({ openModal, openForm, data, multiLine, idRow }) => {
     proyectos: [],
     solita: [],
     estados: [],
+    limite: { label: '10', value: 10 },
   })
 
   const [options, setOptions] = useState({
@@ -45,6 +55,32 @@ const HomeTable = ({ openModal, openForm, data, multiLine, idRow }) => {
     solita: [],
     estados: [],
   })
+
+  const getData = async (reset = false) => {
+
+    toggleLoading(true)
+
+    const filters = {
+      id_ticket: !reset ? id : '',
+      emisores: ['T'],
+      estados: ['T'],
+      proyectos: ['T'],
+      proyectos_tabla: !reset ? select.proyectos.map(item => item.value) : [],
+      estados_tabla: !reset ? select.estados.map(item => item.value) : [],
+      solicita_tabla: !reset ? select.solita.map(item => item.value) : [],
+      titulo: !reset ? titulo : '',
+      descripcion: !reset ? desc : '',
+      orden_id_ticket: '',
+      orden_fecha: '',
+      offset: !reset ? offset : 0,
+      limit: !reset ? select.limite.value : 10,
+    }
+
+    const data = await getTicketList({ rut_usuario: user.rut, ...filters })
+    toggleLoading(false)
+    setTickets(data.res)
+    setTotal(data.total_ticket)
+  }
 
   const formatFilters = async () => {
 
@@ -74,19 +110,49 @@ const HomeTable = ({ openModal, openForm, data, multiLine, idRow }) => {
   const handleReset = () => {
     reset()
     setSelect({
-      proyectos: { label: 'Ninguno', value: '' },
-      solita: { label: 'Ninguno', value: '' },
-      estados: { label: 'Ninguno', value: '' },
+      proyectos: [],
+      solita: [],
+      estados: [],
+      limite: { label: '10', value: 10 },
     })
+    getData(true)
   }
 
   const handleFilter = () => {
-    console.log('filtros', select, id, titulo, desc)
+    setPage(1)
+    setOffset(0)
+    getData()
+  }
+
+  const handleDelete = (id) => {
+
+    Alert({
+      icon: 'warn',
+      title: 'Eliminar',
+      content: `¿Está seguro de eliminar el ticket: <b>${id}</b>?`,
+      confirmText: 'Si, Eliminar',
+      cancelText: 'No, Cancelar',
+      action: () => {
+        deleteTicket(id)
+        toggleLoading(true)
+      }
+    })
+
+  }
+
+  const handleChangePage = (e, value) => {
+    setOffset(((value - 1) * select.limite.value) % total)
+    setPage(value)
   }
 
   useEffect(() => {
     formatFilters()
   }, [select.proyectos])
+
+  useEffect(() => {
+    getData()
+    // eslint-disable-next-line
+  }, [page, select.limite, total, refreshTickets])
 
 
   return (
@@ -96,7 +162,7 @@ const HomeTable = ({ openModal, openForm, data, multiLine, idRow }) => {
 
         <THead>
 
-          {/* <tr className='text-sm font-semibold text-center capitalize bg-gray-700'>
+          <tr className='text-sm font-semibold text-center capitalize bg-gray-700'>
             <Th width='w-10'>
               <Button
                 className='rounded-lg bg-blue-500 hover:bg-blue-600 text-white'
@@ -208,7 +274,7 @@ const HomeTable = ({ openModal, openForm, data, multiLine, idRow }) => {
                   />
                 </Th>
                 : null}
-          </tr> */}
+          </tr>
 
           <tr className='text-sm font-semibold text-center capitalize text-white bg-gray-700'>
             <Th>#</Th>
@@ -234,8 +300,8 @@ const HomeTable = ({ openModal, openForm, data, multiLine, idRow }) => {
         </THead>
 
         <TBody>
-          {data.length > 0 &&
-            data.map((ticket, i) => (
+          {tickets.length > 0 &&
+            tickets.map((ticket, i) => (
               <tr
                 onDoubleClick={() => openForm(ticket.id_ticket)}
                 key={ticket.id_ticket}
@@ -295,12 +361,21 @@ const HomeTable = ({ openModal, openForm, data, multiLine, idRow }) => {
                   <Td>
                     <Button
                       disabled={ticket.desc_estado !== 'En Fila'}
-                      className='bg-transparent hover:bg-blue-50 text-gray-700 hover:text-blue-500 rounded-md'
+                      className='hover:bg-blue-50 text-gray-700 hover:text-blue-500 rounded-md'
                       type='icon'
-                      icon='fas fa-file-medical fa-lg'
+                      icon='fas fa-file-medical'
                       onClick={() => openModal(ticket)}
                     />
+
+                    <Button
+                      disabled={ticket.desc_estado !== 'En Fila'}
+                      className='hover:bg-blue-50 text-red-500 hover:text-red-600 rounded-md'
+                      type='icon'
+                      icon='fas fa-trash'
+                      onClick={() => handleDelete(ticket.id_ticket)}
+                    />
                   </Td>
+
                   : null
                 }
                 {/* <Td>{ticket.prio_cl}</Td> */}
@@ -309,6 +384,36 @@ const HomeTable = ({ openModal, openForm, data, multiLine, idRow }) => {
         </TBody>
 
       </Table>
+
+      <footer className='fixed left-0 w-full bottom-0 h-12 bg-white shadow border-t flex justify-center items-center px-5'>
+
+        <div className='flex gap-5 items-center'>
+          <Pagination
+            // siblingCount={size.width < 480 ? 0 : 1}
+            // boundaryCount={size.width < 480 ? 0 : 1}
+            size='small'
+            count={Math.ceil(Number(total) / Number(select.limite.value))}
+            color='primary'
+            onChange={handleChangePage}
+            page={page}
+          />
+
+          <ComboBox
+            isNormalOptions
+            name='limite'
+            value={select.limite}
+            onChange={handleChangeSelect}
+            options={[
+              { value: 10, label: '10' },
+              { value: 25, label: '25' },
+              { value: 50, label: '50' },
+              { value: total, label: 'Todos' },
+            ]}
+          />
+
+        </div>
+
+      </footer>
 
     </div>
   )

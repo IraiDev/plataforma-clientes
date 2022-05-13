@@ -6,16 +6,23 @@ function UiProvider({ children }) {
 
   const [loading, toggleLoading] = useState(false)
   const [showMenu, setMenu] = useState(null)
+  const [refreshTickets, setRefreshTickets] = useState(null)
 
   const toggleNavMenu = () => {
     setMenu(!showMenu)
   }
 
+  const handleRefreshTickets = () => {
+    setRefreshTickets(Math.random())
+  }
+
   const value = {
     toggleLoading,
     toggleNavMenu,
+    handleRefreshTickets,
     showMenu,
-    loading
+    loading,
+    refreshTickets
   }
 
   return (
