@@ -229,18 +229,15 @@ const HomeTable = ({ openModal, openForm, multiLine, idRow }) => {
                 isMulti
               />
             </Th>
-            {
-              user.isAdmin ?
-                <Th width='w-28'>
-                  <Button
-                    className='rounded-full bg-blue-500 hover:bg-blue-600 text-white'
-                    type='iconText'
-                    name='filtrar'
-                    icon='fas fa-filter'
-                    onClick={handleFilter}
-                  />
-                </Th>
-                : null}
+            <Th width='w-28'>
+              <Button
+                className='rounded-full bg-blue-500 hover:bg-blue-600 text-white'
+                type='iconText'
+                name='filtrar'
+                icon='fas fa-filter'
+                onClick={handleFilter}
+              />
+            </Th>
           </tr>
 
           <tr className='text-sm font-semibold text-center capitalize text-white bg-gray-700'>
@@ -291,7 +288,7 @@ const HomeTable = ({ openModal, openForm, multiLine, idRow }) => {
             <Th className='bg-gray-600'> titulo </Th>
             <Th>descripcion</Th>
             <Th className='bg-gray-600'> estado </Th>
-            {user.isAdmin ? <Th>Acciones</Th> : null}
+            <Th>Acciones</Th>
             {/* <Th width='w-20'>
                   prioridad
                   <span className='block text-gray-300 font-normal'>
@@ -379,7 +376,7 @@ const HomeTable = ({ openModal, openForm, multiLine, idRow }) => {
                     />
                   </Td>
 
-                  : null
+                  : <Td></Td>
                 }
                 {/* <Td>{ticket.prio_cl}</Td> */}
               </tr>
