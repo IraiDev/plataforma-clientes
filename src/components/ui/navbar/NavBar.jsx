@@ -671,8 +671,8 @@ function NavBar({
               </>
             )}
           </div>
-          {/* <div className='flex items-center'>
-            {!isMantainerRoute && (
+          <div className='flex items-center'>
+            {/* {!isMantainerRoute && (
               <div
                 className={`mr-2 max-w-xs text-xs uppercase font-light ${hiddenOption && 'hidden'
                   }`}
@@ -693,7 +693,7 @@ function NavBar({
                   toolptipValue={tooltip?.st}
                 />
               </div>
-            )}
+            )} */}
             <Button
               className={`rounded-full hover:bg-blue-100 text-blue-500 ${!showGoTo && 'hidden'
                 }`}
@@ -716,13 +716,13 @@ function NavBar({
               />
             )}
             <Button
-              tooltip='Cerrar sesion'
-              className='text-red-400 hover:text-red-600 hover:bg-red-100 rounded-lg'
-              type='icon'
+              className='text-red-400 hover:text-red-600 hover:bg-red-100 rounded-full'
+              type='iconText'
               icon='fas fa-sign-out-alt'
+              name='Cerrar sesion'
               onClick={handleLogout}
             />
-          </div> */}
+          </div>
         </section>
       </nav>
 

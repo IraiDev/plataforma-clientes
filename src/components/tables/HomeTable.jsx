@@ -172,49 +172,16 @@ const HomeTable = ({ openModal, openForm, multiLine, idRow }) => {
               />
             </Th>
             <Th width='w-28' className='bg-gray-600'>
-              <div className='flex justify-between items-center'>
-                <Button
-                  className='hover:bg-gray-800 text-white rounded-full flex justify-center items-center'
-                  type='icon'
-                  icon='fas fa-chevron-up fa-xs'
-                  size='h-6 w-6'
-                />
-
-                <Input
-                  isFilter
-                  placeholder=''
-                  width='w-16'
-                  name='id'
-                  value={id}
-                  onChange={handleChange}
-                />
-
-                <Button
-                  className='hover:bg-gray-800 text-white rounded-full flex justify-center items-center'
-                  type='icon'
-                  icon='fas fa-chevron-down fa-xs'
-                  size='h-6 w-6'
-                />
-              </div>
+              <Input
+                isFilter
+                placeholder=''
+                name='id'
+                value={id}
+                onChange={handleChange}
+              />
             </Th>
-            <Th width='w-20'>
-              <div className='flex justify-between items-center'>
-                <Button
-                  className='hover:bg-gray-800 text-white rounded-full flex justify-center items-center'
-                  type='icon'
-                  icon='fas fa-chevron-up fa-xs'
-                  size='h-6 w-6'
-                />
-
-                <Button
-                  className='hover:bg-gray-800 text-white rounded-full flex justify-center items-center'
-                  type='icon'
-                  icon='fas fa-chevron-down fa-xs'
-                  size='h-6 w-6'
-                />
-              </div>
-            </Th>
-            <Th width='w-36' className='bg-gray-600'>
+            <Th width='w-24'></Th>
+            <Th width='w-40' className='bg-gray-600'>
               <ComboBox
                 placeholder=''
                 onChange={handleChangeSelect}
@@ -278,11 +245,47 @@ const HomeTable = ({ openModal, openForm, multiLine, idRow }) => {
 
           <tr className='text-sm font-semibold text-center capitalize text-white bg-gray-700'>
             <Th>#</Th>
-            <Th className='bg-gray-600'> ID </Th>
-            <Th>fecha</Th>
             <Th className='bg-gray-600'>
-              proyecto
-              <span className='block text-gray-300'>(empresa)</span>
+              <div className='flex justify-between items-center'>
+                <Button
+                  className='hover:bg-gray-800 text-white rounded-full flex justify-center items-center'
+                  type='icon'
+                  icon='fas fa-chevron-up fa-xs'
+                  size='h-6 w-6'
+                />
+                ID
+                <Button
+                  className='hover:bg-gray-800 text-white rounded-full flex justify-center items-center'
+                  type='icon'
+                  icon='fas fa-chevron-down fa-xs'
+                  size='h-6 w-6'
+                />
+              </div>
+            </Th>
+            <Th>
+              <div className='flex justify-between items-center'>
+                <Button
+                  className='hover:bg-gray-800 text-white rounded-full flex justify-center items-center'
+                  type='icon'
+                  icon='fas fa-chevron-up fa-xs'
+                  size='h-6 w-6'
+                />
+
+                Fecha
+
+                <Button
+                  className='hover:bg-gray-800 text-white rounded-full flex justify-center items-center'
+                  type='icon'
+                  icon='fas fa-chevron-down fa-xs'
+                  size='h-6 w-6'
+                />
+              </div>
+            </Th>
+            <Th className='bg-gray-600'>
+              <div className='flex justify-center gap-2 items-center'>
+                proyecto
+                <span className='block text-gray-300'>(empresa)</span>
+              </div>
             </Th>
             <Th>solicita</Th>
             <Th className='bg-gray-600'> titulo </Th>
