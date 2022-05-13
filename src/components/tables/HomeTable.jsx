@@ -59,6 +59,17 @@ const HomeTable = ({ openModal, openForm, multiLine, idRow }) => {
 
   const getData = async (reset = false) => {
 
+    const optionsFilter = (array) => {
+
+      if (array.some(item => item.value === 'TODOS')) {
+        return []
+      }
+
+      const resp = !reset ? array.map(item => item.value) : []
+
+      return resp
+    }
+
     toggleLoading(true)
 
     const filters = {
@@ -66,9 +77,9 @@ const HomeTable = ({ openModal, openForm, multiLine, idRow }) => {
       emisores: ['T'],
       estados: ['T'],
       proyectos: ['T'],
-      proyectos_tabla: !reset ? select.proyectos.map(item => item.value) : [],
-      estados_tabla: !reset ? select.estados.map(item => item.value) : [],
-      solicita_tabla: !reset ? select.solita.map(item => item.value) : [],
+      proyectos_tabla: optionsFilter(select.proyectos),
+      estados_tabla: optionsFilter(select.estados),
+      solicita_tabla: optionsFilter(select.solita),
       titulo: !reset ? titulo : '',
       descripcion: !reset ? desc : '',
       orden_id_ticket: !reset ? order.name === 'id' ? order.value : '' : '',
@@ -193,7 +204,7 @@ const HomeTable = ({ openModal, openForm, multiLine, idRow }) => {
                 onChange={handleChangeSelect}
                 value={select.proyectos}
                 name='proyectos'
-                options={options.proyectos}
+                options={[{ label: 'TODOS', value: 'TODOS' }, ...options.proyectos]}
                 isMulti
               />
             </Th>
@@ -203,7 +214,7 @@ const HomeTable = ({ openModal, openForm, multiLine, idRow }) => {
                 onChange={handleChangeSelect}
                 value={select.solita}
                 name='solita'
-                options={options.solita}
+                options={[{ label: 'TODOS', value: 'TODOS' }, ...options.solita]}
                 isMulti
               />
             </Th>
@@ -231,7 +242,7 @@ const HomeTable = ({ openModal, openForm, multiLine, idRow }) => {
                 onChange={handleChangeSelect}
                 value={select.estados}
                 name='estados'
-                options={options.estados}
+                options={[{ label: 'TODOS', value: 'TODOS' }, ...options.estados]}
                 isMulti
               />
             </Th>
