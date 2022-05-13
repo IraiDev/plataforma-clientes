@@ -36,6 +36,7 @@ const HomeTable = ({ openModal, openForm, multiLine, idRow }) => {
   const [page, setPage] = useState(1)
   const [offset, setOffset] = useState(0)
   const [total, setTotal] = useState(0)
+  const [order, setOrder] = useState({ name: '', value: '' })
 
   const [{ id, titulo, desc }, handleChange, reset] = useForm({
     id: '',
@@ -70,8 +71,8 @@ const HomeTable = ({ openModal, openForm, multiLine, idRow }) => {
       solicita_tabla: !reset ? select.solita.map(item => item.value) : [],
       titulo: !reset ? titulo : '',
       descripcion: !reset ? desc : '',
-      orden_id_ticket: '',
-      orden_fecha: '',
+      orden_id_ticket: !reset ? order.name === 'id' ? order.value : '' : '',
+      orden_fecha: !reset ? order.name === 'fecha' ? order.value : '' : '',
       offset: !reset ? offset : 0,
       limit: !reset ? select.limite.value : 10,
     }
@@ -145,6 +146,10 @@ const HomeTable = ({ openModal, openForm, multiLine, idRow }) => {
     setPage(value)
   }
 
+  const handleOrder = (name, param) => {
+    setOrder({ name, value: param })
+  }
+
   useEffect(() => {
     formatFilters()
   }, [select.proyectos])
@@ -152,7 +157,7 @@ const HomeTable = ({ openModal, openForm, multiLine, idRow }) => {
   useEffect(() => {
     getData()
     // eslint-disable-next-line
-  }, [page, select.limite, total, refreshTickets])
+  }, [page, select.limite, total, refreshTickets, order])
 
 
   return (
@@ -245,36 +250,52 @@ const HomeTable = ({ openModal, openForm, multiLine, idRow }) => {
             <Th className='bg-gray-600'>
               <div className='flex justify-between items-center'>
                 <Button
-                  className='hover:bg-gray-800 text-white rounded-full flex justify-center items-center'
+                  className={`hover:bg-gray-800 rounded-full 
+                    flex justify-center items-center
+                    ${order.name === 'id' && order.value === 'asc' ? 'text-red-500' : 'text-white'}
+                    `}
                   type='icon'
                   icon='fas fa-chevron-up fa-xs'
                   size='h-6 w-6'
+                  onClick={() => handleOrder('id', 'asc')}
                 />
                 ID
                 <Button
-                  className='hover:bg-gray-800 text-white rounded-full flex justify-center items-center'
+                  className={`hover:bg-gray-800 rounded-full 
+                    flex justify-center items-center
+                    ${order.name === 'id' && order.value === 'desc' ? 'text-red-500' : 'text-white'}
+                    `}
                   type='icon'
                   icon='fas fa-chevron-down fa-xs'
                   size='h-6 w-6'
+                  onClick={() => handleOrder('id', 'desc')}
                 />
               </div>
             </Th>
             <Th>
               <div className='flex justify-between items-center'>
                 <Button
-                  className='hover:bg-gray-800 text-white rounded-full flex justify-center items-center'
+                  className={`hover:bg-gray-800 rounded-full 
+                    flex justify-center items-center
+                    ${order.name === 'fecha' && order.value === 'asc' ? 'text-red-500' : 'text-white'}
+                    `}
                   type='icon'
                   icon='fas fa-chevron-up fa-xs'
                   size='h-6 w-6'
+                  onClick={() => handleOrder('fecha', 'asc')}
                 />
 
                 Fecha
 
                 <Button
-                  className='hover:bg-gray-800 text-white rounded-full flex justify-center items-center'
+                  className={`hover:bg-gray-800 rounded-full 
+                    flex justify-center items-center
+                    ${order.name === 'fecha' && order.value === 'desc' ? 'text-red-500' : 'text-white'}
+                    `}
                   type='icon'
                   icon='fas fa-chevron-down fa-xs'
                   size='h-6 w-6'
+                  onClick={() => handleOrder('fecha', 'desc')}
                 />
               </div>
             </Th>
