@@ -116,6 +116,7 @@ const HomeTable = ({ openModal, openForm, multiLine, idRow }) => {
       estados: [],
       limite: { label: '10', value: 10 },
     })
+    setOrder({ name: '', value: '' })
     getData(true)
   }
 
