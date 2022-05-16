@@ -4,8 +4,7 @@ import { Ui } from '../../../context/Ui'
 import { Alert } from '../../../helpers/alerts'
 import Button from '../button/Button'
 
-const urlRA = 'http://www.zcloud.cl/registro_avance/'
-const urlTicket = 'http://www.zcloud.cl/'
+const URL = 'https://registroavance.zcloud.cl/'
 
 function LiDocs(props) {
   const { children, type, route, idActivity, isPublic, from, id, onClick, idTicket } = props
@@ -89,7 +88,7 @@ function LiDocs(props) {
           onChange={onChangeFile} />
         <a className="hover:text-blue-500 font-semibold text-gray-600 transition duration-300"
           rel="noreferrer"
-          href={`${idActivity !== null ? urlRA : urlTicket}${route}`}
+          href={`${URL}${route}`}
           target="_blank">
           {children}
         </a>
