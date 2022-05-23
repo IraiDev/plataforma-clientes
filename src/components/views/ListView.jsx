@@ -21,17 +21,38 @@ function ListView({ multiLine }) {
     toggleLoading(true)
     const resp = await getTicketDetails(id)
     const { ok, data } = resp
-    if (ok) {
-      setDetailData(data)
-      setModalForm(true)
-    } else {
+
+    if (!ok) {
       Alert({
         icon: 'error',
         title: 'Error',
         content: 'No se pudo obtener los datos del ticket',
         showCancelButton: false,
       })
+      return
     }
+
+    if (data.estado === 3 || data.estado === 8) {
+      Alert({
+        title: 'Atencion!',
+        content: `
+        El estado del ticket: ${data.ticket} <b>(${data.desc_detalle})</b> es <b>PARA REVISIÓN</b>,
+        en este estado no puede generar nuevos eventos, ya que el ticket ha sido aceptado como
+        solucionado y esta en su tramite final. <br> ¿Desea abrir igualmente el ticket?`,
+        confirmText: 'Abrir ticket',
+        cancelText: 'Cancelar y volver',
+        action: () => {
+          setDetailData(data)
+          setModalForm(true)
+        },
+        cancelAction: () => {
+          toggleLoading(false)
+        }
+      })
+      return
+    }
+    setDetailData(data)
+    setModalForm(true)
   }
 
   const openModalAdd = data => {

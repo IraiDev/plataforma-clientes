@@ -213,19 +213,6 @@ function Form({ onClick, data, from = 'EX' }) {
     } else onClick()
   }
 
-  if (estado === 3) {
-    Alert({
-      icon: 'warn',
-      title: 'Atencion',
-      content: `El ticket: <strong>${ticket}, ${nombre_actividad}</strong>
-       se encuentra en estado <strong>PARA REVISION (P.R)</strong>, 
-       no es posible generar mas eventos sobre este tickets`,
-      cancelText: 'volver',
-      confirmText: 'Aceptar',
-      cancelAction: handleCancel,
-    })
-  }
-
   useEffect(() => {
     let temp = [{ value: '', label: 'ninguno' }]
     historial.forEach(hist => {
@@ -415,53 +402,50 @@ function Form({ onClick, data, from = 'EX' }) {
           </ul>
         </div>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-          {estado !== 3 ? (
-            <>
-              <Button
-                disabled={estado === 3}
-                tooltip='Puedes guardar el archivo seleccionado presionando este boton'
-                className='bg-yellow-500 hover:bg-yellow-400 text-white rounded-full w-full'
-                shadow
-                name='guardar pendiente'
-                onClick={() => handleNewEvent('P')}
-              />
-              <Button
-                disabled={estado === 3}
-                tooltip='Puedes guardar el archivo seleccionado presionando este boton'
-                className='bg-green-500 hover:bg-green-400 text-white rounded-full w-full'
-                shadow
-                name='guardar OK'
-                onClick={() => handleNewEvent('OK')}
-              />
+          <Button
+            disabled={estado === 3 || estado === 8}
+            tooltip='Puedes guardar el archivo seleccionado presionando este boton'
+            className='bg-yellow-500 hover:bg-yellow-400 text-white rounded-full w-full'
+            shadow
+            name='guardar pendiente'
+            onClick={() => handleNewEvent('P')}
+          />
+          <Button
+            disabled={estado === 3 || estado === 8}
+            tooltip='Puedes guardar el archivo seleccionado presionando este boton'
+            className='bg-green-500 hover:bg-green-400 text-white rounded-full w-full'
+            shadow
+            name='guardar OK'
+            onClick={() => handleNewEvent('OK')}
+          />
 
-              <label
+          {estado !== 3 && estado !== 8 ?
+            <label
+              disabled={id_actividad === '' && documentos.length === 1}
+              title={
+                id_actividad === '' && documentos.length === 1
+                  ? 'No puedes subir mas de un archivo si no tienes asignada una actividad'
+                  : ''
+              }
+              className={
+                id_actividad === '' && documentos.length === 1
+                  ? 'bg-blue-300 cursor-not-allowed text-white rounded-full w-full text-center py-1.5 px-3.5 font-semibold'
+                  : 'capitalize text-center cursor-pointer bg-blue-500 hover:bg-blue-400 text-white transition duration-500 rounded-full py-1.5 px-3.5 font-semibold shadow-md w-full'
+              }
+              htmlFor='inputFile'
+            >
+              <input
+                key={resetFile || ''}
                 disabled={id_actividad === '' && documentos.length === 1}
-                title={
-                  id_actividad === '' && documentos.length === 1
-                    ? 'No puedes subir mas de un archivo si no tienes asignada una actividad'
-                    : ''
-                }
-                className={
-                  id_actividad === '' && documentos.length === 1
-                    ? 'bg-blue-300 cursor-not-allowed text-white rounded-full w-full text-center py-1.5 px-3.5 font-semibold'
-                    : 'capitalize text-center cursor-pointer bg-blue-500 hover:bg-blue-400 text-white transition duration-500 rounded-full py-1.5 px-3.5 font-semibold shadow-md w-full'
-                }
-                htmlFor='inputFile'
-              >
-                <input
-                  key={resetFile || ''}
-                  disabled={id_actividad === '' && documentos.length === 1}
-                  className='hidden'
-                  type='file'
-                  id='inputFile'
-                  onChange={onChangeFile}
-                />
-                Seleccionar archivo
-              </label>
-            </>
-          ) : (
-            <span />
-          )}
+                className='hidden'
+                type='file'
+                id='inputFile'
+                onChange={onChangeFile}
+              />
+              Seleccionar archivo
+            </label>
+            : <span />
+          }
 
           <Button
             className={`text-red-500 border border-red-400 hover:bg-red-400 w-full
