@@ -77,6 +77,30 @@ const CreateActivityForm = ({ data, onClose }) => {
     })
   }
 
+  const handleSelectProyect = (option, target) => {
+
+    const filterSubProy = data?.sub_proyectos.filter(item => item.id_proyecto === option.value)
+
+    if (option.value === '') {
+      setOptions({
+        ...options,
+        sub_proyectos: formatArray(data?.sub_proyectos, 'id_sub_proyecto', 'nombre_sub_proy'),
+      })
+    }
+    else {
+      setOptions({
+        ...options,
+        sub_proyectos: formatArray(filterSubProy, 'id_sub_proyecto', 'nombre_sub_proy'),
+      })
+    }
+
+    setSelect({
+      ...select,
+      [target.name]: option,
+      subproyecto: { label: 'Ninguno', value: '' }
+    })
+  }
+
   const validation = () => {
 
     const errors = {}
@@ -233,7 +257,7 @@ const CreateActivityForm = ({ data, onClose }) => {
             label='proyecto'
             name='proyecto'
             value={select.proyecto}
-            onChange={handleSelectChange}
+            onChange={handleSelectProyect}
             options={options.proyectos}
           />
           <ComboBox
